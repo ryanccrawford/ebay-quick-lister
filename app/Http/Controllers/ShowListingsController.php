@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Listing;
+require_once("ebayconfig.php");
+
 use Illuminate\Http\Request;
-use \DTS\eBaySDK\Constants;
-use \DTS\eBaySDK\Trading\Types;
-use \DTS\eBaySDK\Trading\Enums;
-use \Hkonnet\LaravelEbay\EbayServices;
 use Illuminate\Pagination\LengthAwarePaginator;
+use \DTS\eBaySDK\Inventory\Services;
+use \DTS\eBaySDK\Inventory\Types;
+use \DTS\eBaySDK\Inventory\Enums;
+
+
 
 class ShowListingsController extends Controller
 {
-
+    public $configuation;
+    public $provider;
+    public $inventoryService;
     /**
      * Create a new controller instance.
      *
@@ -21,6 +25,18 @@ class ShowListingsController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        if(!isset($this->configuation)){
+            $this->configuation = getConfiguation();
+        }
+        if(!isset($this->inventoryService)) {
+            
+            $this->inventoryService = new Services\InventoryService(
+                [
+                        'authorization' => $this->configuation['production']['oauthUserToken']
+                ]
+                );
+        }
+
     }
 
     /**
@@ -62,45 +78,7 @@ class ShowListingsController extends Controller
      */
     public function show()
     {
-        
-        
-        $ebay_service = new EbayServices();
-        $service = $ebay_service->createTrading();
-
-        $request = new Types\GetMyeBaySellingRequestType();
-
-        $request->RequesterCredentials = new Types\CustomSecurityHeaderType();
-        $authToken = Ebay::getAuthToken();
-        $request->RequesterCredentials->eBayAuthToken = $authToken;
-
-        $request->ActiveList = new Types\ItemListCustomizationType();
-        $request->ActiveList->Include = true;
-        $request->ActiveList->Pagination = new Types\PaginationType();
-        $request->ActiveList->Pagination->EntriesPerPage = 10;
-        $request->ActiveList->Pagination->PageNumber = 1; 
-        $request->ActiveList->Sort = Enums\ItemSortTypeCodeType::C_CURRENT_PRICE_DESCENDING;
-        /**
-         * Send the request.
-         */
-            $response = $service->getMyeBaySelling($request);
-          
-            
-            if (isset($response->Errors)) {
-                
-                $errors = $response->Errors;
-                return view('ebay.listings.listings', compact('errors'));
-                
-            }
-            if ($response->Ack !== 'Failure' && isset($response->ActiveList)) {
-                $totalPages = $response->ActiveList->PaginationResult->TotalNumberOfPages;
-                $pn = $response->ActiveList->PaginationResult->PageNumber;
-                $listings = $response->ActiveList;
-
-                return view('ebay.listings.listings', compact('listings','totalPages','pn'));
-            }
-           
-
-      
+              
     }
 
     /**
@@ -136,4 +114,8 @@ class ShowListingsController extends Controller
     {
         //
     }
+
+    
 }
+
+
