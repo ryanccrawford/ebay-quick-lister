@@ -54,7 +54,14 @@ class ShowListingsController extends Controller
         if ($request->session()->has('token')) {
             $this->token = session('token');
 
-            echo session('username');
+            $service = new \DTS\eBaySDK\Inventory\Services\InventoryService(
+                [
+                    'authorization' => $this->token
+                ]
+            );
+            $request = new \DTS\eBaySDK\Inventory\Types\GetInventoryItemsRestRequest();
+            $response = $service->getInventoryItems($request);
+            echo print_r($response, true);
         }
 
         if ($this->token == '') {
@@ -157,7 +164,7 @@ class ShowListingsController extends Controller
                 $this->token = $response->access_token;
                 session(['token' => $this->token]);
                 //$affected = DB::update('update users set ebay_token = "' . $this->token . '" where name = ?', ['John']);
-                echo $this->token;
+
             }
         }
     }
