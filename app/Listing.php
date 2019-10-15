@@ -2,6 +2,7 @@
 
 namespace App;
 
+use DTS\eBaySDK\Inventory\Types\InventoryItem;
 use Illuminate\Database\Eloquent\Model;
 
 class Listing extends Model
@@ -13,6 +14,6 @@ class Listing extends Model
 
     public function constuctor()
     {
-            //
+        //
     }
 }

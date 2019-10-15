@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-require_once("ebayconfig.php");
+
 
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use \DTS\eBaySDK\Inventory\Services;
-use \DTS\eBaySDK\Inventory\Types;
-use \DTS\eBaySDK\Inventory\Enums;
-
+use \DTS\eBaySDK\Inventory;
+use \DTS\eBaySDK\OAuth;
+use DTS\eBaySDK\Credentials\Credentialsl;
+use App\User;
 
 
 class ShowListingsController extends Controller
@@ -17,6 +17,10 @@ class ShowListingsController extends Controller
     public $configuation;
     public $provider;
     public $inventoryService;
+    public $OAuthService;
+    public $credentials;
+    public $token = '';
+    public $code = '';
     /**
      * Create a new controller instance.
      *
@@ -25,18 +29,19 @@ class ShowListingsController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        if(!isset($this->configuation)){
-            $this->configuation = getConfiguation();
-        }
-        if(!isset($this->inventoryService)) {
-            
-            $this->inventoryService = new Services\InventoryService(
-                [
-                        'authorization' => $this->configuation['production']['oauthUserToken']
-                ]
-                );
-        }
 
+        $this->credentials = [
+            'appId' => getenv('EBAY_PROD_APP_ID'),
+            'certId' => getenv('EBAY_PROD_CERT_ID'),
+            'devId' => getenv('EBAY_PROD_DEV_ID'),
+        ];
+
+        $this->OAuthService = new \DTS\eBaySDK\OAuth\Services\OAuthService(
+            [
+                'credentials' => $this->credentials,
+                'ruName' => getenv('EBAY_PROD_RUNAME'),
+            ]
+        );
     }
 
     /**
@@ -44,9 +49,27 @@ class ShowListingsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-  
+        if ($request->session()->has('token')) {
+            $this->token = session('token');
+
+            echo session('username');
+        }
+
+        if ($this->token == '') {
+            $url =  $this->OAuthService->redirectUrlForUser(
+                [
+                    'state' => 'bar',
+                    'scope' => [
+                        'https://api.ebay.com/oauth/api_scope',
+                        'https://api.ebay.com/oauth/api_scope/sell.inventory',
+                        'https://api.ebay.com/oauth/api_scope/sell.fulfillment'
+                    ]
+                ]
+            );
+            return redirect()->away($url);
+        }
     }
 
     /**
@@ -66,9 +89,7 @@ class ShowListingsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-      
-    }
+    { }
 
     /**
      * Display the specified resource.
@@ -77,9 +98,7 @@ class ShowListingsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show()
-    {
-              
-    }
+    { }
 
     /**
      * Show the form for editing the specified resource.
@@ -115,7 +134,53 @@ class ShowListingsController extends Controller
         //
     }
 
-    
+    public function oauth(Request $request)
+    {
+
+        $this->code = $request->query('code');
+        if (strlen($this->code)) {
+
+            $response = $this->OAuthService->getUserToken(
+                new \DTS\eBaySDK\OAuth\Types\GetUserTokenRestRequest(
+                    [
+                        'code' => $this->code,
+                    ]
+                )
+            );
+            if ($response->getStatusCode() !== 200) {
+                printf(
+                    "%s: %s\n\n",
+                    $response->error,
+                    $response->error_description
+                );
+            } else {
+                $this->token = $response->access_token;
+                session(['token' => $this->token]);
+                //$affected = DB::update('update users set ebay_token = "' . $this->token . '" where name = ?', ['John']);
+                echo $this->token;
+            }
+        }
+    }
+
+    public static function env()
+    {
+        // This function IS the credentials provider.
+        return function () {
+            // Use credentials from environment variables, if available
+            $appId = getenv(self::EBAY_PROD_APP_ID);
+            $certId = getenv(self::EBAY_PROD_CERT_ID);
+            $devId = getenv(self::EBAY_PROD_DEV_ID);
+
+            if ($appId && $certId && $devId) {
+                return new Credentials($appId, $certId, $devId);
+            } else {
+                return new \InvalidArgumentException(
+                    'Could not find environment variable '
+                        . 'credentials in ' . self::EBAY_PROD_APP_ID . '/'
+                        . self::EBAY_PROD_CERT_ID . '/'
+                        . self::EBAY_PROD_DEV_ID
+                );
+            }
+        };
+    }
 }
-
-
