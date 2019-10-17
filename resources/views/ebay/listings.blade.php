@@ -12,7 +12,11 @@
             <div class="panel">
                 <div class="panel-header">Seller Listings</div>
                 <div class="panel-body">
-                    @inclued('listings.show')
+                <div class="container">
+                    @foreach ($inventoryItems as $inventoryItem)
+                        <p>{{ $inventoryItem->sku }}</p>
+                    @endforeach
+                </div>
                 </div>
             </div>
         </div>

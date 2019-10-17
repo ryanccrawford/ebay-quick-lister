@@ -27,6 +27,12 @@
                             @endif
                         @else
                             <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('oauth/clear') }}">{{ __('Clear eBay Token') }}</a>
+                            </li>
+                            <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('create') }}">{{ __('Create') }}</a>
+                            </li>
+                            <li class="nav-item">
                                     <a class="nav-link" href="{{ route('listings') }}">{{ __('Listings') }}</a>
                             </li>
                             <li class="nav-item dropdown">
