@@ -27,4 +27,4 @@ Route::get('listings', 'EbayInventoryController@index')->name('listings');
 Route::get('create', 'EbayInventoryController@create')->name('create');
 Route::get('oauth', 'EbayInventoryController@oauth')->name('oauth');
 Route::get('oauth/clear', 'EbayInventoryController@oauth')->name('oauth/clear');
-Route::post('image-upload', 'ImageUploadController@imagepost')->name('image.upload.post');
+Route::post('image-upload', 'ImageUploadController@imagepost')->name('imageupload');

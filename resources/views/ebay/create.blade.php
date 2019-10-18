@@ -105,12 +105,12 @@
                 <div class="card mb-3">
                     <div class="card-body">
                         <h4 class="card-title">Image Uploader</h4>
-                        <form data-action="{{ route('image.upload.post') }}" method="POST" enctype="multipart/form-data" id="upload-image-form">
+                        <form data-action="{{ route('imageupload') }}" method="POST" enctype="multipart/form-data" id="upload-image-form">
                           @csrf
                             <div class="form-inline">
                                 <div class="form-group">
-                                    <input type="file" name="file" class="form-control"  id="upload-image">   
-    
+                                    <input type="file" name="file" class="form-control"  id="upload-image">
+
                                 </div>
                                     <button type="button" name="submit" class="btn btn-sm btn-primary" id="upload-image-submit">Upload</button>
                                </div>
@@ -161,10 +161,10 @@
 
                         </div>
                         <div id="alertarea2" style="display:none;">
-                         
+
                         </div>
                         <div id="alertarea3" style="display:none;">
-                         
+
                         </div>
                         <button id="preview" class="btn bg-primary text-white right" disabled>Preview</button>
                         <button id="savetoebay" class="btn bg-primary text-white right" disabled>Save Item</button>
