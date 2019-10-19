@@ -150,12 +150,19 @@ $(document).ready(function(e) {
         var formData = new FormData();
         formData.append('file', uploadFile);
         var action_now = $('#upload-image-form').attr('data-action');
-        axios.post(action_now, formData)
+        var axiosOptions = {
+            method: 'POST',
+            url: action_now,
+            data: formData,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            json: true
+        };
+        axios(axiosOptions)
             .then(response => {
                 console.log(response)
                 if (response) {
-                    console.log(response)
-
                     var image = response.message.file.substr(1)
                     var itemFinished = $('<div>').addClass('list-group-item', 'list-group-item-success')
                     var spanItem = $('<span>').addClass('badge alert-success pull-right').text('Success')
@@ -183,28 +190,6 @@ $(document).ready(function(e) {
             }).catch(response => {
                 console.log(response)
             })
-        $.ajax({
-            url: action_now,
-            method: 'POST',
-            data: formData,
-            dataType: "json",
-            processData: false, // tell jQuery not to process the data
-            contentType: false, // tell
-            success: function(data) {
-
-            },
-            error: function(data) {
-                console.log(data);
-
-                var message = data.message
-                console.log(message)
-                var itemFinished = $('<div>').addClass('list-group-item', 'list-group-item-error')
-                var spanItem = $('<span>').addClass('badge alert-danger pull-right').text('Error')
-                itemFinished.append(spanItem).text(message)
-                $('.list-group').append(itemFinished)
-                $('#item-image').attr('src', '').hide()
-            }
-        })
     })
 
     dropZone.ondrop = function(e) {
@@ -247,7 +232,6 @@ $(document).ready(function(e) {
         dissmissAlert.append(dissmissLable)
         alert.append(dissmissAlert)
 
-        return alert
     }
 
     function updateClipboard(newClip) {
