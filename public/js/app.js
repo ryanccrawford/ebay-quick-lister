@@ -69242,49 +69242,38 @@ $(document).ready(function (e) {
   });
   $(imageButton).on('click', function (e) {
     e.preventDefault();
-    var uploadForm = document.getElementById('upload-image-form');
-    var uploadFile = uploadForm[1].files[0];
+    var uploadFile = document.getElementById('upload-image').files[0];
     var formData = new FormData();
     formData.append('file', uploadFile);
     var action_now = $('#upload-image-form').attr('data-action');
-    $.ajax({
-      url: action_now,
+    var axiosOptions = {
       method: 'POST',
+      url: action_now,
       data: formData,
-      dataType: "json",
-      processData: false,
-      // tell jQuery not to process the data
-      contentType: false,
-      // tell 
-      success: function success(data) {
-        if (data) {
-          console.log(data);
-          var image = data.message.file.substr(1);
-          var itemFinished = $('<div>').addClass('list-group-item', 'list-group-item-success');
-          var spanItem = $('<span>').addClass('badge alert-success pull-right').text('Success');
-          itemFinished.append(spanItem).text(image);
-          $('.list-group').append(itemFinished);
-          $('#item-image').attr('src', image).css('max-width', '300px').show();
-          $.get("policy.html", function (data) {
-            var valoftitle = $('#ebaytitle').val() + " | " + $('#sku').val();
-            var newHtml = data.replace("@title", valoftitle);
-            var newHtmlImage = newHtml.replace("@image", image);
-            var detext = $('#desc').val();
-            var newHtmlDesc = newHtmlImage.replace("@description", detext);
-            htmleditor.setData(newHtmlDesc);
-          });
-        } else {
-          var message = data.message;
-          console.log(message);
-          var itemFinished = $('<div>').addClass('list-group-item', 'list-group-item-error');
-          var spanItem = $('<span>').addClass('badge alert-danger pull-right').text('Error');
-          itemFinished.append(spanItem).text(message);
-          $('.list-group').append(itemFinished);
-          $('#item-image').attr('src', '').hide();
-        }
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       },
-      error: function error(data) {
-        console.log(data);
+      json: true
+    };
+    axios(axiosOptions).then(function (response) {
+      console.log(response);
+
+      if (response) {
+        var image = response.message.file.substr(1);
+        var itemFinished = $('<div>').addClass('list-group-item', 'list-group-item-success');
+        var spanItem = $('<span>').addClass('badge alert-success pull-right').text('Success');
+        itemFinished.append(spanItem).text(image);
+        $('.list-group').append(itemFinished);
+        $('#item-image').attr('src', image).css('max-width', '300px').show();
+        $.get("policy.html", function (data) {
+          var valoftitle = $('#ebaytitle').val() + " | " + $('#sku').val();
+          var newHtml = response.replace("@title", valoftitle);
+          var newHtmlImage = newHtml.replace("@image", image);
+          var detext = $('#desc').val();
+          var newHtmlDesc = newHtmlImage.replace("@description", detext);
+          htmleditor.setData(newHtmlDesc);
+        });
+      } else {
         var message = data.message;
         console.log(message);
         var itemFinished = $('<div>').addClass('list-group-item', 'list-group-item-error');
@@ -69293,6 +69282,8 @@ $(document).ready(function (e) {
         $('.list-group').append(itemFinished);
         $('#item-image').attr('src', '').hide();
       }
+    })["catch"](function (response) {
+      console.log(response);
     });
   });
 
@@ -69332,7 +69323,6 @@ $(document).ready(function (e) {
     alert.text(message);
     dissmissAlert.append(dissmissLable);
     alert.append(dissmissAlert);
-    return alert;
   }
 
   function updateClipboard(newClip) {
@@ -69365,8 +69355,8 @@ $(document).ready(function (e) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! J:\School\ebay-quick-lister\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! J:\School\ebay-quick-lister\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! c:\Users\RyanC\Desktop\code\ebay-quick-lister\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! c:\Users\RyanC\Desktop\code\ebay-quick-lister\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
