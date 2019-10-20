@@ -69252,14 +69252,13 @@ $(document).ready(function (e) {
       data: formData,
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      },
-      json: true
+      }
     };
     axios(axiosOptions).then(function (response) {
-      console.log(response);
+      console.log(response.data);
 
-      if (response) {
-        var image = response.message.file.substr(1);
+      if (response.data) {
+        var image = "images/" + response.data.file;
         var itemFinished = $('<div>').addClass('list-group-item', 'list-group-item-success');
         var spanItem = $('<span>').addClass('badge alert-success pull-right').text('Success');
         itemFinished.append(spanItem).text(image);
@@ -69267,14 +69266,14 @@ $(document).ready(function (e) {
         $('#item-image').attr('src', image).css('max-width', '300px').show();
         $.get("policy.html", function (data) {
           var valoftitle = $('#ebaytitle').val() + " | " + $('#sku').val();
-          var newHtml = response.replace("@title", valoftitle);
+          var newHtml = data.replace("@title", valoftitle);
           var newHtmlImage = newHtml.replace("@image", image);
           var detext = $('#desc').val();
           var newHtmlDesc = newHtmlImage.replace("@description", detext);
           htmleditor.setData(newHtmlDesc);
         });
       } else {
-        var message = data.message;
+        var message = response.data.message;
         console.log(message);
         var itemFinished = $('<div>').addClass('list-group-item', 'list-group-item-error');
         var spanItem = $('<span>').addClass('badge alert-danger pull-right').text('Error');
@@ -69355,8 +69354,8 @@ $(document).ready(function (e) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! c:\Users\RyanC\Desktop\code\ebay-quick-lister\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! c:\Users\RyanC\Desktop\code\ebay-quick-lister\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\Users\RyanC\Desktop\code\ebay-quick-lister\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\Users\RyanC\Desktop\code\ebay-quick-lister\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

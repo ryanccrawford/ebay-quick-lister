@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
   
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Routing\ResponseFactory;
+
+
   
 class ImageUploadController extends Controller
 {
@@ -13,7 +16,7 @@ class ImageUploadController extends Controller
      */
     public function imageUpload()
     {
-        return view('imageUpload');
+       // return view('imageUpload');
     }
   
     /**
@@ -31,9 +34,10 @@ class ImageUploadController extends Controller
    
         $request->file->move(public_path('images'), $imageName);
    
-        return back()
-            ->with('success','You have successfully upload image.')
-            ->with('file',$imageName);
+        return response()->json([
+            'message' => 'Upload success',
+            'file' => $imageName
+        ]);
    
     }
 }

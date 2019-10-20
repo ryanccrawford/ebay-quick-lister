@@ -156,22 +156,21 @@ $(document).ready(function(e) {
             data: formData,
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            json: true
+            }
         };
         axios(axiosOptions)
             .then(response => {
-                console.log(response)
-                if (response) {
-                    var image = response.message.file.substr(1)
+                console.log(response.data)
+                if (response.data) {
+                    var image = "images/" + response.data.file
                     var itemFinished = $('<div>').addClass('list-group-item', 'list-group-item-success')
                     var spanItem = $('<span>').addClass('badge alert-success pull-right').text('Success')
                     itemFinished.append(spanItem).text(image)
                     $('.list-group').append(itemFinished)
                     $('#item-image').attr('src', image).css('max-width', '300px').show()
-                    $.get("policy.html", function(data) {
+                    $.get("policy.html", (data) => {
                         var valoftitle = $('#ebaytitle').val() + " | " + $('#sku').val();
-                        var newHtml = response.replace("@title", valoftitle);
+                        var newHtml = data.replace("@title", valoftitle);
                         var newHtmlImage = newHtml.replace("@image", image);
                         var detext = $('#desc').val()
                         var newHtmlDesc = newHtmlImage.replace("@description", detext);
@@ -179,7 +178,7 @@ $(document).ready(function(e) {
                     });
                 } else {
 
-                    var message = data.message
+                    var message = response.data.message
                     console.log(message)
                     var itemFinished = $('<div>').addClass('list-group-item', 'list-group-item-error')
                     var spanItem = $('<span>').addClass('badge alert-danger pull-right').text('Error')
