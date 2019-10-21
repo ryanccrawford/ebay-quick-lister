@@ -29,11 +29,17 @@
                             <li class="nav-item">
                                     <a class="nav-link" href="{{ route('oauth/clear') }}">{{ __('Clear eBay Token') }}</a>
                             </li>
-                            <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('create') }}">{{ __('Create') }}</a>
-                            </li>
-                            <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('listings') }}">{{ __('Listings') }}</a>
+                            <li class="nav-item dropdown">
+                                <a id="inventoryDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Inventory <span class="caret"></span>
+                                </a>
+
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="inventoryDropdown">
+                                    <a class="dropdown-item" href="{{ route('inventory/locations') }}">{{ __('Locations') }}</a>
+                                    <a class="dropdown-item" href="{{ route('listings') }}">{{ __('Items') }}</a>
+                                    <a class="dropdown-item" href="{{ route('create') }}">{{ __('Create') }}</a>
+                                </div>
+
                             </li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

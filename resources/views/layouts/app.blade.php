@@ -18,9 +18,10 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <!-- Styles -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    
-    @yield('headscripts')
+
+    @stack('head')
 </head>
 <body>
     <div id="app">
@@ -29,8 +30,10 @@
             @yield('content')
         </main>
     </div>
-    
-    @yield('endscripts')
-    
+
+
+
+    @stack('end')
+
 </body>
 </html>

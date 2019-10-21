@@ -15,62 +15,52 @@ $(document).ready(function(e) {
     textCompleted.val('');
     uploadFinished.hide();
     progressBar.hide();
-
+    var template = '';
+    var templateLoaded = false
+    $.get("policy.html", (data) => {
+        template = data
+        templateLoaded = true;
+    })
     var dropZone = document.getElementById('upload-image-drop-zone');
 
 
-    $('#desc').focusout(function(e) {
-        var detext = $('#desc').val()
-        var valoftitle = $('#ebaytitle').val() + " | " + $('#sku').val();
-        $.get("policy.html", function(data) {
-            var newHtml = data.replace("@title", valoftitle);
+    $('#desc').keyup((e) => {
+        if (templateLoaded) {
+            var detext = $('#desc').val()
+            var valoftitle = $('#ebaytitle').val() + " | " + $('#sku').val();
+            var newHtml = template.replace("@title", valoftitle);
             var image = $('#item-image').attr('src')
             var newHtmlImage = newHtml.replace("@image", image);
             var newHtmlDesc = newHtmlImage.replace("@description", detext);
             htmleditor.setData(newHtmlDesc)
-        });
-
+        }
     });
-    $('#ebaytitle').focusout(function(e) {
-        var detext = $('#desc').val()
-        var valoftitle = $('#ebaytitle').val() + " | " + $('#sku').val();
-        $.get("policy.html", function(data) {
-            var newHtml = data.replace("@title", valoftitle).toUpperCase();
+
+    $('#ebaytitle').keyup((e) => {
+        if (templateLoaded) {
+            var detext = $('#desc').val()
+            var valoftitle = $('#ebaytitle').val() + " | " + $('#sku').val();
+            var newHtml = template.replace("@title", valoftitle);
             var image = $('#item-image').attr('src')
             var newHtmlImage = newHtml.replace("@image", image);
             var newHtmlDesc = newHtmlImage.replace("@description", detext);
             htmleditor.setData(newHtmlDesc)
-        });
+        }
 
     });
 
-    $('#sku').focusout(function(e) {
-        var detext = $('#desc').val()
-        var valoftitle = $('#ebaytitle').val() + " | " + $('#sku').val().toUpperCase();
-        $.get("policy.html", function(data) {
-            var newHtml = data.replace("@title", valoftitle).toUpperCase();
-            var image = $('#item-image').attr('src');
+    $('#sku').keyup((e) => {
+        if (templateLoaded) {
+            var detext = $('#desc').val()
+            var valoftitle = $('#ebaytitle').val() + " | " + $('#sku').val();
+            var newHtml = template.replace("@title", valoftitle);
+            var image = $('#item-image').attr('src')
             var newHtmlImage = newHtml.replace("@image", image);
             var newHtmlDesc = newHtmlImage.replace("@description", detext);
             htmleditor.setData(newHtmlDesc)
-        });
+        }
     });
 
-    var startUpload = function(file) {
-        console.log(file)
-        $.ajax({
-            url: 'server.php',
-            method: 'POST',
-            data: file,
-            success: function(data) {
-                if (data) {
-                    console.log(data)
-                } else {
-                    console.log("Unkonwn Error")
-                }
-            }
-        })
-    }
     $('#copyhtml').on('click', function(e) {
         e.preventDefault()
         var clipboard = htmleditor.getData();

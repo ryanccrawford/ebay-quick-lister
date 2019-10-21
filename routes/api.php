@@ -17,3 +17,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::post('imagepost', 'ImageUploadController@imagepost')->name('imagepost');
+Route::post('inventory/locations/saveadd', 'EbayInventoryController@saveInventoryLocation')->name('saveadd');
