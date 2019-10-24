@@ -30,4 +30,5 @@ Route::get('oauth', 'EbayInventoryController@oauth')->name('oauth');
 Route::get('oauth/clear', 'EbayInventoryController@oauth')->name('oauth/clear');
 
 Route::get('inventory/locations', 'EbayInventoryController@showlocations')->name('inventory/locations');
-Route::get('inventory/locations/add', 'EbayInventoryController@createInventoryLocation')->name('inventory/locations/add');
+Route::get('inventory/locations/add', 'EbayInventoryController@createInventoryLocation')->name('inventory/showlocationadd');
+Route::post('inventory/locations/saveadd', 'EbayInventoryController@saveInventoryLocation')->name('inventory/savelocation');

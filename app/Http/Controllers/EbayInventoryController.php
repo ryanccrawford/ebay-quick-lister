@@ -164,7 +164,8 @@ class EbayInventoryController extends Controller
     public function saveInventoryLocation(Request $request)
     {
         //
-        
+        echo "Inside save function";
+        $this->startService();
         // $validatedData = $request->validate(
         //     [
         //         'name' => 'required|max:1000',
@@ -177,63 +178,52 @@ class EbayInventoryController extends Controller
         //     ]
         // );
         if ($request->session()->has('token')) {
+            echo "Has Token Passed";
             $this->token = session('token');
-            echo var_dump($request->data);
-            return response()->json(
-                [
-                    'message' => $request->data
-                ]
+           
+            $name = $request->name;
+            
+            $addressArray = array(
+                'address' => array(
+                        'addressLine1' => $request->addressLine1,
+                        'addressLine2' => $request->addressLine2,
+                        'city' => $request->city,
+                        'country' => \DTS\eBaySDK\Inventory\Enums\CountryCodeEnum::C_US,
+                        'postalCode' => $request->postalCode,
+                        'stateOrProvince' => $request->state   
+                )
             );
-            $locationdata = $request->data;
-            $inventoryLocation = new \DTS\eBaySDK\Inventory\Types\InventoryLocation();
-            $inventoryLocation->name = $locationdata->name;
-            $inventoryLocation->location = new \DTS\eBaySDK\Inventory\Types\Location();
-            $inventoryLocation
-                ->location
-                ->address = new Address();
-            $inventoryLocation
-                ->location
-                ->address
-                ->addressLine1 =  $locationdata->addressLine1;
-            $inventoryLocation
-                ->location
-                ->address
-                ->addressLine2 = $locationdata->addressLine2;
-            $inventoryLocation
-                ->location
-                ->address
-                ->city = $locationdata->city;
-            $inventoryLocation
-                ->location
-                ->address
-                ->country = CountryCodeEnum::C_US;
-            $inventoryLocation
-                ->location
-                ->address
-                ->postalCode = $locationdata->postalCode;
-            $inventoryLocation
-                ->location
-                ->address
-                ->stateOrProvince = $locationdata->state;
-            $inventoryLocation->locationTypes = [];
-            $locationTypes = $locationdata->locationTypes;
-            foreach ($locationTypes as $locationType) {
-                if ($locationType === 'C_STORE') {
-                    $inventoryLocation
-                        ->locationTypes[] = StoreTypeEnum::C_STORE;
-                }
-                if ($locationType === 'C_WAREHOUSE') {
-                    $inventoryLocation
-                        ->locationTypes[] = StoreTypeEnum::C_WAREHOUSE;
-                }
+
+            $locationDetails = new \DTS\eBaySDK\Inventory\Types\LocationDetails( $addressArray );
+
+            $locationTypesArray = array();
+            if ($request->locationTypes === 'C_STORE') {
+                    $locationTypesArray[] = \DTS\eBaySDK\Inventory\Enums\StoreTypeEnum::C_STORE;
             }
-            echo var_dump($inventoryLocation);
-            $ebayRequest = new \DTS\eBaySDK\Inventory\Types\CreateInventoryLocationRestRequest();
-            $ebayRequest->location = $inventoryLocation;
-            $ebayRequest->merchantLocationKey = substr(str_replace(" ", "", $inventoryLocation->name), 0, 35);
-            $ebayResponse = $this->inventoryService->createInventoryLocation($request);
+            if ($request->locationTypes === 'C_WAREHOUSE') {
+                    $locationTypesArray[] = \DTS\eBaySDK\Inventory\Enums\StoreTypeEnum::C_WAREHOUSE;
+            }
 
+            $location = array(
+                'location' => $locationDetails,
+                'locationTypes' => $locationTypesArray,
+                'name' => $name,
 
+            );
+
+            $inventoryLocationFull = new \DTS\eBaySDK\Inventory\Types\InventoryLocationFull($location);
+            $merchantLocationKey = array(
+                'merchantLocationKey' => substr(str_replace(" ", "", $name), 0, 35)
+            );
+            $ebayRequest = new \DTS\eBaySDK\Inventory\Types\CreateInventoryLocationRestRequest($merchantLocationKey);
+            echo var_dump( $ebayRequest);
+            
+            echo var_dump( $this->inventoryService);
+            $ebayResponse = $this->inventoryService->createInventoryLocation($ebayRequest);
+          
+            echo var_dump($ebayResponse);
+            return view('ebay.inventory.locationadd');
+            
             return redirect()
                 ->action(
                     'App\Http\Controllers\EbayInventoryController@showlocations'

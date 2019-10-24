@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('headscripts')
+@push('head')
 
 <style>
     .upload-image-drop-zone {
@@ -23,7 +23,7 @@
         border-color: #222;
     }
 </style>
-@endsection
+   @endpush
 
 @section('content')
 <div class="container">
@@ -201,9 +201,9 @@
 
 
                 @endsection
-                @push('end')
+                @push('start')
                 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
                 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-                <script scr="js/createinventory"></script>
+                <script scr="js/createinventory.js"></script>
                 @endpush

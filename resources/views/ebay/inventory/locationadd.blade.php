@@ -16,7 +16,7 @@
                          <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">New Inventory Location</h5>
-                                <form name="location">
+                                <form action="{{ route('inventory/savelocation') }}" method="POST" name="location">
                                       @csrf
                                     <div class="form-row">
                                         <div class="form-group col-md-6">
@@ -66,18 +66,18 @@
             </div>
 
 @endsection
-@push('end')
+@push('start')
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-<script>
+<!-- <script>
 
 $(document).ready(function(){
 
 
    $('#submit').on('click', (event) => {
        event.preventDefault();
-        let url = "{{ route('saveadd') }}";
+        let url = "{{ route('inventory/savelocation') }}";
         let formdata = $('[name="location"]')[0];
         const axiosOptions = {
             method: 'POST',
@@ -98,5 +98,5 @@ $(document).ready(function(){
 
 }
 )
-</script>
+</script> -->
 @endpush
