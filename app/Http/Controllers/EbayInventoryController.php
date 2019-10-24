@@ -164,24 +164,18 @@ class EbayInventoryController extends Controller
     public function saveInventoryLocation(Request $request)
     {
         //
-        echo var_dump($request);
-        echo var_dump($request->data);
-        return response()->json(
-            [
-                'message' => $request->data
-            ]
-        );
-        $validatedData = $request->validate(
-            [
-                'name' => 'required|max:1000',
-                'locationTypes' => 'required',
-                'addressLine1' => 'required',
-                'addressLine2' => 'required',
-                'city' => 'required',
-                'state' => 'required',
-                'postalCode' => 'required',
-            ]
-        );
+        
+        // $validatedData = $request->validate(
+        //     [
+        //         'name' => 'required|max:1000',
+        //         'locationTypes' => 'required',
+        //         'addressLine1' => 'required',
+        //         'addressLine2' => 'required',
+        //         'city' => 'required',
+        //         'state' => 'required',
+        //         'postalCode' => 'required',
+        //     ]
+        // );
         if ($request->session()->has('token')) {
             $this->token = session('token');
             echo var_dump($request->data);
