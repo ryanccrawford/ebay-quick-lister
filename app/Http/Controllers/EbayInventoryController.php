@@ -52,6 +52,7 @@ class EbayInventoryController extends Controller
                 'ruName' => getenv('EBAY_PROD_RUNAME'),
             ]
         );
+        
     }
 
     /**
@@ -165,7 +166,8 @@ class EbayInventoryController extends Controller
     {
         //
         echo "Inside save function";
-        $this->startService();
+       
+       
         // $validatedData = $request->validate(
         //     [
         //         'name' => 'required|max:1000',
@@ -177,12 +179,11 @@ class EbayInventoryController extends Controller
         //         'postalCode' => 'required',
         //     ]
         // );
+       
         if ($request->session()->has('token')) {
-            echo "Has Token Passed";
             $this->token = session('token');
-           
+            $this->startService();
             $name = $request->name;
-            
             $addressArray = array(
                 'address' => array(
                         'addressLine1' => $request->addressLine1,
@@ -193,44 +194,79 @@ class EbayInventoryController extends Controller
                         'stateOrProvince' => $request->state   
                 )
             );
-
             $locationDetails = new \DTS\eBaySDK\Inventory\Types\LocationDetails( $addressArray );
-
-            $locationTypesArray = array();
-            if ($request->locationTypes === 'C_STORE') {
-                    $locationTypesArray[] = \DTS\eBaySDK\Inventory\Enums\StoreTypeEnum::C_STORE;
-            }
-            if ($request->locationTypes === 'C_WAREHOUSE') {
-                    $locationTypesArray[] = \DTS\eBaySDK\Inventory\Enums\StoreTypeEnum::C_WAREHOUSE;
-            }
-
+            $locationTypesArray = $this->getLocationTypes($request->locationTypes);
             $location = array(
                 'location' => $locationDetails,
                 'locationTypes' => $locationTypesArray,
                 'name' => $name,
-
             );
-
             $inventoryLocationFull = new \DTS\eBaySDK\Inventory\Types\InventoryLocationFull($location);
-            $merchantLocationKey = array(
-                'merchantLocationKey' => substr(str_replace(" ", "", $name), 0, 35)
+            $eBayRequest = array(
+                'merchantLocationKey' => substr(str_replace(" ", "", $name), 0, 35),
+                'location' => $locationDetails,
+                'locationTypes' => $locationTypesArray,
+                'name' => $name,
             );
-            $ebayRequest = new \DTS\eBaySDK\Inventory\Types\CreateInventoryLocationRestRequest($merchantLocationKey);
-            echo var_dump( $ebayRequest);
+            $ebayRequestObj = new \DTS\eBaySDK\Inventory\Types\CreateInventoryLocationRestRequest($eBayRequest);
+            $ebayResponse = $this->inventoryService->createInventoryLocation($ebayRequestObj);
+            $responseArray = $ebayResponse->toArray();
             
-            echo var_dump( $this->inventoryService);
-            $ebayResponse = $this->inventoryService->createInventoryLocation($ebayRequest);
-          
-            echo var_dump($ebayResponse);
-            return view('ebay.inventory.locationadd');
-            
-            return redirect()
-                ->action(
-                    'App\Http\Controllers\EbayInventoryController@showlocations'
-                );
-        }
+            $wasError = false;
+            $statusCode = $ebayResponse->getStatusCode();
+            //Check for errors
+            if ($statusCode >= 400) {
+                $wasError = true;
+                if (isset($responseArray['errors'])) {
+                    $errorMessage = '';
+                    echo var_dump($responseArray['errors']);
+                    foreach($responseArray['errors'] as $rerror){
 
+                        if ($rerror['errorId'] === 25803) {
+                            $errorMessage += "The inventory location name is already in use.<br>";
+                        } else {
+                            $errorMessage += $rerror['message'] . "<br>";
+                        }
+                    } 
+                    return view('ebay.inventory.locationadd', compact('wasError', 'request', 'errorMessage'));
+                }
+            }
+            //Check for success
+            if($statusCode >= 200){
+                if($statusCode === 204){
+                    return redirect()
+                    ->action(
+                        'EbayInventoryController@showlocations'
+                    );
+                }
+
+            }
+            
+       }
+        //Return getToken if totken has expired, Might need to handle this differnetly.
         return $this->getToken();
+    }
+
+    public function getLocationTypes($locationTypes){
+        $locationTypesArray = [];
+        if(is_array($locationTypes)){ 
+            foreach($locationTypes as $type){
+                if ($type === 'C_STORE') {
+                    $locationTypesArray[] = \DTS\eBaySDK\Inventory\Enums\StoreTypeEnum::C_STORE;
+                }
+                if ($type === 'C_WAREHOUSE') {
+                    $locationTypesArray[] = \DTS\eBaySDK\Inventory\Enums\StoreTypeEnum::C_WAREHOUSE;
+                }
+            }
+        }else{ 
+            if ($locationTypes === 'C_STORE') {
+                $locationTypesArray[] = \DTS\eBaySDK\Inventory\Enums\StoreTypeEnum::C_STORE;
+            }
+            if ($locationTypes === 'C_WAREHOUSE') {
+                $locationTypesArray[] = \DTS\eBaySDK\Inventory\Enums\StoreTypeEnum::C_WAREHOUSE;
+            }
+        }
+        return $locationTypesArray;
     }
 
     /**
@@ -245,7 +281,6 @@ class EbayInventoryController extends Controller
         $request->offset = "0";
         $request->limit = "100";
         $response = $this->inventoryService->getInventoryLocations($request);
-        echo var_dump($response->locations);
         return $response->locations;
     }
 

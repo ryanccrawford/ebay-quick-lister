@@ -9,6 +9,11 @@
                 <strong>{{ print_r($errors, true) }}</strong>
             </div>
             @endif
+            @isset($wasError)
+                <div class="alert alert-danger" role="alert">
+                    <strong>{{ $errorMessage }}</strong>
+                </div>
+            @endisset 
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col s12">
@@ -21,11 +26,11 @@
                                     <div class="form-row">
                                         <div class="form-group col-md-6">
                                         <label for="name">Location Name</label>
-                                        <input type="text" max="1000" class="form-control" name="name" id="name" placeholder="Location Name">
+                                        <input type="text" max="1000" class="form-control" name="name" id="name" placeholder="Location Name" value="{{ isset($request) ? $request->name : '' }}">
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label for="locationTypes">Select all that apply</label>
-                                                <select name="locationTypes" class="form-control" id="locationTypes" multiple>
+                                                <select name="locationTypes" class="form-control" id="locationTypes" multiple value="{{ isset($request) ? $request->locationTypes : ''}}">
                                                     <option value="C_STORE">Store</option>
                                                     <option value="C_WAREHOUSE">Warehouse</option>
                                                 </select>
@@ -33,20 +38,20 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="addressLine1">Address Line 1</label>
-                                        <input type="text" class="form-control" id="addressLine1" name="addressLine1" placeholder="1234 Main St">
+                                        <input type="text" class="form-control" id="addressLine1" name="addressLine1" placeholder="1234 Main St" value="{{ isset($request) ? $request->addressLine1 : '' }}">
                                     </div>
                                     <div class="form-group">
                                         <label for="addressLine2">Address Line 2</label>
-                                        <input type="text" class="form-control" id="addressLine2" name="addressLine2" placeholder="Apartment, studio, or floor">
+                                        <input type="text" class="form-control" id="addressLine2" name="addressLine2" placeholder="Apartment, studio, or floor" value="{{ isset($request) ? $request->addressLine2 : ''}}">
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col-md-6">
                                         <label for="city">City</label>
-                                            <input type="text" class="form-control" name="city" id="city" placeholder="The City">
+                                            <input type="text" class="form-control" name="city" id="city" placeholder="The City" value="{{ isset($request) ? $request->city : '' }}">
                                         </div>
                                         <div class="form-group col-md-4">
                                         <label for="state">State</label>
-                                            <select id="state" name="state" class="form-control">
+                                            <select id="state" name="state" class="form-control" value="{{ isset($request) ? $request->state : '' }}">
                                                 <option selected>Choose...</option>
                                                 <option>Florida</option>
                                                 <option>Virgina</option>
@@ -54,7 +59,7 @@
                                         </div>
                                         <div class="form-group col-md-2">
                                         <label for="postalCode">Zip Code</label>
-                                            <input type="text" class="form-control" id="postalCode" name="postalCode" placeholder="01234">
+                                            <input type="text" class="form-control" id="postalCode" name="postalCode" placeholder="01234" value="{{ isset($request) ? $request->postalCode : '' }}">
                                         </div>
                                     </div>
                                     <button type="submit" id="submit" class="btn btn-primary">Create</button>
