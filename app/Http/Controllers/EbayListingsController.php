@@ -28,7 +28,7 @@ class EbayListingsController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        `$this->middleware('auth');`
 
         $this->credentials = [
             'appId' => getenv('EBAY_PROD_APP_ID'),
