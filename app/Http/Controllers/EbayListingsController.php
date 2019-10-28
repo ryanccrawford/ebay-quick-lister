@@ -6,7 +6,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use \DTS\eBaySDK\;
+use \DTS\eBaySDK;
 use \DTS\eBaySDK\OAuth;
 use DTS\eBaySDK\Credentials\Credentialsl;
 use App\User;
@@ -61,11 +61,9 @@ class EbayListingsController extends Controller
             );
             $request = new \DTS\eBaySDK\Inventory\Types\GetInventoryItemsRestRequest();
             $response = $service->getInventoryItems($request);
-           
+
             $inventoryItems = $response->inventoryItems;
             return view('ebay.listings', compact('inventoryItems'));
-
-
         }
 
         if ($this->token == '') {

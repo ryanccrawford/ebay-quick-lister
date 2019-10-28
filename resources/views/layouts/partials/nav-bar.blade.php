@@ -27,7 +27,7 @@
                             @endif
                         @else
                             <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('oauth/clear') }}">{{ __('Clear eBay Token') }}</a>
+                                    <a class="nav-link" href="{{ route('trading') }}">{{ __('Trading') }}</a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a id="inventoryDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

@@ -26,9 +26,14 @@ Route::get('home', 'HomeController@index')->name('home');
 Route::get('listings', 'EbayInventoryController@index')->name('listings');
 
 Route::get('create', 'EbayInventoryController@create')->name('create');
-Route::get('oauth', 'EbayInventoryController@oauth')->name('oauth');
-Route::get('oauth/clear', 'EbayInventoryController@oauth')->name('oauth/clear');
+
+Route::get('oauth', 'Ebay\OAuth\OAuthController@oauth')->name('oauth');
+Route::get('getauth', 'Ebay\OAuth\OAuthController@getauth')->name('getauth');
+
+
 
 Route::get('inventory/locations', 'EbayInventoryController@showlocations')->name('inventory/locations');
 Route::get('inventory/locations/add', 'EbayInventoryController@createInventoryLocation')->name('inventory/showlocationadd');
 Route::post('inventory/locations/saveadd', 'EbayInventoryController@saveInventoryLocation')->name('inventory/savelocation');
+
+Route::get('trading', 'Ebay\Trading\API\ItemsController@index')->name('trading');
