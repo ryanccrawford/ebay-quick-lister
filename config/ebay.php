@@ -1,6 +1,6 @@
 <?php
 
-return [
+$f = [
     /*
     |--------------------------------------------------------------------------
     | Modes
@@ -30,7 +30,7 @@ return [
     |
     */
 
-    'siteId' => getenv('EBAY_SITE_ID', '0'),
+    'siteId' => env('EBAY_SITE_ID', '0'),
 
     /*
     |--------------------------------------------------------------------------
@@ -46,20 +46,22 @@ return [
 
     'sandbox' => [
         'credentials' => [
-            'devId' => getenv('EBAY_SANDBOX_DEV_ID'),
-            'appId' => getenv('EBAY_SANDBOX_APP_ID'),
-            'certId' => getenv('EBAY_SANDBOX_CERT_ID'),
+            'devId' => env('EBAY_SANDBOX_DEV_ID'),
+            'appId' => env('EBAY_SANDBOX_APP_ID'),
+            'certId' => env('EBAY_SANDBOX_CERT_ID'),
         ],
-        'authToken' => getenv('EBAY_SANDBOX_AUTH_TOKEN'),
-        'oauthUserToken' => getenv('EBAY_SANDBOX_OAUTH_USER_TOKEN'),
+        'authToken' => env('EBAY_SANDBOX_AUTH_TOKEN'),
+        'oauthUserToken' => '',
     ],
     'production' => [
         'credentials' => [
-            'devId' => getenv('EBAY_PROD_DEV_ID'),
-            'appId' => getenv('EBAY_PROD_APP_ID'),
-            'certId' => getenv('EBAY_PROD_CERT_ID'),
+            'devId' => env('EBAY_PROD_DEV_ID'),
+            'appId' => env('EBAY_PROD_APP_ID'),
+            'certId' => env('EBAY_PROD_CERT_ID'),
         ],
-        'authToken' => getenv('EBAY_PROD_AUTH_TOKEN'),
+        'authToken' => env('EBAY_PROD_AUTH_TOKEN'),
         'oauthUserToken' => '',
     ]
 ];
+
+return $f;

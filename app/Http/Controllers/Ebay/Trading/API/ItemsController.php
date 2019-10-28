@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Ebay\Trading\API;
 
 use \App\Http\Controllers\Controller;
+use DateInterval;
+use DateTime;
 use \Illuminate\Http\Request;
 use \DTS\eBaySDK\Trading\Services;
 use \DTS\eBaySDK\Trading\Types;
@@ -34,34 +36,29 @@ class ItemsController extends Controller
     public function index(Request $request)
     {
 
-
+        
         if ($request->session()->has('token')) {
             echo 'have';
             $this->service = new \DTS\eBaySDK\Trading\Services\TradingService(
                 [
+                    'siteId' => '0',
                     'authorization' => session('token')
                 ]
             );
-            if (!$this->service) {
-                echo 'no service';
-                $this->getToken($request, 'trading', true);
-            }
-            $serviceRequest  = new  $this->service->getSellerList();
-            return response(var_dump($this->service), 200);
+           
+            $serviceRequest = new \DTS\eBaySDK\Trading\Types\GetMyeBaySellingRequestType();
+           
             $page_num = $request->query('page_num') ? intval($request->query('page_num')) : 1;
             $limit = $request->query('limit') ? intval($request->query('limit')) : 10;
-            echo $page_num;
-            echo $limit;
-
-
-            $serviceRequest->ActiveList = new Types\ItemListCustomizationType();
-            $serviceRequest->ActiveList->Include = true;
-            $serviceRequest->ActiveList->Pagination = new Types\PaginationType();
+             
+            $serviceRequest->ActiveList = new \DTS\eBaySDK\Trading\Types\ItemListCustomizationType();
+            $serviceRequest->ActiveList->Pagination = new \DTS\eBaySDK\Trading\Types\PaginationType();
+            $serviceRequest->ActiveList->Pagination->PageNumber = $page_num;
             $serviceRequest->ActiveList->Pagination->EntriesPerPage = $limit;
-            $serviceRequest->ActiveList->Sort = Enums\ItemSortTypeCodeType::C_CURRENT_PRICE_DESCENDING;
-            $serviceRequest->ActiveList->Pagination->PageNumber = intval($page_num);
-
+             
+           
             $serviceResponse = $this->service->getMyeBaySelling($serviceRequest);
+            echo var_dump($serviceResponse);
             if (isset($serviceResponse->Errors)) {
                 $message = array();
                 foreach ($serviceResponse->Errors as $error) {
@@ -79,16 +76,17 @@ class ItemsController extends Controller
                         'messages' => $message
                     ]);
             }
-            if ($serviceResponse->Ack !== 'Failure' && isset($serviceResponse->ActiveList)) {
+            if ($serviceResponse->Ack !== 'Failure' && isset($serviceResponse->ItemArray)) {
                 return response()
                     ->json([
                         'sucess' => true,
-                        'items' => $serviceResponse->ActiveList->ItemArray->Item,
-                        'taotal_pages' => $serviceResponse->ActiveList->PaginationResult->TotalNumberOfPages
+                        'items' => $serviceResponse->ItemArray,
+                        'taotal_pages' => $serviceResponse->PaginationResult->TotalNumberOfPages
                     ]);
             }
         }
-        $this->getToken($request, 'trading', false);
+        session()->forget('token');
+        $this->getToken($request, 'trading', true);
         return redirect('getauth');
     }
 
@@ -144,13 +142,8 @@ class ItemsController extends Controller
      */
     public function getToken(Request $request, String $return = '', $failed = false)
     {
-        echo var_dump($request->session());
-        if ($request->session()->has('token') && !$failed) {
-            $this->token = session('token');
-            return;
-        }
-        $scope = 'https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.fulfillment';
-
+        
+        $scope = 'https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account';
 
         session(['scope' => $scope]);
         if ($return === '') {
