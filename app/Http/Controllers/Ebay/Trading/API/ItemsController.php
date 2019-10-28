@@ -36,9 +36,35 @@ class ItemsController extends Controller
     public function index(Request $request)
     {
 
-        
+        $page_num = $request->query('page_num') ? intval($request->query('page_num')) : 1;
+        $limit = $request->query('limit') ? intval($request->query('limit')) : 10;
         if ($request->session()->has('token')) {
-            echo 'have';
+            
+            $listing = $this->getMyeBaySellingItems($page_num, $limit, );
+       
+            $listingItems = $listing;
+            if(isset($listingItems->errors)){
+                $errors = $listingItems->errors;
+                return view('ebay.trading.listings.listingitems', compact('errors'));
+            }
+            $next = $page_num  + 1;
+            $prev = $page_num > 1 ? $page_num - 1 : 1;
+            $next_link = '/trading?page_num='.$next.'&limit='.$limit.'';
+            $prev_link = '/trading?page_num='.$prev.'&limit='.$limit.'';
+            return view('ebay.trading.listings.listingitems', compact('listingItems', 'next_link', 'prev_link'));
+
+        }else{
+            
+            session()->forget('token');
+            $this->getToken($request, 'trading', true);
+            return redirect('getauth');
+        }
+    }
+
+    public function getMyeBaySellingItems(Int $Page_number, Int $Page_limit)
+    {
+       
+
             $this->service = new \DTS\eBaySDK\Trading\Services\TradingService(
                 [
                     'siteId' => '0',
@@ -47,20 +73,17 @@ class ItemsController extends Controller
             );
            
             $serviceRequest = new \DTS\eBaySDK\Trading\Types\GetMyeBaySellingRequestType();
-           
-            $page_num = $request->query('page_num') ? intval($request->query('page_num')) : 1;
-            $limit = $request->query('limit') ? intval($request->query('limit')) : 10;
-             
             $serviceRequest->ActiveList = new \DTS\eBaySDK\Trading\Types\ItemListCustomizationType();
             $serviceRequest->ActiveList->Pagination = new \DTS\eBaySDK\Trading\Types\PaginationType();
-            $serviceRequest->ActiveList->Pagination->PageNumber = $page_num;
-            $serviceRequest->ActiveList->Pagination->EntriesPerPage = $limit;
+            $serviceRequest->ActiveList->Pagination->PageNumber = $Page_number;
+            $serviceRequest->ActiveList->Pagination->EntriesPerPage = $Page_limit;
              
-           
+      
             $serviceResponse = $this->service->getMyeBaySelling($serviceRequest);
-            echo var_dump($serviceResponse);
+            
             if (isset($serviceResponse->Errors)) {
-                $message = array();
+                session()->forget('token');
+                $message = [];
                 foreach ($serviceResponse->Errors as $error) {
                     $message[] = printf(
                         "%s: %s\n%s\n\n",
@@ -70,24 +93,22 @@ class ItemsController extends Controller
                     );
                 }
 
-                return response()
-                    ->json([
+                return json_encode([
                         'error' => true,
                         'messages' => $message
                     ]);
             }
-            if ($serviceResponse->Ack !== 'Failure' && isset($serviceResponse->ItemArray)) {
-                return response()
-                    ->json([
-                        'sucess' => true,
-                        'items' => $serviceResponse->ItemArray,
-                        'taotal_pages' => $serviceResponse->PaginationResult->TotalNumberOfPages
-                    ]);
+            if ($serviceResponse->Ack !== 'Failure' && isset($serviceResponse->ActiveList->ItemArray)) {
+               // echo var_dump($serviceResponse->ActiveList->ItemArray->toArray());
+               // \DTS\eBaySDK\Trading\Types\ItemType;
+                return $serviceResponse->ActiveList->ItemArray->Item;
+              
+                
             }
-        }
-        session()->forget('token');
-        $this->getToken($request, 'trading', true);
-        return redirect('getauth');
+        
+        
+
+
     }
 
     /**

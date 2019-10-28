@@ -45,7 +45,9 @@ class OAuthController extends Controller
             ]
         );
        
-       $scope = $request->session('scope');
+      // $scope = $request->session('scope');
+       $scope = 'https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account';
+
         $s = explode(' ', $scope);
         $url =  $this->OAuthService->redirectUrlForUser(
             [
@@ -75,12 +77,7 @@ class OAuthController extends Controller
         );
        
         $this->code = $request->query('code');
-        if(strlen($this->code)){
-            echo 'got code';
-            echo $this->code;
-        }else{
-            echo 'didnt get code, something went wrong';
-        }
+        
         if (strlen($this->code)) {
             $response = $this->OAuthService->getUserToken(
                 new \DTS\eBaySDK\OAuth\Types\GetUserTokenRestRequest(
@@ -91,17 +88,12 @@ class OAuthController extends Controller
             );
 
             if ($response->getStatusCode() !== 200) {
-                echo printf(
-                    "%s: %s\n\n",
-                    $response->error,
-                    $response->error_description
-                );
+              
                 return redirect('home');
             } else {
                 session(['token' => $response->access_token]);
                 if ($request->session()->has('return')) {
-                    echo 'has return session var';
-                    
+           
                     $rd = session('return') ? session('return') : 'home';//  session('return');
                     session()->forget('return');
                     return redirect($rd);
@@ -109,7 +101,7 @@ class OAuthController extends Controller
 
                 
             }
-            echo 'Backup Return';
+       
             return redirect('home');
         }
     }

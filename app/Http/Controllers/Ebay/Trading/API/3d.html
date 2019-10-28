@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>XHTML DOM access for X_ITE</title>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="https://code.create3000.de/x_ite/latest/dist/x_ite.css" type="text/css" media="all"/>
+    <script type="text/javascript" src="https://code.create3000.de/x_ite/latest/dist/x_ite.min.js"></script> 
+    <script type="text/javascript" src="https://raw.githack.com/andreasplesch/x_ite_dom/master/release/x_ite_dom.1.3.js"></script>
+    <style>
+X3DCanvas {
+   width: 1000px;
+   height: 800px;
+}
+    </style>
+  </head>
+  <body>
+ 
+    <!-- /* Create a X_ITE browser and define X3D content directly within the element.
+         An Inline node is used here to load a complete scene because the scene is
+         some way larger. */ -->
+    <X3DCanvas>
+      <X3D profile='Full' version='3.3' xmlns='http://www.web3d.org/specifications/x3d-namespace'>
+        <Scene>
+          <Viewpoint position='0 100 0' orientation='0 0 0 0' description='start'></Viewpoint>
+          <NavigationInfo type='"FLY", "ANY"'></NavigationInfo>
+          <Inline DEF='bph25g' url='https://www.3starinc.com/bph25g.wrl'></Inline>
+        </Scene>
+      </X3D>
+      <p class="fallback">Your browser may not support all features required by X_ITE!</p>
+    </X3DCanvas>
+ 
+   
+    
+ 
+    <script type="text/javascript">
+
+    </script>
+  </body>
+</html>
