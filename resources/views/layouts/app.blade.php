@@ -24,7 +24,7 @@
 
     @stack('head')
 </head>
-<body>
+<body class="bg-info">
     <div id="app">
         @include('layouts.partials.nav-bar')
         <main class="py-4">

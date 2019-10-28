@@ -2,6 +2,13 @@
 
 @section('content')
 <div class="container">
+<nav aria-label="Page navigation example">
+  <ul class="pagination">
+    <li class="page-item"><a class="page-link" href="{{$prev_link }}">Previous</a></li>
+   
+    <li class="page-item"><a class="page-link" href="{{  $next_link }}">Next</a></li>
+  </ul>
+</nav>
     <div class="row justify-content-center">
         <div class="col-md-12">
       
@@ -11,19 +18,22 @@
             </div>
             @endif
            
-            <div class="container  card-deck">
-                <div class="row justify-content-center">
-                <span><h1 class="mt-1 mb-1">Listings<a class="btn btn-danger round" href="#">{{ __('Add') }}</a></h1></span>
+            <div class="container">
+            <span><h1 class="mt-1 mb-2">Listings<a class="btn btn-danger round ml-2" href="#">{{ __('Add') }}</a></h1></span>
+              
+                
 
-                <div class="col-sm-12">
+                <div class="col-lg-12">  
+                    <div class="row justify-content-center card-group">
                 @isset($listingItems)
                      @foreach ($listingItems as $listingItem)
-                        <div class="card shadow rounded col-sm-6" style="max-width: 450px;">
+                    <div class="col-lg-4">
+                        <div class="card shadow rounded">
                         <div class="row no-gutters">    
                         <div class="col-md-3">
                            <img src="{{ $listingItem->PictureDetails->GalleryURL }} " class="card-img-top" alt="photo">
                         </div>
-                           <div class="col-md-6">
+                           <div class="col-md-7">
                                     <div class="card-body">
                                         <h5 class="card-title">{{ $listingItem->Title }}</h5>
                                         <h5 class="card-text">SKU: {{ $listingItem->SKU }}</h5>
@@ -43,6 +53,7 @@
                             
                             </div>
                         </div>
+                    </div>
                         @endforeach
                     @endisset
                 </div>
@@ -51,13 +62,7 @@
             </div>
         </div>
     </div>
-    <nav aria-label="Page navigation example">
-  <ul class="pagination">
-    <li class="page-item"><a class="page-link" href="{{$prev_link }}">Previous</a></li>
    
-    <li class="page-item"><a class="page-link" href="{{  $next_link }}">Next</a></li>
-  </ul>
-</nav>
 </div>
     @endsection
 @push('end')
