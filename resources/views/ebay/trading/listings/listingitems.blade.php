@@ -1,14 +1,10 @@
 @extends('layouts.app')
 
+
+
 @section('content')
 <div class="container">
-<nav aria-label="Page navigation example">
-  <ul class="pagination">
-    <li class="page-item"><a class="page-link" href="{{$prev_link }}">Previous</a></li>
-   
-    <li class="page-item"><a class="page-link" href="{{  $next_link }}">Next</a></li>
-  </ul>
-</nav>
+
     <div class="row justify-content-center">
         <div class="col-md-12">
       
@@ -19,41 +15,111 @@
             @endif
            
             <div class="container">
-            <span><h1 class="mt-1 mb-2">Listings<a class="btn btn-danger round ml-2" href="#">{{ __('Add') }}</a></h1></span>
-              
-                
+            <div class="row">
+                <div class="col-sm-6">
+            <span><h1 class="mt-1 mb-2 left">Listings<a class="btn btn-danger round ml-2" href="#">{{ __('Add') }}</a></h1></span>
+                    
+                </div>
+                <div class="col-sm-6">
+                    <span>
+               <form class="form-inline my-2 my-lg-0 justify-content-end">
+                    <input class="form-control mr-sm-2" type="search" placeholder="SKU / Title" aria-label="Search">
+                    <button class="btn btn-dark my-2 my-sm-0" type="submit">Search</button>
+                </form>
+                </div>
+                </span>
+            </div>
+            @isset($listingArray)
+                @if(count($listingArray) > 1)
+                    <nav aria-label="pagination">
+                        <div class="justify-content-center">
+                                    <ul class="pagination justify-content-center">
+                                    <li class="page-item"><a class="page-link" href="{{ $prev_link }}">Previous</a></li>
+                                
 
-                <div class="col-lg-12">  
-                    <div class="row justify-content-center card-group">
-                @isset($listingItems)
-                     @foreach ($listingItems as $listingItem)
-                    <div class="col-lg-4">
-                        <div class="card shadow rounded">
-                        <div class="row no-gutters">    
-                        <div class="col-md-3">
-                           <img src="{{ $listingItem->PictureDetails->GalleryURL }} " class="card-img-top" alt="photo">
+                                    @foreach ($beforeCurrentPageLinks as $link)
+                                
+                                    <li class="page-item"><a class="page-link" href="{{ $link['link'] }}">{{ $link['page'] }}</a></li>
+                                
+                                    @endforeach
+                                    
+                                    <li class="page-item active"><a class="page-link" href="#">{{ $currentPage }}</a></li>
+                                    
+                                    @foreach ($afterCurrentPageLinks as $link)
+                                    
+                                    <li class="page-item"><a class="page-link" href="{{ $link['link'] }}" >{{ $link['page'] }}</a></li>
+                                    
+                                    @endforeach
+                                
+                                    <li class="page-item"><a class="page-link" href="{{ $next_link }}">Next</a></li>
+                                </ul>
+                                
                         </div>
-                           <div class="col-md-7">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ $listingItem->Title }}</h5>
-                                        <h5 class="card-text">SKU: {{ $listingItem->SKU }}</h5>
-                                        <p class="card-text">$ {{  $listingItem->SellingStatus->CurrentPrice->value}}<br></p>
-                                        <p class="card-text">
-                                            {{ $listingItem->Description }}
-                                           
-                                        </p>
-                                    </div>
-                                </div>  
-                            <div class="col-md-1">
-                            <div class="card-body">
-                                <a href="#" class="btn btn-primary btn-sm"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                    
+                    </nav>
+                @endif
+            <div class="col-lg-12">  
+                <div class="card-group">
+                    <!-- { 'listingArray', 'next_link', 'prev_link', 'totalPages', 'limit', 'currentPage', 'afterCurrentPageLinks', 'beforeCurrentPageLinks' } -->
+                    @foreach ($listingArray as $listingItem)
+                <div class="col-sm-6">
+                    <div class="card shadow rounded mb-3">
+                        <div class="row no-gutters">    
+                            <div class="col-sm-4">
+                              
+                            <img src="{{ $listingItem->PictureDetails->GalleryURL }} " class="card-img pl-3 pt-3 pr-3" alt="photo">
                             </div>
-                            </div>
+                            <div class="col-sm-8">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ $listingItem->Title }}</h6>
+                                    <div class="badge badge-secondary">SKU: {{ $listingItem->SKU }}</div>
+                                    <p class="badge badge-secondary ml-2">ID {{$listingItem->ItemID}}</p> 
+                                </div>
+                                <div class="card-body">
+                                        
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text bg-primary text-white"><strong>Price: </strong></span>
+                                                        <span class="input-group-text">
+                                                            @php 
+                                                                $number = floatval($listingItem->SellingStatus->CurrentPrice->value);
+                                                            @endphp
+                                                            ${{  number_format($number, 2) }}
+                                                        </span>
+                                                    </div>
+                                                    <input type="number" min="0.00" max="999999.99" placeholder="0.00" class="form-control text-right" aria-label="Dollar amount (with dot and two decimal places)">
+                                                    <div class="input-group-append">
+                                                        <button class="button btn-info text-white" type="button" id="change_price_{{$listingItem->ItemID}}">Update</button>
+                                                    </div>
+                                                </div>  
+                                                <div class="input-group mt-1">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text bg-primary text-white"><strong>QOH: </strong></span>
+                                                        <span class="input-group-text">
+                                                            @php 
+                                                                $qty = intval($listingItem->QuantityAvailable);
+                                                            @endphp
+                                                            {{  number_format($qty, 0) }}
+                                                        </span>
+                                                    </div>
+                                                    <input type="number" min="0" max="9999" placeholder="0" class="form-control text-right" aria-label="Quantity on Hand">
+                                                    <div class="input-group-append">
+                                                        <button class="button btn-info text-white" type="button" id="change_qoh_{{$listingItem->ItemID}}">Update</button>
+                                                    </div>
+                                                </div>  
+                                                <div class="card-body">
+                                   
+                                   <button id="edit_item_{{$listingItem->ItemID }}" class="btn btn-primary btn-sm text-right"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                                   
+                               </div>
+                              </div>
+                            </div>  
                             
-                            
-                            </div>
+                               
+                           
                         </div>
                     </div>
+                </div>
                         @endforeach
                     @endisset
                 </div>
@@ -65,8 +131,9 @@
    
 </div>
     @endsection
-@push('end')
+
+@section('last')
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-@endpush
+@endsection

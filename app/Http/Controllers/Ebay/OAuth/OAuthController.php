@@ -33,9 +33,9 @@ class OAuthController extends Controller
     {
 
         $this->credentials = [
-            'appId' => getenv('EBAY_PROD_APP_ID'),
-            'certId' => getenv('EBAY_PROD_CERT_ID'),
-            'devId' => getenv('EBAY_PROD_DEV_ID'),
+            'appId' => env('EBAY_PROD_APP_ID'),
+            'certId' => env('EBAY_PROD_CERT_ID'),
+            'devId' => env('EBAY_PROD_DEV_ID'),
         ];
 
         $this->OAuthService = new \DTS\eBaySDK\OAuth\Services\OAuthService(

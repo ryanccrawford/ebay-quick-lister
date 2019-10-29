@@ -33,7 +33,7 @@
     </div>
 
 
-
+    @yield('last')
     @stack('end')
 
 </body>
