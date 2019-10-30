@@ -128,7 +128,7 @@ class EbayInventoryController extends Controller
      */
     public function create(Request $request)
     {
-        return view('ebay.inventory.items.create');
+       
     }
 
     /**

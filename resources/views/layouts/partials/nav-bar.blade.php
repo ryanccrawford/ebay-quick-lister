@@ -36,8 +36,8 @@
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="inventoryDropdown">
                                     <a class="dropdown-item" href="{{ route('inventory/locations') }}">{{ __('Locations') }}</a>
-                                    <a class="dropdown-item" href="{{ route('listings') }}">{{ __('Items') }}</a>
-                                    <a class="dropdown-item" href="{{ route('create') }}">{{ __('Create') }}</a>
+                                   
+                                   
                                 </div>
 
                             </li>
