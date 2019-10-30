@@ -39,25 +39,28 @@ class ItemsController extends Controller
        
        
         if ($request->session()->has('token')) {
-            
+   
             $page_num = $request->query('page_num') !== null  ? intval($request->query('page_num')) : 1;
             $limit = $request->query('limit') !== null ? intval($request->query('limit')) : 10;
 
             $listingItems = $this->getMyeBaySellingItems($page_num, $limit, $request);
 
             if(!$listingItems instanceof \DTS\eBaySDK\Trading\Types\GetMyeBaySellingResponseType){
+              
                 
-                echo var_dump($listingItems);
                 if(isset($listingItems->error)){
-                    $errors = json_decode($listingItems->messages);
+                   
+                    $errorsObj = $listingItems->messages;
+                    return view('ebay.trading.listings.listingitems', compact('errorsObj'));
                 }else{
                         $errors = array(
-                            array(
+                           
                                 'error' => true,
-                                'messages' => "Unknown Error"
-                            )
+                                'messages' => "No Items Found!"
+                            
                         );
                 }
+            
                 return view('ebay.trading.listings.listingitems', compact('errors'));
             }
             
@@ -80,17 +83,19 @@ class ItemsController extends Controller
             $beforeCurrentPageLinks = self::beforeCurrentPage($page_num, $totalPages, 5, '/trading?page_num=',  $limitParameter);
            
             $listingArray =  $listingItems->ActiveList->ItemArray->Item;
-
+            echo "Showing Listings";
             return view('ebay.trading.listings.listingitems', compact('listingArray', 'next_link', 'prev_link', 'totalPages', 'limit', 'currentPage', 'afterCurrentPageLinks', 'beforeCurrentPageLinks'));
 
-        }else{
+        }
+        echo "Getting new token";
             session()->forget('totalPages');
             session()->forget('token');
             session()->forget('scope');
             session()->forget('return');
             $this->getToken($request, 'trading', true);
-            
-        }
+            return redirect('getauth');
+           
+        
     }
 
     public static function getTotalPages($listingItems){
@@ -210,7 +215,7 @@ class ItemsController extends Controller
             session()->forget('return');
             session()->forget('token');
             $this->getToken($request, 'trading', true);
-            
+            return redirect('getauth');
 
         }
         
@@ -282,6 +287,6 @@ class ItemsController extends Controller
             $return = 'home';
         }
         session(['return' => $return]);
-        return redirect('getauth');
+        
     }
 }
