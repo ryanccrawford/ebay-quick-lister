@@ -34,7 +34,7 @@
                 </span>
             </div>
             @isset($listingArray)
-                @if(count($listingArray) > 1)
+                @if($totalPages > 1)
                     <nav aria-label="pagination">
                         <div class="justify-content-center">
                                     <ul class="pagination justify-content-center">
@@ -78,6 +78,7 @@
                                     <h6 class="card-title">{{ $listingItem->Title }}</h6>
                                     <div class="badge badge-secondary">SKU: {{ $listingItem->SKU }}</div>
                                     <p class="badge badge-secondary ml-2">ID {{$listingItem->ItemID}}</p> 
+                                    <p class="badge badge-danger round ml-2">Watching {{$listingItem->WatchCount}}</p>
                                 </div>
                                 <div class="card-body">
                                         

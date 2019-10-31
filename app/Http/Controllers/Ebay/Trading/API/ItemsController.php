@@ -19,6 +19,7 @@ class ItemsController extends Controller
     protected $service;
     protected $config;
     protected $token;
+    protected $credentials;
     /**
      * Create a new controller instance.
      *
@@ -27,6 +28,11 @@ class ItemsController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->credentials = [
+            'appId' => getenv('EBAY_PROD_APP_ID'),
+            'certId' => getenv('EBAY_PROD_CERT_ID'),
+            'devId' => getenv('EBAY_PROD_DEV_ID'),
+        ];
     }
 
     /**
