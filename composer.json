@@ -16,6 +16,7 @@
         "jenssegers/mongodb": "^3.6",
         "laravel/framework": "^6.0",
         "laravel/tinker": "^1.0",
+        "symfony/process": "^4.3",
         "symfony/psr-http-message-bridge": "^1.2",
         "vlucas/phpdotenv": "^3.6"
     },

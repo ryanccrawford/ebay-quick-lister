@@ -37,3 +37,6 @@ Route::get('inventory/locations/add', 'EbayInventoryController@createInventoryLo
 Route::post('inventory/locations/saveadd', 'EbayInventoryController@saveInventoryLocation')->name('inventory/savelocation');
 
 Route::get('trading', 'Ebay\Trading\API\ItemsController@index')->name('trading');
+
+
+Route::post('deploy', 'DeployController@deploy');
