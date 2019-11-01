@@ -18,3 +18,6 @@ Homestead.json
 
 # Rocketeer PHP task runner and deployment package. https://github.com/rocketeers/rocketeer
 .rocketeer/
+/nbproject/private/
+app/Http/Controllers/Ebay/Trading/API/email.html
+templates/
