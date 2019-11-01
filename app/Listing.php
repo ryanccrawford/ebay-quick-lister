@@ -3,14 +3,15 @@
 namespace App;
 
 use DTS\eBaySDK\Inventory\Types\InventoryItem;
-use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
-class Listing extends Model
+class Listing extends Eloquent
 {
 
     public $provider;
     public $inventoryService;
-
+    protected $connection = 'mongodb';
+    protected $collection = 'listings';
 
     public function constuctor()
     {

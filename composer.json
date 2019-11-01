@@ -9,9 +9,11 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
+        "ext-mongodb": "^1.5",
         "dts/ebay-sdk-php": "^18.0",
         "fideloper/proxy": "^4.0",
         "hkonnet/laravel-ebay": "^1.4",
+        "jenssegers/mongodb": "^3.6",
         "laravel/framework": "^6.0",
         "laravel/tinker": "^1.0",
         "symfony/psr-http-message-bridge": "^1.2",
