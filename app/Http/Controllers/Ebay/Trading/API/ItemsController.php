@@ -11,6 +11,7 @@ use \DTS\eBaySDK\Trading\Types;
 use \DTS\eBaySDK\Trading\Enums;
 use \DTS\eBaySDK\Constants;
 use Illuminate\Database\Query\Expression;
+use Symfony\Component\Translation\Interval;
 
 class ItemsController extends Controller
 {
@@ -43,17 +44,18 @@ class ItemsController extends Controller
     public function index(Request $request)
     {
 
-
+       
+        
         if ($request->session()->has('token')) {
 
             $page_num = $request->query('page_num') !== null  ? intval($request->query('page_num')) : 1;
             $limit = $request->query('limit') !== null ? intval($request->query('limit')) : 10;
+            echo "b4 service call";
+            $listingItems = $this->getSellingList($page_num, $limit, $request);
+            echo "b4 comparison";
+            if (!$listingItems instanceof \DTS\eBaySDK\Trading\Types\GetSellerListResponseType) {
 
-            $listingItems = $this->getMyeBaySellingItems($page_num, $limit, $request);
-
-            if (!$listingItems instanceof \DTS\eBaySDK\Trading\Types\GetMyeBaySellingResponseType) {
-
-
+                echo "is an instanceof GetSellerList";
                 if (isset($listingItems->error)) {
 
                     $errorsObj = $listingItems->messages;
@@ -87,12 +89,14 @@ class ItemsController extends Controller
             $next_link = '/trading?page_num=' . $next . $limitParameter;
             $prev_link = '/trading?page_num=' . $prev . $limitParameter;
             $beforeCurrentPageLinks = self::beforeCurrentPage($page_num, $totalPages, 5, '/trading?page_num=',  $limitParameter);
-
-            $listingArray =  $listingItems->ActiveList->ItemArray->Item;
-            // echo "Showing Listings";
+           //$listingItems->ItemArray->Item[0]
+            $listingArray =  $listingItems->ItemArray->Item;
+            //echo "buy it now price";
+            //echo var_dump($listingArray[0]->BuyItNowPrice);
+            //echo var_dump($listingArray);
             return view('ebay.trading.listings.listingitems', compact('listingArray', 'next_link', 'prev_link', 'totalPages', 'limit', 'currentPage', 'afterCurrentPageLinks', 'beforeCurrentPageLinks'));
         }
-        echo "Getting new token";
+        //echo "Getting new token";
         session()->forget('totalPages');
         session()->forget('token');
         session()->forget('scope');
@@ -104,7 +108,7 @@ class ItemsController extends Controller
     public static function getTotalPages($listingItems)
     {
 
-        return intval($listingItems->ActiveList->PaginationResult->TotalNumberOfPages);
+        return intval($listingItems->PaginationResult->TotalNumberOfPages);
     }
 
     public static function afterCurrentPage(int $currentPage, int $totalPages, int $maxPages, string $url, string $limit)
@@ -161,12 +165,12 @@ class ItemsController extends Controller
         return $pages;
     }
 
-    public function getMyeBaySellingItems(Int $Page_number, Int $Page_limit, Request $request)
+    public function getSellingList(Int $Page_number, Int $Page_limit, Request $request)
     {
 
         try {
 
-
+         
             $this->service = new \DTS\eBaySDK\Trading\Services\TradingService(
                 [
                     'siteId' => '0',
@@ -175,54 +179,59 @@ class ItemsController extends Controller
                 ]
             );
 
-            // echo var_dump($this->service);
-            $serviceRequest = new \DTS\eBaySDK\Trading\Types\GetMyeBaySellingRequestType();
-            $serviceRequest->ActiveList = new \DTS\eBaySDK\Trading\Types\ItemListCustomizationType();
-            $serviceRequest->ActiveList->Pagination = new \DTS\eBaySDK\Trading\Types\PaginationType();
-            $serviceRequest->ActiveList->Pagination->PageNumber = $Page_number;
-            $serviceRequest->ActiveList->Pagination->EntriesPerPage = $Page_limit;
+            $searchFor = $request->input('search');
+           
+            $serviceRequest = new \DTS\eBaySDK\Trading\Types\GetSellerListRequestType();
+    
+            $serviceRequest->EndTimeTo= new DateTime(now());
+            $serviceRequest->EndTimeFrom  =  new DateTime(date('Y-m-d H:i:s', strtotime('-100 days', strtotime('now'))));
+            $serviceRequest->DetailLevel =  [\DTS\eBaySDK\Trading\Enums\DetailLevelCodeType::C_RETURN_ALL];
+            
 
-            $ouputSelection = ['ActiveList', 'ActiveList.PaginationResult'];
-            $serviceRequest->OutputSelector = $ouputSelection;
-            $serviceResponse = $this->service->getMyeBaySelling($serviceRequest);
-
-            if (isset($serviceResponse->Errors)) {
-                session()->forget('token');
-                $message = [];
-                foreach ($serviceResponse->Errors as $error) {
-                    $message[] = printf(
-                        "%s: %s\n%s\n\n",
-                        $error->SeverityCode === Enums\SeverityCodeType::C_ERROR ? 'Error' : 'Warning',
-                        $error->ShortMessage,
-                        $error->LongMessage
-                    );
-                }
-
-                return json_encode([
-                    'error' => true,
-                    'messages' => $message
-                ]);
-                die();
+            $serviceRequest->Pagination = new \DTS\eBaySDK\Trading\Types\PaginationType();
+            $serviceRequest->Pagination->PageNumber = $Page_number ? $Page_number : 1;
+            
+            $serviceRequest->Pagination->EntriesPerPage = $Page_limit ? $Page_limit : 10;
+            if ($searchFor) {
+                $serviceRequest->SKUArray = new \DTS\eBaySDK\Trading\Types\SKUArrayType(explode(" ", $searchFor));
             }
-            if ($serviceResponse->Ack !== 'Failure' && isset($serviceResponse->ActiveList->ItemArray)) {
+            //echo var_dump($serviceRequest);
+            //$ouputSelection = ['ItemArray.Item.BuyItNowPrice', 'PaginationResult', 'ItemArray.Item.Quantity'];
+            //$serviceRequest->OutputSelector = $ouputSelection;
+            $serviceResponse = $this->service->getSellerList($serviceRequest);
+           
+            if (isset($serviceResponse->Errors)) {
+                $this->doOAuth($request);
+            }
+            if ($serviceResponse->Ack !== 'Failure' && isset($serviceResponse->ItemArray)) {
                 //$serviceResponse->ActiveList->ItemArray->Item[0]->QuantityAvailable;
                 // \DTS\eBaySDK\Trading\Types\ItemType;
+                echo "Everything went well";
+             
+               
                 return $serviceResponse;
             }
         } catch (Expression $e) {
-
-            session()->forget('totalPages');
-            session()->forget('token');
-            session()->forget('scope');
-            session()->forget('return');
-            session()->forget('token');
-            $this->getToken($request, 'trading', true);
-            return redirect('getauth');
+            echo "Exception Was Triggered";
+            echo var_dump($e);
+            echo "Doing OAuth";
+            $this->doOAuth($request);
         }
+        echo "No exception but did not return an ItemArray oject";
+        echo var_dump($serviceResponse);
     }
 
-    public function clearSessionPagination()
-    { }
+    public function doOAuth(Request $request)
+    { 
+        session()->forget('totalPages');
+        session()->forget('token');
+        session()->forget('scope');
+        session()->forget('return');
+        session()->forget('token');
+        $this->getToken($request, 'trading', true);
+        return redirect('getauth');
+
+    }
 
     /**
      * Store a newly created resource in storage.

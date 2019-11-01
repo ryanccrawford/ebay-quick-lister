@@ -71,7 +71,7 @@
                         <div class="row no-gutters">
                             <div class="col-sm-4">
 
-                            <img src="{{ $listingItem->PictureDetails->GalleryURL }} " class="card-img pl-3 pt-3 pr-3" alt="photo">
+                            <img src="{{ $listingItem->PictureDetails->PictureURL[0] }} " class="card-img pl-3 pt-3 pr-3" alt="photo">
                             </div>
                             <div class="col-sm-8">
                                 <div class="card-body">
@@ -87,7 +87,8 @@
                                                         <span class="input-group-text bg-primary text-white"><strong>Price: </strong></span>
                                                         <span class="input-group-text">
                                                             @php
-                                                                $number = floatval($listingItem->SellingStatus->CurrentPrice->value);
+                            
+                                                                $number = floatval($listingItem->BuyItNowPrice->value );
                                                             @endphp
                                                             ${{  number_format($number, 2) }}
                                                         </span>

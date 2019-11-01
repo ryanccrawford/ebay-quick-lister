@@ -3,9 +3,9 @@
 namespace App;
 
 use DTS\eBaySDK\Inventory\Types\InventoryItem;
-use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
-class Listing extends Eloquent
+
+class Listing extends Moloquent
 {
 
     public $provider;
