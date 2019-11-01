@@ -23,10 +23,6 @@ class OAuthController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-
-        
-        
-    
     }
 
     public function getauth(Request $request)
@@ -37,16 +33,16 @@ class OAuthController extends Controller
             'certId' => env('EBAY_PROD_CERT_ID'),
             'devId' => env('EBAY_PROD_DEV_ID'),
         ];
-
+        echo var_dump($this->credentials);
         $this->OAuthService = new \DTS\eBaySDK\OAuth\Services\OAuthService(
             [
                 'credentials' => $this->credentials,
                 'ruName' => getenv('EBAY_PROD_RUNAME'),
             ]
         );
-       
-      // $scope = $request->session('scope');
-       $scope = 'https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account';
+
+        // $scope = $request->session('scope');
+        $scope = 'https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account';
 
         $s = explode(' ', $scope);
         $url =  $this->OAuthService->redirectUrlForUser(
@@ -62,7 +58,7 @@ class OAuthController extends Controller
 
     public function oauth(Request $request)
     {
-          
+
         $this->credentials = [
             'appId' => env('EBAY_PROD_APP_ID'),
             'certId' => env('EBAY_PROD_CERT_ID'),
@@ -75,9 +71,9 @@ class OAuthController extends Controller
                 'ruName' => env('EBAY_PROD_RUNAME'),
             ]
         );
-       
+
         $this->code = $request->query('code');
-        
+
         if (strlen($this->code)) {
             $response = $this->OAuthService->getUserToken(
                 new \DTS\eBaySDK\OAuth\Types\GetUserTokenRestRequest(
@@ -88,20 +84,18 @@ class OAuthController extends Controller
             );
 
             if ($response->getStatusCode() !== 200) {
-              
+
                 return redirect('home');
             } else {
                 session(['token' => $response->access_token]);
                 if ($request->session()->has('return')) {
-           
-                    $rd = session('return') ? session('return') : 'home';//  session('return');
+
+                    $rd = session('return') ? session('return') : 'home'; //  session('return');
                     session()->forget('return');
                     return redirect($rd);
                 }
-
-                
             }
-       
+
             return redirect('home');
         }
     }
