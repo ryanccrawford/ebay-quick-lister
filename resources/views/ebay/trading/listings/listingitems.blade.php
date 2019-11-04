@@ -13,10 +13,14 @@
                 <strong>{{ $errors['messages'] }}</strong>
             </div>
             @endif
-            @isset($errorsObj)
-            <div class="alert alert-danger" role="alert">
-                <strong>{{ $errorsObj->messages }}</strong>
-            </div>
+            @isset($Errors)
+                @foreach($Errors as $error)
+                    @foreach ($error as $key => $value)
+                        <div class="alert alert-danger" role="alert">
+                        <strong>{{ $key }} : {{ $value }}</strong>
+                        </div>
+                    @endforeach
+                @endforeach
             @endisset
             <div class="container">
             <div class="row">
@@ -33,7 +37,7 @@
                 </div>
                 </span>
             </div>
-            @isset($listingArray)
+            @isset($itemsArray)
                 @if($totalPages > 1)
                     <nav aria-label="pagination">
                         <div class="justify-content-center">
@@ -65,13 +69,13 @@
             <div class="col-lg-12">
                 <div class="card-group">
                     <!-- { 'listingArray', 'next_link', 'prev_link', 'totalPages', 'limit', 'currentPage', 'afterCurrentPageLinks', 'beforeCurrentPageLinks' } -->
-                    @foreach ($listingArray as $listingItem)
+                    @foreach ($itemsArray as $listingItem)
                 <div class="col-sm-6">
                     <div class="card shadow rounded mb-3">
                         <div class="row no-gutters">
                             <div class="col-sm-4">
 
-                            <img src="{{ $listingItem->PictureDetails->PictureURL[0] }} " class="card-img pl-3 pt-3 pr-3" alt="photo">
+                            <img src="{{ $listingItem->PictureDetails->GalleryURL }} " class="card-img pl-3 pt-3 pr-3" alt="photo">
                             </div>
                             <div class="col-sm-8">
                                 <div class="card-body">
@@ -81,44 +85,44 @@
                                     <span class="badge badge-primary round ml-2" data-toggle="tooltip" data-placement="top" title="Watchers"><i class="fa fa-eye" aria-hidden="true"></i> {{$listingItem->WatchCount}}</span>
                                 </div>
                                 <div class="card-body">
-
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text bg-primary text-white"><strong>Price: </strong></span>
-                                                        <span class="input-group-text">
-                                                            @php
-                            
-                                                                $number = floatval($listingItem->BuyItNowPrice->value );
-                                                            @endphp
-                                                            ${{  number_format($number, 2) }}
-                                                        </span>
-                                                    </div>
-                                                    <input type="number" min="0.00" max="999999.99" placeholder="0.00" class="form-control text-right" aria-label="Dollar amount (with dot and two decimal places)">
-                                                    <div class="input-group-append">
-                                                        <button class="button btn-info text-white" type="button" id="change_price_{{$listingItem->ItemID}}">Update</button>
-                                                    </div>
-                                                </div>
-                                                <div class="input-group mt-1">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text bg-primary text-white"><strong>QOH: </strong></span>
-                                                        <span class="input-group-text">
-                                                            @php
-                                                                $qty = intval($listingItem->QuantityAvailable);
-                                                            @endphp
-                                                            {{  number_format($qty, 0) }}
-                                                        </span>
-                                                    </div>
-                                                    <input type="number" min="0" max="9999" placeholder="0" class="form-control text-right" aria-label="Quantity on Hand">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text bg-primary text-white"><strong>Price: </strong></span>
+                                            <span class="input-group-text">
+                                                @php
+                                                    $number = floatval($listingItem->BuyItNowPrice->value );
+                                                @endphp
+                                                ${{  number_format($number, 2) }}
+                                            </span>
+                                        </div>
+                                            <input type="number" min="0.00" max="999999.99" placeholder="0.00" class="form-control text-right" aria-label="Dollar amount (with dot and two decimal places)">
+                                        <div class="input-group-append">
+                                            <button class="button btn-info text-white" type="button" id="change_price_{{$listingItem->ItemID}}">Update</button>
+                                        </div>
+                                    </div>
+                                    <div class="input-group mt-1">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text bg-primary text-white"><strong>QOH: </strong></span>
+                                                <span class="input-group-text">
+                                                    @php
+                                                        $qty = intval($listingItem->QuantityAvailable);
+                                                    @endphp
+                                                    {{  number_format($qty, 0) }}
+                                                </span>
+                                        </div>
+                                               <input type="number" min="0" max="9999" placeholder="0" class="form-control text-right" aria-label="Quantity on Hand">
                                                     <div class="input-group-append">
                                                         <button class="button btn-info text-white" type="button" id="change_qoh_{{$listingItem->ItemID}}">Update</button>
                                                     </div>
                                                 </div>
+
                                                 <div class="card-body">
-
-                                   <button id="edit_item_{{$listingItem->ItemID }}" class="btn btn-primary btn-sm text-right"><i class="fa fa-pencil" aria-hidden="true"></i></button>
-
-                               </div>
-                              </div>
+                                                    <div class="btn-group-vertical">
+                                                        <a class="btn btn-secondary btn-sm" href="{{$listingItem->ListingDetails->ViewItemURL}}" data-toggle="tooltip" data-placement="top" title="View on Ebay"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                                                        <a href="{{ route('trading/edit') . '?item_id=' . $listingItem->ItemID }}" class="btn btn-primary btn-sm text-right" data-toggle="tooltip" data-placement="top" title="Edit Listing"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                                    </div>
+                                                </div>
+                                        </div>
                             </div>
 
 

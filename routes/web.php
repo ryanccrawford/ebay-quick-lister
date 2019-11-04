@@ -11,7 +11,7 @@
 |
 */
 
-//Entry Point for public 
+//Entry Point for public
 Route::get(
     '/',
     function () {
@@ -41,19 +41,20 @@ Route::post('inventory/locations/saveadd', 'EbayInventoryController@saveInventor
 //Trading
 Route::get('trading', 'Ebay\Trading\API\ItemsController@index')->name('trading');
 Route::get('trading/search', 'Ebay\Trading\API\ItemsController@index')->name('trading/search');
-
+Route::get('trading/edit', 'Ebay\Trading\API\ItemsController@show')->name('trading/edit');
+Route::put('trading/edit', 'Ebay\Trading\API\ItemsController@update')->name('trading/edit');
 
 
 
 
 
 //selleritem
-Route::get('addselleritem','selleritemController@create');
-Route::post('addselleritem','selleritemController@store');
-Route::get('selleritem','selleritemController@index');
-Route::get('editselleritem/{id}','selleritemController@edit');
-Route::post('editselleritem/{id}','selleritemController@update');
-Route::delete('selleritem/{id}','selleritemController@destroy');
+Route::get('addselleritem', 'selleritemController@create');
+Route::post('addselleritem', 'selleritemController@store');
+Route::get('selleritem', 'selleritemController@index');
+Route::get('editselleritem/{id}', 'selleritemController@edit');
+Route::post('editselleritem/{id}', 'selleritemController@update');
+Route::delete('selleritem/{id}', 'selleritemController@destroy');
 
 
 //Deployment
