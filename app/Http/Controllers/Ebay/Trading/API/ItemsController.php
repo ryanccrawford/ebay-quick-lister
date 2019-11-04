@@ -290,7 +290,7 @@ class ItemsController extends Controller
         return $this->retry($request, 'trading/edit?item_id=' . $item_id, 'ebay.trading.listings.listingitemedit');
     }
 
-    public function retry($request, $retryRoute, $failRoute)
+    public function retry(Request $request, string $retryRoute, string $failRoute)
     {
 
         if (!$request->session()->has('retry')) {

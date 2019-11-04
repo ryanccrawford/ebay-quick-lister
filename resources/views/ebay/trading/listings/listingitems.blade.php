@@ -23,9 +23,10 @@
                 @endforeach
             @endisset
             <div class="container">
-            <div class="row">
+            <span><h1 class="mt-1 mb-2 left text-white">Listings<a class="btn btn-danger round ml-2" href="#">{{ __('Add') }}</a></h1></span>
+
+                <div class="row">
                 <div class="col-sm-6">
-            <span><h1 class="mt-1 mb-2 left">Listings<a class="btn btn-danger round ml-2" href="#">{{ __('Add') }}</a></h1></span>
 
                 </div>
                 <div class="col-sm-6">
@@ -95,9 +96,9 @@
                                                 ${{  number_format($number, 2) }}
                                             </span>
                                         </div>
-                                            <input type="number" min="0.00" max="999999.99" placeholder="0.00" class="form-control text-right" aria-label="Dollar amount (with dot and two decimal places)">
+                                    <input type="number" name="price_{{$$listingItem->ItemID}}" min="0.00" max="999999.99" placeholder="0.00" class="form-control text-right" aria-label="Dollar amount (with dot and two decimal places)">
                                         <div class="input-group-append">
-                                            <button class="button btn-info text-white" type="button" id="change_price_{{$listingItem->ItemID}}">Update</button>
+                                            <button class="button btn-info text-white change-price" type="button" name="change_price_{{$listingItem->ItemID}}">Update</button>
                                         </div>
                                     </div>
                                     <div class="input-group mt-1">
@@ -110,9 +111,9 @@
                                                     {{  number_format($qty, 0) }}
                                                 </span>
                                         </div>
-                                               <input type="number" min="0" max="9999" placeholder="0" class="form-control text-right" aria-label="Quantity on Hand">
+                                    <input type="number" min="0" max="9999" name="qoh_{{$listingItem->ItemID}}" placeholder="0" class="form-control text-right" aria-label="Quantity on Hand">
                                                     <div class="input-group-append">
-                                                        <button class="button btn-info text-white" type="button" id="change_qoh_{{$listingItem->ItemID}}">Update</button>
+                                                        <button class="button btn-info text-white change-qoh" type="button" name="change_qoh_{{$listingItem->ItemID}}">Update</button>
                                                     </div>
                                                 </div>
 
@@ -143,9 +144,7 @@
     @endsection
 
 @section('end')
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="../js/quickupdate.js"></script>
     <script>
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()

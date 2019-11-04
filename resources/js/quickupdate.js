@@ -1,0 +1,4 @@
+$('.change-price')
+
+
+$('.change-qoh')
