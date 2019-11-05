@@ -57,10 +57,10 @@
                         </div>
                     </div>
 
-                <div class="col-md-6">
+                <div class="col-md-12">
 
                             <div class="card mb-3">
-                                <img id="item-image" src="" class="card-img-top mt-3 center" alt="..." style="display:none;">
+                                <img id="item-image" src="../../images/details.jpg" class="ml-3 mt-3 right" alt="..." style="width:50px;">
                                 <div class="card-body">
                                     <h4 class="card-title">Item Details</h4>
                                     <div class="input-group mb-3">
@@ -102,10 +102,13 @@
                             </div>
 
                     </div>
-                    <div class="col-md-6 px-md-5">
+                    <div class="col-md-12">
                         <div class="card mb-3">
                             <div class="card-body">
                                 <h4 class="card-title">Image Uploader</h4>
+                                <div class="row">
+                                    <div class="col-md-4">
+
                                 <form data-action="{{ route('imagepost') }}" method="POST" enctype="multipart/form-data" id="upload-image-form">
                                     @csrf
                                     <div class="form-inline">
@@ -121,6 +124,54 @@
                                 <h4>Or Drag an Image Here</h4>
                                 <div class="upload-image-drop-zone" id="upload-image-drop-zone">
                                     Just drag and drop files here
+                                </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="row">
+
+
+
+                    @php
+                      $count = count($item->PictureDetails->PictureURL);
+                      $size = 12 / ($count + 1);
+                   $imagecount = 0;
+                   @endphp
+
+
+                    @foreach($item->PictureDetails->PictureURL as $PictureDetails)
+                <div class="col-md-{{intval($size)}}">
+                         <div class="card">
+                             <div class="card-header">
+                                 Main Image
+                             <div class="button-group">
+                             <button type="button" class="close" data-dismiss="alert" aria-label="Close" name="del_main_image_{{$imagecount++}}">
+                                    <span aria-hidden="true"><i class="fa fa-trash" aria-hidden="true"></i></span>
+                             </button>
+                             </div>
+                             </div>
+                            <img class="card-img" src="{{$PictureDetails}}" alt="..." style="border: 2px dashed black">
+
+                        </div>
+                     </div>
+                     @endforeach
+                     <div class="col-md-{{intval($size)}}">
+                         <div class="card">
+                             <div class="card-header">
+                                 Description Image
+                             <div class="button-group">
+                             <button type="button" class="close" data-dismiss="alert" aria-label="Close" name="del_description_image">
+                                    <span aria-hidden="true"><i class="fa fa-trash" aria-hidden="true"></i></span>
+                             </button>
+                             </div>
+                             </div>
+                            <img class="card-img" id="descriptionImage" src="..." alt="..." style="border: 2px dashed black">
+
+                        </div>
+                     </div>
+
+
+                                </div>
+                                   </div>
                                 </div>
 
                                 <!-- Progress Bar -->
@@ -158,42 +209,7 @@
                     </div>
 
                     </div>
-                <div class="row justify-content-center">
-                    @php
-                      $count = count($item->PictureDetails->PictureURL);
-                      $size = 4 / $count + 1;
-                    @endphp
-                <div class="col-md-{{intval($size)}}">
-                         <div class="card">
-                             <div class="button-group">
-                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true"><i class="fa fa-trash" aria-hidden="true"></i></span>
-                             </button>
-                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true"><i class="fa fa-plus" aria-hidden="true"></i></span>
-                             </button>
-                             </div>
-                            <img class="card-img" src="../images/placeholder-400x400.png" alt="..." style="border: 2px dashed black">
 
-                    </div>
-                </div>
-                    @foreach($item->PictureDetails->PictureURL as $PictureDetails)
-                <div class="col-md-{{intval($size)}}">
-                         <div class="card">
-                             <div class="button-group">
-                             <button type="button" class="close" data-dismiss="alert" aria-label="Close" name="del_image_">
-                                    <span aria-hidden="true"><i class="fa fa-trash" aria-hidden="true"></i></span>
-                             </button>
-                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true"><i class="fa fa-plus" aria-hidden="true"></i></span>
-                             </button>
-                             </div>
-                            <img class="card-img" src="{{$PictureDetails}}" alt="..." style="border: 2px dashed black">
-
-                        </div>
-                     </div>
-                     @endforeach
-                </div>
                 <div class="row">
                     <div class="col-md-12 mt-3 mb-3">
                         <div class="card">
@@ -239,7 +255,7 @@
 
                 @endsection
                 @push('end')
-                <script src="../js/createinventory.js"></script>
+                <script src="{{ asset('js/edititemListing.js') }}"></script>
 
                 @endpush
 

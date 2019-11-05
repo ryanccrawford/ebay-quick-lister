@@ -124,7 +124,10 @@ $(document).ready(function(e) {
             }
         })
     })
-
+    $("#HTMLeditor1").ckeditor(function(textarea) {
+        let desImage = $(htmleditor.document).find("[attr=alt]");
+        console.log(desImage);
+    });
 
 
     $(imageButton).on('click', function(e) {

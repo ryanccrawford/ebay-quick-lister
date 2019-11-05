@@ -96,9 +96,9 @@
                                                 ${{  number_format($number, 2) }}
                                             </span>
                                         </div>
-                                    <input type="number" name="price_{{$$listingItem->ItemID}}" min="0.00" max="999999.99" placeholder="0.00" class="form-control text-right" aria-label="Dollar amount (with dot and two decimal places)">
+                                    <input type="number" name="price_{{$listingItem->ItemID}}" min="0.00" max="999999.99" placeholder="0.00" class="form-control text-right" aria-label="Dollar amount (with dot and two decimal places)" value="{{number_format($number, 2) }}">
                                         <div class="input-group-append">
-                                            <button class="button btn-info text-white change-price" type="button" name="change_price_{{$listingItem->ItemID}}">Update</button>
+                                            <button class="btn btn-info text-white change-price" type="button" name="change_price_{{$listingItem->ItemID}}">Update</button>
                                         </div>
                                     </div>
                                     <div class="input-group mt-1">
@@ -111,19 +111,20 @@
                                                     {{  number_format($qty, 0) }}
                                                 </span>
                                         </div>
-                                    <input type="number" min="0" max="9999" name="qoh_{{$listingItem->ItemID}}" placeholder="0" class="form-control text-right" aria-label="Quantity on Hand">
+                                    <input type="number" min="0" max="9999" name="qoh_{{$listingItem->ItemID}}" placeholder="0" class="form-control text-right" aria-label="Quantity on Hand" value="{{number_format($qty, 0)}}">
                                                     <div class="input-group-append">
-                                                        <button class="button btn-info text-white change-qoh" type="button" name="change_qoh_{{$listingItem->ItemID}}">Update</button>
+                                                        <button class="btn btn-info text-white change-qoh" type="button" name="change_qoh_{{$listingItem->ItemID}}">Update</button>
                                                     </div>
                                                 </div>
 
-                                                <div class="card-body">
-                                                    <div class="btn-group-vertical">
+
+                                        </div>
+                                        <div class="card-body">
+                                                    <div class="btn-group">
                                                         <a class="btn btn-secondary btn-sm" href="{{$listingItem->ListingDetails->ViewItemURL}}" data-toggle="tooltip" data-placement="top" title="View on Ebay"><i class="fa fa-eye" aria-hidden="true"></i></a>
                                                         <a href="{{ route('trading/edit') . '?item_id=' . $listingItem->ItemID }}" class="btn btn-primary btn-sm text-right" data-toggle="tooltip" data-placement="top" title="Edit Listing"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                                     </div>
                                                 </div>
-                                        </div>
                             </div>
 
 
@@ -144,7 +145,7 @@
     @endsection
 
 @section('end')
-    <script src="../js/quickupdate.js"></script>
+    <script src="../../js/quickupdate.js"></script>
     <script>
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()

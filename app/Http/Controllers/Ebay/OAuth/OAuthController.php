@@ -122,7 +122,7 @@ class OAuthController extends Controller
         $nd = new DateTime(now());
         dump($ed);
         dump($nd);
-        dump('session expires: ' . $ed > $nd);
+
         if ($ed > $nd) {
             dump("not expire<br>");
 
