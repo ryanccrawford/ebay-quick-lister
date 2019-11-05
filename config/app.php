@@ -166,6 +166,7 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         Hkonnet\LaravelEbay\EbayServiceProvider::class,
         Jenssegers\Mongodb\MongodbServiceProvider::class,
+       
 
         /*
          * Package Service Providers...
@@ -180,7 +181,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\TelescopeServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
+        App\Providers\CkServiceProvider::class,
 
     ],
 

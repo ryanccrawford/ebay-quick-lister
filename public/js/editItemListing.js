@@ -1,3 +1,5 @@
+var htmleditor = CKEDITOR.replace('HTMLeditor1', {'height':'600'});
+
 $(document).ready(function(e) {
 
     var uploadFinished = $('.js-upload-finished');
@@ -72,63 +74,15 @@ $(document).ready(function(e) {
 
         e.preventDefault()
 
-        var sku = $('#sku').val();
-        var descrip = htmleditor.getData();
-        var product = {
-            title: $('#ebaytitle').val(),
-            description: descrip,
-            condition: 1000,
-            sku: $('#sku').val(),
-            imageUrls: ['https://www.3starinc.com/ebaymaker/' + $('#item-image').attr('src')],
-            packageWeightAndSize: {
-                dimensions: {
-                    height: 5,
-                    length: 10,
-                    width: 15,
-                    unit: "INCH"
-                },
-                packageType: "MAILING_BOX",
-                weight: {
-                    value: 15,
-                    unit: "POUND"
-                }
-            },
-            availability: {
-                shipToLocationAvailability: {
-                    quantity: $('#qty').val().toString()
-                }
-            }
-        }
-
-        $.ajax({
-            url: 'ebay.php?sku=' + $('#sku').val(),
-            method: 'POST',
-            data: JSON.stringify(product),
-            dataType: "json",
-            success: function(data) {
-                if (data) {
-                    console.log(data)
-                    $('#alertarea').append(createAlert('Success', data.message))
-                }
-            },
-            error: function(data) {
-                console.log(data);
-                $('#alertarea').append(createAlert('Error', data.responseText))
-                var message = data.message
-                console.log(message)
-                var itemFinished = $('<div>').addClass('list-group-item', 'list-group-item-error')
-                var spanItem = $('<span>').addClass('badge alert-danger pull-right').text('Error')
-                itemFinished.append(spanItem).text(message)
-                $('.list-group').append(itemFinished)
-                $('#item-image').attr('src', '').hide()
-            }
-        })
     })
-    $("#HTMLeditor1").ckeditor(function(textarea) {
+
+    var htmleditor = CKEDITOR.replace('HTMLeditor1', {'height':'600'});
+    
+    $(htmleditor).instanceReady(function(textarea) {
         let desImage = $(htmleditor.document).find("[attr=alt]");
         console.log(desImage);
     });
-
+    
 
     $(imageButton).on('click', function(e) {
         e.preventDefault()

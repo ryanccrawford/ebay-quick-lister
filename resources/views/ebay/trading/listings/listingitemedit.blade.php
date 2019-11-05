@@ -220,9 +220,7 @@
                         echo htmlentities($item->Description);
                         ?>
                         </textarea>
-                                <script>
-                                    var htmleditor = CKEDITOR.replace('HTMLeditor1', {'height':'600'});
-                                </script>
+                        
                             </div>
                         </div>
                 </div>
@@ -255,7 +253,8 @@
 
                 @endsection
                 @push('end')
+               
                 <script src="{{ asset('js/edititemListing.js') }}"></script>
-
+               
                 @endpush
 

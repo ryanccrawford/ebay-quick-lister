@@ -18,7 +18,8 @@
         "laravel/tinker": "^1.0",
         "symfony/process": "^4.3",
         "symfony/psr-http-message-bridge": "^1.2",
-        "vlucas/phpdotenv": "^3.6"
+        "vlucas/phpdotenv": "^3.6",
+        "ckeditor/ckeditor": "dev-full/4.11.x"
     },
     "require-dev": {
         "facade/ignition": "^1.4",
