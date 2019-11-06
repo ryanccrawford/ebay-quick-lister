@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Ebay\Trading\API;
 
+use App\Catagory;
 use \App\Http\Controllers\Controller;
 use DateInterval;
 use DateTime;
@@ -11,16 +12,19 @@ use \DTS\eBaySDK\Trading\Types;
 use \DTS\eBaySDK\Trading\Enums;
 use \DTS\eBaySDK\Constants;
 use DTS\eBaySDK\MerchantData\Enums\DetailLevelCodeType;
+use DTS\eBaySDK\Taxonomy\Types\Category;
 use Exception;
 use Illuminate\Database\Query\Expression;
 use stdClass;
 use Symfony\Component\Translation\Interval;
+
 
 class ItemsController extends Controller
 {
 
 
     protected $service;
+    protected $categoryService;
     protected $config;
     protected $token;
     protected $credentials;
@@ -212,7 +216,21 @@ class ItemsController extends Controller
         if ($mySellingResults->Ack == 'Failure') {
             $Errors = $mySellingResults->Errors;
             dump($Errors);
-            return view('ebay.trading.listings.listingitems', compact('Errors'));
+            // if () {
+            //     dump("token expired");
+            // }
+            // dump($Errors);
+            session()->forget(
+                [
+                    'user_token',
+                    'expires_in',
+                    'refresh_token'
+                ]
+            );
+
+
+
+            return redirect('getoauth');
         }
         if ($mySellingResults->Ack !== 'Failure' && isset($mySellingResults->ActiveList->ItemArray)) {
 
@@ -279,7 +297,15 @@ class ItemsController extends Controller
         $itemResponse = $this->GetItem($item_id);
         $item = $itemResponse->Item;
         dump($item);
+        // $categories = DB::connection('mongodb')->collection('catagories_collection')->get();
+        // if (count($categories) <= 0) {
+
+        // $categories = $this->GetCategories('all');
+        // }
+        // dump($categories->CategoryArray);
+
         if ($item instanceof \DTS\eBaySDK\Trading\Types\ItemType) {
+
             return view('ebay.trading.listings.listingitemedit', compact('item'));
         }
         $Errors = [
@@ -288,6 +314,30 @@ class ItemsController extends Controller
         ];
         dump($Errors);
         return $this->retry($request, 'trading/edit?item_id=' . $item_id, 'ebay.trading.listings.listingitemedit');
+    }
+
+    public function GetCategories($type): \DTS\eBaySDK\Trading\Types\GetCategoriesResponseType
+    {
+        $serviceRequest = new \DTS\eBaySDK\Trading\Types\GetCategoriesRequestType();
+        $serviceRequest->CategorySiteID = '0';
+
+
+        if ($type === 'all') {
+
+            // if (!$this->service instanceof \DTS\eBaySDK\Trading\Services\TradingService) {
+            //     $this->service = new \DTS\eBaySDK\Trading\Services\TradingService(
+            //         [
+            //             'siteId' => '0',
+            //             'authorization' => session('user_token'),
+            //             'credentials' => $this->credentials
+            //         ]
+            //     );
+            // }
+            dump("inside get cat");
+            return $this->service->GetCategories($serviceRequest);
+
+            // User::create(['name' => 'John']);
+        }
     }
 
     public function retry(Request $request, string $retryRoute, string $failRoute)

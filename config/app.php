@@ -166,7 +166,7 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         Hkonnet\LaravelEbay\EbayServiceProvider::class,
         Jenssegers\Mongodb\MongodbServiceProvider::class,
-       
+
 
         /*
          * Package Service Providers...

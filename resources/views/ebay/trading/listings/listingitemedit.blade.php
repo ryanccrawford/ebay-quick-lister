@@ -41,7 +41,7 @@
             </div>
             @endisset
                 @isset($item)
-                <h1 class="text-white">Editing Item {{$item->ItemID}}</h1>
+                <h1 class="text-white">Editing Item {{ $item->ItemID}}</h1>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card mb-3 mt-3">
@@ -56,7 +56,7 @@
                             </div>
                         </div>
                     </div>
-
+                        @include('ebay.trading.listings.listingcategories')
                 <div class="col-md-12">
 
                             <div class="card mb-3">
@@ -220,7 +220,7 @@
                         echo htmlentities($item->Description);
                         ?>
                         </textarea>
-                        
+
                             </div>
                         </div>
                 </div>
@@ -253,8 +253,8 @@
 
                 @endsection
                 @push('end')
-               
+
                 <script src="{{ asset('js/edititemListing.js') }}"></script>
-               
+
                 @endpush
 

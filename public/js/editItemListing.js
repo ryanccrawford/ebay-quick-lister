@@ -1,7 +1,11 @@
-var htmleditor = CKEDITOR.replace('HTMLeditor1', {'height':'600'});
-
+var htmleditor = CKEDITOR.replace('HTMLeditor1', { 'height': '600' });
+var rawHTML = '';
 $(document).ready(function(e) {
-
+    var templateLoaded = false;
+    $.get("../files/policy.html", data => {
+        rawHTML = data;
+        templateLoaded = true;
+    });
     var uploadFinished = $('.js-upload-finished');
     var progressBar = $('.progress');
     var imageButton = $('#upload-image-submit');
@@ -11,49 +15,27 @@ $(document).ready(function(e) {
     textCompleted.val('');
     uploadFinished.hide();
     progressBar.hide();
-    var template = '';
-    var templateLoaded = false
-    $.get("policy.html", (data) => {
-        template = data
-        templateLoaded = true;
-    })
+
+
     var dropZone = document.getElementById('upload-image-drop-zone');
 
 
     $('#desc').keyup((e) => {
         if (templateLoaded) {
-            var detext = $('#desc').val()
-            var valoftitle = $('#ebaytitle').val() + " | " + $('#sku').val();
-            var newHtml = template.replace("@title", valoftitle);
-            var image = $('#item-image').attr('src')
-            var newHtmlImage = newHtml.replace("@image", image);
-            var newHtmlDesc = newHtmlImage.replace("@description", detext);
-            htmleditor.setData(newHtmlDesc)
+            updateHTML();
         }
     });
 
     $('#ebaytitle').keyup((e) => {
         if (templateLoaded) {
-            var detext = $('#desc').val()
-            var valoftitle = $('#ebaytitle').val() + " | " + $('#sku').val();
-            var newHtml = template.replace("@title", valoftitle);
-            var image = $('#item-image').attr('src')
-            var newHtmlImage = newHtml.replace("@image", image);
-            var newHtmlDesc = newHtmlImage.replace("@description", detext);
-            htmleditor.setData(newHtmlDesc)
+            updateHTML();
         }
 
     });
 
     $('#sku').keyup((e) => {
         if (templateLoaded) {
-            var detext = $('#desc').val()
-            var valoftitle = $('#ebaytitle').val() + " | " + $('#sku').val();
-            var newHtml = template.replace("@title", valoftitle);
-            var image = $('#item-image').attr('src')
-            var newHtmlImage = newHtml.replace("@image", image);
-            var newHtmlDesc = newHtmlImage.replace("@description", detext);
-            htmleditor.setData(newHtmlDesc)
+            updateHTML();
         }
     });
 
@@ -76,13 +58,10 @@ $(document).ready(function(e) {
 
     })
 
-    var htmleditor = CKEDITOR.replace('HTMLeditor1', {'height':'600'});
-    
-    $(htmleditor).instanceReady(function(textarea) {
-        let desImage = $(htmleditor.document).find("[attr=alt]");
-        console.log(desImage);
-    });
-    
+
+
+
+
 
     $(imageButton).on('click', function(e) {
         e.preventDefault()
@@ -172,6 +151,16 @@ $(document).ready(function(e) {
         dissmissAlert.append(dissmissLable)
         alert.append(dissmissAlert)
 
+    }
+
+    function updateHTML() {
+        var detext = $("#desc").val();
+        var valoftitle = $("#ebaytitle").val() + " | " + $("#sku").val();
+        var newHtml = rawHTML.replace("@title", valoftitle);
+        var image = $("#item-image").attr("src");
+        var newHtmlImage = newHtml.replace("@image", image);
+        var newHtmlDesc = newHtmlImage.replace("@description", detext);
+        htmleditor.setData(newHtmlDesc);
     }
 
     function updateClipboard(newClip) {

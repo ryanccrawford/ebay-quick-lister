@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "21c79e40e26a14fe16d9479b7868e681",
+    "content-hash": "c5bca2d751d2a0d6397e4186eb4a78f6",
     "packages": [
         {
             "name": "ckeditor/ckeditor",
-            "version": "4.13.0",
+            "version": "dev-full/4.11.x",
             "source": {
                 "type": "git",
-                "url": "https://github.com/ckeditor/ckeditor4-releases.git",
-                "reference": "4d6b1722a79009f4627fd338ca872e57914e8235"
+                "url": "https://github.com/ckeditor/ckeditor-releases.git",
+                "reference": "6f1346dc4ac94a6e22ebde53d92b3267159c4c05"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ckeditor/ckeditor4-releases/zipball/4d6b1722a79009f4627fd338ca872e57914e8235",
-                "reference": "4d6b1722a79009f4627fd338ca872e57914e8235",
+                "url": "https://api.github.com/repos/ckeditor/ckeditor-releases/zipball/6f1346dc4ac94a6e22ebde53d92b3267159c4c05",
+                "reference": "6f1346dc4ac94a6e22ebde53d92b3267159c4c05",
                 "shasum": ""
             },
             "type": "library",
@@ -45,7 +45,7 @@
                 "text",
                 "wysiwyg"
             ],
-            "time": "2019-09-26T11:04:37+00:00"
+            "time": "2019-04-09T13:35:04+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -1572,6 +1572,56 @@
                 "type"
             ],
             "time": "2015-07-25T16:39:46+00:00"
+        },
+        {
+            "name": "predis/predis",
+            "version": "v1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nrk/predis.git",
+                "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nrk/predis/zipball/f0210e38881631afeafb56ab43405a92cafd9fd1",
+                "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.9"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.8"
+            },
+            "suggest": {
+                "ext-curl": "Allows access to Webdis when paired with phpiredis",
+                "ext-phpiredis": "Allows faster serialization and deserialization of the Redis protocol"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Predis\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Daniele Alessandri",
+                    "email": "suppakilla@gmail.com",
+                    "homepage": "http://clorophilla.net"
+                }
+            ],
+            "description": "Flexible and feature-complete Redis client for PHP and HHVM",
+            "homepage": "http://github.com/nrk/predis",
+            "keywords": [
+                "nosql",
+                "predis",
+                "redis"
+            ],
+            "time": "2016-06-16T16:22:20+00:00"
         },
         {
             "name": "psr/container",
@@ -5615,7 +5665,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "ckeditor/ckeditor": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
