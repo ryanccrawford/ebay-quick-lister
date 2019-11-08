@@ -23,20 +23,37 @@
                 @endforeach
             @endisset
             <div class="container">
-            <span><h1 class="mt-1 mb-2 left text-white">Listings<a class="btn btn-danger round ml-2" href="#">{{ __('Add') }}</a></h1></span>
+            <span><h1 class="mt-1 mb-2 left text-white">Listings<a class="btn btn-danger round ml-2" href="{{ route('trading/edit') . '?create=true' }}">{{ __('Add') }}</a></h1></span>
 
                 <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-8">
 
                 </div>
-                <div class="col-sm-6">
+            <div class="col-sm-4">
                     <span>
                <form class="form-inline my-2 my-lg-0 justify-content-end">
-                    <input class="form-control mr-sm-2" type="search" placeholder="SKU / Title" aria-label="Search">
-                    <button class="btn btn-dark my-2 my-sm-0" type="submit">Search</button>
+                    <input class="form-control mr-sm-2" type="search" placeholder="SKU" aria-label="Search">
+                    <button class="btn btn-dark my-2 my-sm-0" type="submit">Find by SKU</button>
+                    <div class="form-check mb-2 mr-sm-2">
+                        <input class="form-check-input" type="radio" name="ActiveList" id="ActiveList" value="ActiveList" checked>
+                        <label class="form-check-label" for="inlineRadio1">Active Listings</label>
+                    </div>
+                    <div class="form-check mb-2 mr-sm-2">
+                        <input class="form-check-input" type="radio" name="SoldList" id="SoldList" value="SoldList" disabled>
+                        <label class="form-check-label" for="inlineRadio2">Sold Listings</label>
+                    </div>
+                    <div class="form-check mb-2 mr-sm-2">
+                        <input class="form-check-input" type="radio" name="UnsoldList" id="UnsoldList" value="UnsoldList" disabled>
+                        <label class="form-check-label" for="inlineRadio3">Unsold Listings</label>
+                    </div>
+                    <div class="form-check mb-2 mr-sm-2">
+                        <input class="form-check-input" type="checkbox" name="IncludeVariations" id="IncludeVariations" disabled>
+                        <label class="form-check-label" for="IncludeVariations">Include Variations</label>
+                    </div>
                 </form>
-                </div>
-                </span>
+                    </span>
+            </div>
+                
             </div>
             @isset($itemsArray)
                 @if($totalPages > 1)

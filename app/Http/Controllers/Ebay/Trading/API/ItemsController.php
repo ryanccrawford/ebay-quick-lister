@@ -262,8 +262,9 @@ class ItemsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $serviceRequest = new \DTS\eBaySDK\Trading\Types\
     }
+
 
     /**
      * Display one specified resource.
@@ -273,9 +274,13 @@ class ItemsController extends Controller
      */
     public function show(Request $request)
     {
-
+       
         $item_id = $request->query('item_id');
-
+        $create = $request->query('create');
+        if($create === 'true'){
+            $descriptionTemplate = file_get_contents( public_path() . '/files/policy.html');
+           return view('ebay.trading.listings.listingitemcreate',compact('descriptionTemplate'));
+        }
         $itemResponse = $this->GetItem($item_id);
         $item = $itemResponse->Item;
         dump($item);
