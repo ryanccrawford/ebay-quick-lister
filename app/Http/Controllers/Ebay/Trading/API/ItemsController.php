@@ -2,41 +2,28 @@
 
 namespace App\Http\Controllers\Ebay\Trading\API;
 
-use \App\Http\Controllers\Controller;
-use DateInterval;
-use DateTime;
 use \Illuminate\Http\Request;
-use \DTS\eBaySDK\Trading\Services;
-use \DTS\eBaySDK\Trading\Types;
-use \DTS\eBaySDK\Trading\Enums;
-use \DTS\eBaySDK\Constants;
 use DTS\eBaySDK\MerchantData\Enums\DetailLevelCodeType;
 use Exception;
-use Illuminate\Database\Query\Expression;
-use stdClass;
-use Symfony\Component\Translation\Interval;
 
-class ItemsController extends Controller
+class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
 {
 
 
     protected $service;
     protected $config;
-    protected $token;
-    protected $credentials;
+
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Request $request)
     {
+        dump($request);
+        parent::__construct($request);
+        dump('not the parent');
         $this->middleware('auth');
-        $this->credentials = [
-            'appId' => env('EBAY_PROD_APP_ID'),
-            'certId' => env('EBAY_PROD_CERT_ID'),
-            'devId' => env('EBAY_PROD_DEV_ID')
-        ];
     }
 
     /**
@@ -46,13 +33,7 @@ class ItemsController extends Controller
      */
     public function index(Request $request)
     {
-
-        if ($request->session()->has('user_token')) {
-            return $this->activeView($request);
-        } else {
-            $this->doOAuth();
-            return redirect('getauth');
-        }
+        return $this->activeView($request);
     }
 
     public static function getTotalPages(\DTS\eBaySDK\Trading\Types\PaginationResultType $pagination)
@@ -186,14 +167,7 @@ class ItemsController extends Controller
         return $this->service->getItem($serviceRequest);
     }
 
-    public function doOAuth($return = 'trading')
-    {
-        session()->forget('totalPages');
-        session()->forget('user_token');
-        session()->forget('scope');
-        session()->forget('return');
-        $this->prepareOAuthSession($return . '?isactiveview=1');
-    }
+
 
     public function activeView(Request $request)
     {
@@ -262,7 +236,9 @@ class ItemsController extends Controller
      */
     public function store(Request $request)
     {
-        $serviceRequest = new \DTS\eBaySDK\Trading\Types\
+        $serviceRequest = new \DTS\eBaySDK\Trading\Types\VerifyAddFixedPriceItemRequestType();
+        $serviceRequest->Item = new \DTS\eBaySDK\Trading\Types\ItemType();
+        //$serviceRequest->Item->ConditionID =
     }
 
 
@@ -274,12 +250,12 @@ class ItemsController extends Controller
      */
     public function show(Request $request)
     {
-       
+
         $item_id = $request->query('item_id');
         $create = $request->query('create');
-        if($create === 'true'){
-            $descriptionTemplate = file_get_contents( public_path() . '/files/policy.html');
-           return view('ebay.trading.listings.listingitemcreate',compact('descriptionTemplate'));
+        if ($create === 'true') {
+            $descriptionTemplate = file_get_contents(public_path() . '/files/policy.html');
+            return view('ebay.trading.listings.listingitemcreate', compact('descriptionTemplate'));
         }
         $itemResponse = $this->GetItem($item_id);
         $item = $itemResponse->Item;
@@ -292,6 +268,9 @@ class ItemsController extends Controller
 
         ];
         dump($Errors);
+        if ($create === 'true') {
+            return $this->retry($request, 'trading/edit?create=true', 'ebay.trading.listings.listingitemcreate');
+        }
         return $this->retry($request, 'trading/edit?item_id=' . $item_id, 'ebay.trading.listings.listingitemedit');
     }
 
@@ -332,22 +311,5 @@ class ItemsController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    /**
-     * Do OAuth.
-     *
-     * @return void
-     */
-    public function prepareOAuthSession(String $return = '')
-    {
-
-        $scope = 'https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account';
-
-        session(['scope' => $scope]);
-        if ($return === '') {
-            $return = 'home';
-        }
-        session(['return' => $return]);
     }
 }

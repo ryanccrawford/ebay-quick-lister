@@ -14,7 +14,7 @@
                         </div>
                     @endif
 
-                    You are logged in!
+                    Welcome. Seller Dashboard comming soon!
                 </div>
             </div>
         </div>
