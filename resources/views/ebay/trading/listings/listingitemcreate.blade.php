@@ -138,6 +138,14 @@
                                     <div class="col">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
+                                                <span class="input-group-text" id="shippingWeight">Weight (lbs.)</span>
+                                            </div>
+                                            <input type="number" name="shippingWeight" min="0" max="500" class="form-control" placeholder="0" aria-label="shippingWeight" aria-describedby="shippingWidth">
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
                                                 <span class="input-group-text" id="shippingHeight">Height</span>
                                             </div>
                                             <input type="number" name="shippingHeight" min="0" max="500" class="form-control" placeholder="0" aria-label="shippingHeight" aria-describedby="shippingHeight">
@@ -166,17 +174,15 @@
                                     </div>
                                     <input type="number" name="shippingCost" min=".01" max="9999999.00" step=".01" class="form-control" aria-label="shippingCost" aria-describedby="shippingCost">
                                 </div>
-                                @isset($ShippingPoliciesResponse->fulfillmentPolicies)
-                                        <div class="form-group col-md-12">
-                                            <label for="shippingPolicyProfile">Shipping Policy</label>
-                                            <select id="shippingPolicyProfile" name="shippingPolicyProfile" class="form-control">
-                                                <option selected>Choose...</option>
-                                                @foreach($ShippingPoliciesResponse->fulfillmentPolicies as $FulfillmentPolicy )
-                                                <option value="{{ $FulfillmentPolicy->fulfillmentPolicyId }}">{{ $FulfillmentPolicy->name }}</option>
-                                                @endforeach
-                                            </select>
+
+                                        <div class="form-group col-md-12" id="shipping">
+                                            <div class="text-center" id="shippingSpinner">
+                                            <div class="spinner-border" role="status">
+                                                <span class="sr-only">Loading...</span>
+                                            </div>
+                                            </div>
                                         </div>
-                                @endisset
+
                             </div>
                         </div>
                     </div>
@@ -184,14 +190,21 @@
                         <div class="card mb-3">
                             <div class="card-body">
                                    <h4 class="card-title">Business Policies</h4>
-                                    
-                                    <div class="form-group col-md-12" id="returns">
-                                         
-                                    </div>
-                                   
-                                    <div class="form-group col-md-12" id="payments">
 
-                                        
+                                    <div class="form-group col-md-12" id="returns">
+                                        <div class="text-center" id="returnsSpinner">
+                                        <div class="spinner-border" role="status">
+                                                <span class="sr-only">Loading...</span>
+                                        </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-md-12" id="payments">
+                                        <div class="text-center" id="paymentsSpinner">
+                                        <div class="spinner-border" role="status">
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                        </div>
                                     </div>
                             </div>
                         </div>
@@ -208,12 +221,12 @@
                             </div>
                         </div>
                     </div>
-               
+
                <div class="col-md-12">
                     <div class="card mb-3">
                         <div class="card-body">
                         <h4 class="card-title">Submit Item</h4>
-                            <div class="row">    
+                            <div class="row">
                                 <div class="col-md-9">
                                     <div id="alertarea">
                                     </div>
@@ -225,7 +238,7 @@
                                 <div class="col-md-3">
                                     <button id="preview" class="btn bg-primary text-white right" disabled>Preview</button>
                                     <button type="submit" id="savetoebay" class="btn bg-primary text-white right">Save Item</button>
-                                </div>  
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -238,9 +251,8 @@
 
             @endsection
             @push('end')
-          
+
 
             <script src="{{ asset('js/createListing.js') }}"></script>
 
             @endpush
-          

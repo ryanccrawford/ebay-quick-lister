@@ -15,14 +15,14 @@
 
 
 
-    Route::get(
-        '/',
-        function () {
-            return view('welcome');
-        }
-    );
+Route::get(
+    '/',
+    function () {
+        return view('welcome');
+    }
+);
 
-    Auth::routes();
+Auth::routes();
 
 //Entry point from login
 Route::get('dashboard', 'HomeController@index')->name('dashboard');
@@ -52,6 +52,7 @@ Route::put('trading/edit', 'Ebay\Trading\API\ItemsController@update')->name('tra
 
 Route::get('api/get/returnpolicies', 'Ebay\Trading\API\ItemsController@returnpolicies')->name('api/get/returnpolicies');
 Route::get('api/get/paymentpolicies', 'Ebay\Trading\API\ItemsController@paymentpolicies')->name('api/get/paymentpolicies');
+Route::get('api/get/shippingpolicies', 'Ebay\Trading\API\ItemsController@shippingpolicies')->name('api/get/shippingpolicies');
 
 
 
@@ -66,5 +67,3 @@ Route::delete('selleritem/{id}', 'selleritemController@destroy');
 
 //Deployment
 Route::post('deploy', 'DeployController@deploy');
-
-
