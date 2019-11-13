@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Ebay\Trading\API;
 use \Illuminate\Http\Request;
 use DTS\eBaySDK\MerchantData\Enums\DetailLevelCodeType;
 use Exception;
+use Illuminate\Support\Facades\Cache;
+
 
 class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
 {
 
 
-    protected $service;
-    protected $config;
-
+    public $service;
+    public $config;
+    public $AccountService;
+   
     /**
      * Create a new controller instance.
      *
@@ -20,10 +23,10 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
      */
     public function __construct(Request $request)
     {
-        dump($request);
         parent::__construct($request);
-        dump('not the parent');
         $this->middleware('auth');
+       
+        
     }
 
     /**
@@ -104,7 +107,7 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
 
         //Creates a new Request
         $serviceRequest = new \DTS\eBaySDK\Trading\Types\GetMyeBaySellingRequestType();
-
+      
         //Includes
         foreach ($include as $item) {
 
@@ -133,6 +136,7 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
         }
 
         //
+      
         $this->service = new \DTS\eBaySDK\Trading\Services\TradingService(
             [
                 'siteId' => '0',
@@ -163,7 +167,7 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
                 'credentials' => $this->credentials
             ]
         );
-        dump($this->service);
+       
         return $this->service->getItem($serviceRequest);
     }
 
@@ -171,7 +175,7 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
 
     public function activeView(Request $request)
     {
-
+        
         $page_num = $request->query('page_num') !== null  ? intval($request->query('page_num')) : 1;
         $limit = $request->query('limit') !== null ? intval($request->query('limit')) : 10;
 
@@ -179,6 +183,13 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
         $pagination->EntriesPerPage = $limit;
         $pagination->PageNumber = $page_num;
         $include = ['ActiveList'];
+
+        
+        if(session('user_token') === null){
+         $this->doOAuth(url()->current());
+         return redirect('getauth');
+        }
+        
 
         $mySellingResults = $this->GetMyeBaySelling($include, $pagination);
 
@@ -236,8 +247,90 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
      */
     public function store(Request $request)
     {
+
+        
         $serviceRequest = new \DTS\eBaySDK\Trading\Types\VerifyAddFixedPriceItemRequestType();
         $serviceRequest->Item = new \DTS\eBaySDK\Trading\Types\ItemType();
+        $serviceRequest->Item->AutoPay = true;
+        $serviceRequest->Item->ConditionID = 1000;
+        $serviceRequest->Item->Country = \DTS\eBaySDK\Trading\Enums\CountryCodeType::C_US;
+        $serviceRequest->Item->Currency = \DTS\eBaySDK\Trading\Enums\CurrencyCodeType::C_USD;
+        $serviceRequest->Item->Description =  trim($request->input('descriptionEditorArea'));
+        $serviceRequest->Item->DispatchTimeMax = 1;
+        $serviceRequest->Item->IncludeRecommendations = false;
+        $serviceRequest->Item->InventoryTrackingMethod = \DTS\eBaySDK\Trading\Enums\InventoryTrackingMethodCodeType::C_SKU;
+        $serviceRequest->Item->ListingType = \DTS\eBaySDK\Trading\Enums\ListingTypeCodeType::C_FIXED_PRICE_ITEM;
+        $serviceRequest->Item->ListingDuration = \DTS\eBaySDK\Trading\Enums\ListingDurationCodeType::C_GTC;
+        $serviceRequest->Item->Location = "Ashland, VA";
+       
+        $serviceRequest->Item->PictureDetails = new \DTS\eBaySDK\Trading\Types\PictureDetailsType();
+
+        $imagePaths = [
+            'main' => '',
+            'description' => '',
+        ];
+        
+        $isMainImage = request()->input('mainImageFile') ? true : false;
+        $isDescriptionImage =  request()->input('descriptionImageFile') ? true : false;
+        
+        if($isMainImage){
+            
+            request()->validate(
+                [
+                'mainImageFile' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+                ]
+            );
+            $mainImageFileName = time().'.'.request()->image->getClientOriginalExtension();
+    
+            $imagePaths['main'] = $mainImageFileName;
+            dump($imagePaths['main']);
+            request()->image->move(public_path('images'), $mainImageFileName);
+    
+      
+    
+        
+        }
+        if($isDescriptionImage){
+            
+            request()->validate(
+                [
+                'descriptionImageFile' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+                ]
+            );
+            $descriptionImageFileName = time().'.'.request()->image->getClientOriginalExtension();
+    
+            $imagePaths['description'] = $mainImageFileName;
+            dump($imagePaths['description']);
+            request()->image->move(public_path('images'), $descriptionImageFileName);
+
+        }
+            $images = [];
+       foreach($imagePaths as $key => $value){
+            if($key === 'main'){
+                $images[0] = $value;
+            }else{
+                $images[1] = $value;
+            }
+       }
+
+        
+        $serviceRequest->Item->PrimaryCategory = new \DTS\eBaySDK\Trading\Types\CategoryType();
+        $serviceRequest->Item->PrimaryCategory->CategoryID = "32834";
+        $serviceRequest->Item->ProductListingDetails = new \DTS\eBaySDK\Trading\Types\ProductListingDetailsType();
+        $serviceRequest->Item->ProductListingDetails->BrandMPN = new \DTS\eBaySDK\Trading\Types\BrandMPNType();
+        $serviceRequest->Item->ProductListingDetails->BrandMPN->Brand = "3 Star Inc";
+        $serviceRequest->Item->ProductListingDetails->BrandMPN->MPN = $request->input('sku');
+        $serviceRequest->Item->Quantity = intval($request->input('qty'));
+      
+      
+        if(session('user_token') === null){
+            $this->doOAuth(url()->current());
+            return redirect('getauth');
+        }
+       
+         
+        return redirect(url()->previous());
+       
         //$serviceRequest->Item->ConditionID =
     }
 
@@ -255,11 +348,42 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
         $create = $request->query('create');
         if ($create === 'true') {
             $descriptionTemplate = file_get_contents(public_path() . '/files/policy.html');
-            return view('ebay.trading.listings.listingitemcreate', compact('descriptionTemplate'));
+           
+            // $PaymentPoliciesRequest = new \DTS\eBaySDK\Account\Types\GetPaymentPoliciesByMarketplaceRestRequest();
+            // $PaymentPoliciesRequest->marketplace_id = \DTS\eBaySDK\Account\Enums\MarketplaceIdEnum::C_EBAY_US;
+            if ($this->AccountService === null) {
+                $this->AccountService = new \DTS\eBaySDK\Account\Services\AccountService(
+                      [
+                     'siteId' => '0',
+                     'authorization' => session('user_token'),
+                     'credentials' => $this->credentials,
+                     ]
+                  );
+            }
+            $ShippingPoliciesRequest = new \DTS\eBaySDK\Account\Types\GetFulfillmentPoliciesByMarketplaceRestRequest();
+            $ShippingPoliciesRequest->marketplace_id = \DTS\eBaySDK\Account\Enums\MarketplaceIdEnum::C_EBAY_US;
+            
+            // $ReturnPoliciesRequest = new \DTS\eBaySDK\Account\Types\GetReturnPoliciesByMarketplaceRestRequest();
+            // $ReturnPoliciesRequest->marketplace_id = \DTS\eBaySDK\Account\Enums\MarketplaceIdEnum::C_EBAY_US;
+
+
+
+            
+           
+          
+            
+            
+                // $PaymentPoliciesResponse = $AccountPolicyService->getPaymentPoliciesByMarketplace($PaymentPoliciesRequest);
+                 $ShippingPoliciesResponse =   $this->AccountService->getFulfillmentPoliciesByMarketplace($ShippingPoliciesRequest);
+                // $ReturnPoliciesResponse = $AccountPolicyService->getReturnPoliciesByMarketplace($ReturnPoliciesRequest);
+            
+               
+                
+            return view('ebay.trading.listings.listingitemcreate', compact('descriptionTemplate', 'ShippingPoliciesResponse'));
         }
         $itemResponse = $this->GetItem($item_id);
         $item = $itemResponse->Item;
-        dump($item);
+       
         if ($item instanceof \DTS\eBaySDK\Trading\Types\ItemType) {
             return view('ebay.trading.listings.listingitemedit', compact('item'));
         }
@@ -267,11 +391,65 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
             'message' => 'Unknown Error. Can not view item ' . $item_id,
 
         ];
-        dump($Errors);
+        
         if ($create === 'true') {
-            return $this->retry($request, 'trading/edit?create=true', 'ebay.trading.listings.listingitemcreate');
+
+           
+                return $this->retry($request, 'trading/edit?create=true', 'ebay.trading.listings.listingitemcreate');
         }
         return $this->retry($request, 'trading/edit?item_id=' . $item_id, 'ebay.trading.listings.listingitemedit');
+    }
+
+    public function returnpolicies(Request $request)
+    {
+        
+
+        if ($this->AccountService === null) {
+            $this->AccountService = new \DTS\eBaySDK\Account\Services\AccountService(
+                  [
+                 'siteId' => '0',
+                 'authorization' => session('user_token'),
+                 'credentials' => $this->credentials,
+                 ]
+              );
+        }
+        $ReturnPoliciesRequest = new \DTS\eBaySDK\Account\Types\GetReturnPoliciesByMarketplaceRestRequest();
+        $ReturnPoliciesRequest->marketplace_id = \DTS\eBaySDK\Account\Enums\MarketplaceIdEnum::C_EBAY_US;
+
+        
+        $responseObj = $this->AccountService->getReturnPoliciesByMarketplace($ReturnPoliciesRequest);
+        $label = 'Return Policy';
+        $responseName = 'ReturnPoliciesResponse';
+        $className = 'returnPolicies';
+        $idName = 'returnPolicyId';
+        $name = 'name';
+        $view = view('ebay.partials.ajaxselectoptionfill', compact('label','responseName', 'className', 'idName', 'name', 'responseObj'))->render();
+        return response()->json(['html' => $view]);
+    }
+
+    public function paymentpolicies(Request $request)
+    {
+       
+        if ($this->AccountService === null) {
+            $this->AccountService = new \DTS\eBaySDK\Account\Services\AccountService(
+                  [
+                 'siteId' => '0',
+                 'authorization' => session('user_token'),
+                 'credentials' => $this->credentials,
+                 ]
+              );
+        }
+        $PaymentPoliciesRequest = new \DTS\eBaySDK\Account\Types\GetPaymentPoliciesByMarketplaceRestRequest();
+        $PaymentPoliciesRequest->marketplace_id = \DTS\eBaySDK\Account\Enums\MarketplaceIdEnum::C_EBAY_US;
+  
+        $responseObj = $this->AccountService->getPaymentPoliciesByMarketplace($PaymentPoliciesRequest);
+        $label = 'Payment Policy';
+        $responseName = 'PaymentPoliciesResponse';
+        $className = 'paymentPolicies';
+        $idName = 'paymentPolicyId';
+        $name = 'description';
+        $view = view('ebay.partials.ajaxselectoptionfill', compact('label','responseName', 'className', 'idName', 'name', 'responseObj'))->render();
+        return response()->json(['html' => $view]);
     }
 
     public function retry(Request $request, string $retryRoute, string $failRoute)

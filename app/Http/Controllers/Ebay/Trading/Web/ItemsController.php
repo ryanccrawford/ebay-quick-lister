@@ -4,12 +4,11 @@ namespace App\Http\Controllers\Ebay\Trading\Web;
 
 use \App\Http\Controllers\Controller;
 use \Illuminate\Http\Request;
-use \Hkonnet\LaravelEbay\EbayServices;
 use \DTS\eBaySDK\Trading\Types;
 use \DTS\eBaySDK\Trading\Enums;
 use \DTS\eBaySDK\Constants;
 
-class ItemsController extends Controller
+class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
 {
 
 
@@ -21,12 +20,14 @@ class ItemsController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Request $request)
     {
-        $this->middleware('auth');
+        if(!$request->session()->has('user_token')){
+            
+            return redirect('getauth');
 
-        $ebay_service = new EbayServices();
-        $this->service = new $ebay_service->createTrading();
+        }
+        
     }
 
     /**

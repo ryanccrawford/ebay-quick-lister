@@ -21,4 +21,5 @@ Route::post('imagepost', 'ImageUploadController@imagepost')->name('imagepost');
 Route::post('api/quickupdate/price', 'QuickUpdateController@price')->name('api/quickupdate/price');
 Route::post('api/quickupdate/qoh', 'QuickUpdateController@qoh')->name('api/quickupdate/qoh');
 
-Route::post('api/trading/itemconditions', 'Ebay\Trading\API\ItemsConditionsController@conditions')->name('api/trading/itemconditions');
+// Route::get('api/get/returnpolicies', 'Ebay\Trading\API\ItemsController@returnpolicies')->name('api/get/returnpolicies');
+// Route::get('api/get/paymentpolicies', 'Ebay\Trading\API\ItemsController@paymentpolicies')->name('api/get/paymentpolicies');

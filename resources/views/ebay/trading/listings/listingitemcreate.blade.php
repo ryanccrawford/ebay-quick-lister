@@ -31,7 +31,8 @@
             </div>
             @endif
             <div class="container">
-                <form method="POST" action="{{ route('trading/edit') }}">
+                <form method="POST" action="{{ route('trading/new') }}">
+                @csrf
                 @isset($Errors)
                 <div class="alert alert-danger Errors" role="alert">
                     <strong>{{ $Errors['message'] }}</strong>
@@ -125,12 +126,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Progress Bar -->
-                                <div class="progress">
-                                </div>
-                                <!-- Upload Finished -->
-                                <div class="container">
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -171,15 +166,33 @@
                                     </div>
                                     <input type="number" name="shippingCost" min=".01" max="9999999.00" step=".01" class="form-control" aria-label="shippingCost" aria-describedby="shippingCost">
                                 </div>
-                                <div class="form-group col-md-12">
-                                    <label for="shippingType">Shipping Type</label>
-                                    <select id="shippingType" class="form-control">
-                                        <option selected>Choose...</option>
-                                        <option value="1">Buyer Pays (Calculated)</option>
-                                        <option value="2">Free Shipping</option>
-                                        <option value="3">Freight Truck Shipping</option>
-                                    </select>
-                                </div>
+                                @isset($ShippingPoliciesResponse->fulfillmentPolicies)
+                                        <div class="form-group col-md-12">
+                                            <label for="shippingPolicyProfile">Shipping Policy</label>
+                                            <select id="shippingPolicyProfile" name="shippingPolicyProfile" class="form-control">
+                                                <option selected>Choose...</option>
+                                                @foreach($ShippingPoliciesResponse->fulfillmentPolicies as $FulfillmentPolicy )
+                                                <option value="{{ $FulfillmentPolicy->fulfillmentPolicyId }}">{{ $FulfillmentPolicy->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                @endisset
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                   <h4 class="card-title">Business Policies</h4>
+                                    
+                                    <div class="form-group col-md-12" id="returns">
+                                         
+                                    </div>
+                                   
+                                    <div class="form-group col-md-12" id="payments">
+
+                                        
+                                    </div>
                             </div>
                         </div>
                     </div>

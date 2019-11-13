@@ -12,14 +12,17 @@
 */
 
 //Entry Point for public
-Route::get(
-    '/',
-    function () {
-        return view('welcome');
-    }
-);
 
-Auth::routes();
+
+
+    Route::get(
+        '/',
+        function () {
+            return view('welcome');
+        }
+    );
+
+    Auth::routes();
 
 //Entry point from login
 Route::get('dashboard', 'HomeController@index')->name('dashboard');
@@ -43,11 +46,12 @@ Route::get('trading', 'Ebay\Trading\API\ItemsController@index')->name('trading')
 Route::get('trading/search', 'Ebay\Trading\API\ItemsController@index')->name('trading/search');
 Route::get('trading/edit', 'Ebay\Trading\API\ItemsController@show')->name('trading/edit');
 
-
+Route::post('trading/new', 'Ebay\Trading\API\ItemsController@store')->name('trading/new');
 Route::put('trading/edit', 'Ebay\Trading\API\ItemsController@update')->name('trading/edit');
-Route::post('trading/edit', 'Ebay\Trading\API\ItemsController@store')->name('trading/edit');
 
 
+Route::get('api/get/returnpolicies', 'Ebay\Trading\API\ItemsController@returnpolicies')->name('api/get/returnpolicies');
+Route::get('api/get/paymentpolicies', 'Ebay\Trading\API\ItemsController@paymentpolicies')->name('api/get/paymentpolicies');
 
 
 
@@ -62,3 +66,5 @@ Route::delete('selleritem/{id}', 'selleritemController@destroy');
 
 //Deployment
 Route::post('deploy', 'DeployController@deploy');
+
+
