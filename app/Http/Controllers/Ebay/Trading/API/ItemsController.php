@@ -184,8 +184,8 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
         $include = ['ActiveList'];
 
 
-        if (session('user_token') === null) {
-            $this->doOAuth(url()->current());
+        if (session('user_token') === null || $this->isTokenExpired()) {
+            $this->doOAuth(url()->full());
             return redirect('getauth');
         }
 
@@ -249,9 +249,9 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreItem $request)
     {
-
+        $validated = $request->validated();
 
         $serviceRequest = new \DTS\eBaySDK\Trading\Types\VerifyAddFixedPriceItemRequestType();
         $serviceRequest->Item = new \DTS\eBaySDK\Trading\Types\ItemType();
@@ -259,8 +259,12 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
         $serviceRequest->Item->ConditionID = 1000;
         $serviceRequest->Item->Country = \DTS\eBaySDK\Trading\Enums\CountryCodeType::C_US;
         $serviceRequest->Item->Currency = \DTS\eBaySDK\Trading\Enums\CurrencyCodeType::C_USD;
+        $serviceRequest->Item->BuyItNowPrice = new \DTS\eBaySDK\Trading\Types\AmountType();
+        $serviceRequest->Item->BuyItNowPrice->currencyID = \DTS\eBaySDK\Trading\Enums\CurrencyCodeType::C_USD;
+        $serviceRequest->Item->BuyItNowPrice->value = doubleval(trim($request->input('price')));
         $serviceRequest->Item->Description =  trim($request->input('descriptionEditorArea'));
         $serviceRequest->Item->DispatchTimeMax = 1;
+        $serviceRequest->Item->SKU =  trim($request->input('sku'));
         $serviceRequest->Item->IncludeRecommendations = false;
         $serviceRequest->Item->InventoryTrackingMethod = \DTS\eBaySDK\Trading\Enums\InventoryTrackingMethodCodeType::C_SKU;
         $serviceRequest->Item->ListingType = \DTS\eBaySDK\Trading\Enums\ListingTypeCodeType::C_FIXED_PRICE_ITEM;
@@ -399,7 +403,7 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
         $view = $this->getSelectOptions($label, $responseName, $className, $idName, $name);
         return response($view, 200);
     }
-
+    
     public function paymentpolicies(Request $request)
     {
         $label = 'Payment Policy';
