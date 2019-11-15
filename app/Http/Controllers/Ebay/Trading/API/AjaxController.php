@@ -51,8 +51,10 @@ class AjaxController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
         );
 
         $serviceResponse = $this->service->GetSuggestedCategories($serviceRequest);
-
-        $view = view('ebay.partials.ajaxsuggestedcategories', compact('serviceResponse'))->render();
+        dump($serviceResponse->SuggestedCategoryArray);
+        $categories = $serviceResponse->SuggestedCategoryArray->SuggestedCategory;
+        dump($categories);
+        $view = view('ebay.partials.ajaxsuggestedcategories', compact('categories'))->render();
         dump($view);
         die;
     }

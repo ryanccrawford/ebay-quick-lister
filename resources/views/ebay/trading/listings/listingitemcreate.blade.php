@@ -48,7 +48,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">Title</span>
                                     </div>
-                                    <input maxlength="80" type="text" id="ebaytitle" class="form-control" placeholder="Item Title" aria-label="ItemTitle" aria-describedby="ebaytitle" value="">
+                                    <input maxlength="80" name="title" type="text" id="ebaytitle" class="form-control" placeholder="Item Title" aria-label="ItemTitle" aria-describedby="ebaytitle" value="">
                                 </div>
                                 <div class="text-center" id="categorySpinner">
                                         <div class="spinner-border" role="status">

@@ -30,7 +30,14 @@ class StoreItem extends FormRequest
             'descriptionEditorArea' => 'nullable',
             'fulfillmentPolicyId' => 'required',
             'returnPolicyId' => 'required',
-            'paymentPolicyId' => 'required'
+            'paymentPolicyId' => 'required',
+            'shippingCost' => 'nullable',
+            'shippingLenght' => 'nullable', 
+            'shippingWidth' => 'nullable',
+            'shippingHeight'=> 'nullable',
+            'shippingWeight' => 'nullable',
+            'qty'=> 'required',
+            'primaryCategory'=> 'required',
         ];
     }
 
