@@ -351,18 +351,25 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
         $create = $request->query('create');
         if ($create === 'true') {
             $descriptionTemplate = file_get_contents(public_path() . '/files/policy.html');
-            if ($this->AccountService === null) {
-                $this->AccountService = new \DTS\eBaySDK\Account\Services\AccountService(
-                    [
-                        'siteId' => '0',
-                        'authorization' => session('user_token'),
-                        'credentials' => $this->credentials,
-                    ]
-                );
-            }
+            try {
+                if ($this->AccountService === null) {
 
+                    $this->AccountService = new \DTS\eBaySDK\Account\Services\AccountService(
+                        [
+                            'siteId' => '0',
+                            'authorization' => session('user_token'),
+                            'credentials' => $this->credentials,
+                        ]
+                    );
+                }
+            } catch (Exception $e) {
+                $this->doOAuth(url()->current());
+                return redirect('getauth');
+            }
             return view('ebay.trading.listings.listingitemcreate', compact('descriptionTemplate'));
         }
+
+
         $itemResponse = $this->GetItem($item_id);
         $item = $itemResponse->Item;
 
@@ -403,7 +410,7 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
         $view = $this->getSelectOptions($label, $responseName, $className, $idName, $name);
         return response($view, 200);
     }
-    
+
     public function paymentpolicies(Request $request)
     {
         $label = 'Payment Policy';
@@ -422,13 +429,18 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
         $type = $typeClass;
 
         if ($this->AccountService === null) {
-            $this->AccountService = new \DTS\eBaySDK\Account\Services\AccountService(
-                [
-                    'siteId' => '0',
-                    'authorization' => session('user_token'),
-                    'credentials' => $this->credentials,
-                ]
-            );
+            try {
+                $this->AccountService = new \DTS\eBaySDK\Account\Services\AccountService(
+                    [
+                        'siteId' => '0',
+                        'authorization' => session('user_token'),
+                        'credentials' => $this->credentials,
+                    ]
+                );
+            } catch (Exception $e) {
+                $this->doOAuth(url()->current());
+                return redirect('getauth');
+            }
         }
         $Request = new $type();
         $Request->marketplace_id = $this->marketPlaceId;

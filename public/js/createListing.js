@@ -4,7 +4,7 @@ var descriptionEditor = CKEDITOR.replace('descriptionEditorArea', { 'height': '6
 
 
 $(document).ready(function() {
-
+    $("#categorySpinner").hide();
     // https://stackoverflow.com/questions/4459379/preview-an-image-before-it-is-uploaded
     function readURL1(input) {
         if (input.files && input.files[0]) {
@@ -49,7 +49,37 @@ $(document).ready(function() {
         $(this).data('pre', $(this).val())
 
     }).data('pre', $selectStatus.val());
+    let is_searching = false;
 
+    var getSuggestedCategories = query => {
+        let url = "/api/get/suggestions?title=" + query;
+        $.ajax({
+            url: url,
+            type: "GET"
+        }).done(data4 => {
+            $("#categorySpinner").hide();
+            $("#categorySuggestion").empty();
+            $("#categorySuggestion").html(data4);
+            is_searching = false;
+        });
+    };
+
+    $("#catsearchbutton").on('click', (event) => {
+        event.preventDefault();
+        let title = $("#ebaytitle").val();
+        if (title < 4 || title > 350) {
+            $("#categorySpinner").hide();
+            return;
+        }
+        $("#categorySpinner").show();
+        if (!is_searching) {
+            is_searching = true;
+            getSuggestedCategories(title);
+        }
+
+
+
+    });
 
     var getShippingOptions = () => {
         $.ajax({

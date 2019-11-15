@@ -50,15 +50,16 @@
                                     </div>
                                     <input maxlength="80" type="text" id="ebaytitle" class="form-control" placeholder="Item Title" aria-label="ItemTitle" aria-describedby="ebaytitle" value="">
                                 </div>
-                                <div class="form-group col-md-12">
-                                    <label for="primaryCategory">Primary Category</label>
-                                    <select id="primaryCategory" name="primaryCategory" class="form-control">
-                                        <option selected>Choose...</option>
-                                        <option value="1">Test 1</option>
-                                        <option value="2">Test 2</option>
-                                        <option value="3">Test 3</option>
-                                    </select>
+                                <div class="text-center" id="categorySpinner">
+                                        <div class="spinner-border" role="status">
+                                                <span class="sr-only">Loading...</span>
+                                        </div>
+                                        </div>
+                                        <p>Categories are suggested based on the item title.</p>
+                                <div class="form-group col-md-12" id="categorySuggestion">
+
                                 </div>
+                                <button class="btn bg-primary text-white right" id="catsearchbutton">Get Suggestions</button>
                             </div>
                         </div>
                     </div>

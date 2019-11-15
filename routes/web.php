@@ -55,6 +55,9 @@ Route::get('api/get/paymentpolicies', 'Ebay\Trading\API\ItemsController@paymentp
 Route::get('api/get/shippingpolicies', 'Ebay\Trading\API\ItemsController@shippingpolicies')->name('api/get/shippingpolicies');
 
 
+Route::get('api/get/suggestions', 'Ebay\Trading\API\AjaxController@GetSuggestedCategories')->name('api/get/suggestions');
+
+
 
 //selleritem
 Route::get('addselleritem', 'selleritemController@create');
