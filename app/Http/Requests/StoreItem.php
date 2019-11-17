@@ -13,7 +13,7 @@ class StoreItem extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -28,16 +28,16 @@ class StoreItem extends FormRequest
             'price' => 'required',
             'sku' => 'required',
             'descriptionEditorArea' => 'nullable',
-            'fulfillmentPolicyId' => 'required',
-            'returnPolicyId' => 'required',
-            'paymentPolicyId' => 'required',
+            'ShippingPoliciesResponse' => 'required',
+            'ReturnPoliciesResponse' => 'required',
+            'PaymentPoliciesResponse' => 'required',
             'shippingCost' => 'nullable',
-            'shippingLenght' => 'nullable', 
+            'shippingLenght' => 'nullable',
             'shippingWidth' => 'nullable',
-            'shippingHeight'=> 'nullable',
+            'shippingHeight' => 'nullable',
             'shippingWeight' => 'nullable',
-            'qty'=> 'required',
-            'primaryCategory'=> 'required',
+            'qty' => 'required',
+            'primaryCategory' => 'required',
         ];
     }
 

@@ -30,6 +30,15 @@
                 <strong>{{ $errors->message }}</strong>
             </div>
             @endif
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                </div>
+            @endif
             <div class="container">
                 <form method="POST" action="{{ route('trading/new') }}">
                 @csrf
@@ -49,11 +58,17 @@
                                         <span class="input-group-text">Title</span>
                                     </div>
                                     <input maxlength="80" name="title" id="title" type="text" id="ebaytitle" class="form-control" placeholder="Item Title" aria-label="ItemTitle" aria-describedby="ebaytitle" value="">
+                                    @error('title')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <p>Categories are suggested based on the item title.</p>
                                 <div class="form-group col-md-12" id="categorySuggestion">
-
+                                    @error('primaryCategory')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
                                 </div>
+
                                 <button class="btn bg-primary text-white right" id="catsearchbutton">Get Suggestions <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="categorySpinner" style="display:none;"></span></button>
                             </div>
                         </div>
@@ -74,12 +89,18 @@
                                         <span class="input-group-text">QTY</span>
                                     </div>
                                     <input type="number" name="qty" id="qty" min="1" max="9000" class="form-control" aria-label="qty" aria-describedby="qty" value="">
+                                    @error('qty')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="price">Price $</span>
                                     </div>
                                     <input type="number" name="price" min=".01" max="9999999.00" step=".01" class="form-control" aria-label="price" aria-describedby="price" value="">
+                                    @error('price')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>

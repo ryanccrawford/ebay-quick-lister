@@ -6,7 +6,8 @@ use \Illuminate\Http\Request;
 use DTS\eBaySDK\MerchantData\Enums\DetailLevelCodeType;
 use Exception;
 use Illuminate\Support\Facades\Cache;
-
+use \App\Http\Requests\StoreItem;
+use Illuminate\Foundation\Http\FormRequest;
 
 class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
 {
@@ -252,6 +253,7 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
     public function store(StoreItem $request)
     {
         $validated = $request->validated();
+        dump($validated);
 
         $serviceRequest = new \DTS\eBaySDK\Trading\Types\VerifyAddFixedPriceItemRequestType();
         $serviceRequest->Item = new \DTS\eBaySDK\Trading\Types\ItemType();
@@ -331,6 +333,15 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
             return redirect('getauth');
         }
 
+        $this->service = new \DTS\eBaySDK\Trading\Services\TradingService(
+            [
+                'siteId' => '0',
+                'authorization' => session('user_token'),
+                'credentials' => $this->credentials
+            ]
+        );
+
+        $serviceResponse = $this->service->verifyAddFixedPriceItem($serviceRequest);
 
         return redirect(url()->previous());
 
