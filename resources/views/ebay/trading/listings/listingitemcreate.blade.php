@@ -48,18 +48,13 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">Title</span>
                                     </div>
-                                    <input maxlength="80" name="title" type="text" id="ebaytitle" class="form-control" placeholder="Item Title" aria-label="ItemTitle" aria-describedby="ebaytitle" value="">
+                                    <input maxlength="80" name="title" id="title" type="text" id="ebaytitle" class="form-control" placeholder="Item Title" aria-label="ItemTitle" aria-describedby="ebaytitle" value="">
                                 </div>
-                                <div class="text-center" id="categorySpinner">
-                                        <div class="spinner-border" role="status">
-                                                <span class="sr-only">Loading...</span>
-                                        </div>
-                                        </div>
-                                        <p>Categories are suggested based on the item title.</p>
+                                <p>Categories are suggested based on the item title.</p>
                                 <div class="form-group col-md-12" id="categorySuggestion">
 
                                 </div>
-                                <button class="btn bg-primary text-white right" id="catsearchbutton">Get Suggestions</button>
+                                <button class="btn bg-primary text-white right" id="catsearchbutton">Get Suggestions <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="categorySpinner" style="display:none;"></span></button>
                             </div>
                         </div>
                     </div>

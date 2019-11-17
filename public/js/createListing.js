@@ -1,6 +1,6 @@
 var descriptionEditor = CKEDITOR.replace('descriptionEditorArea', { 'height': '600' });
 
-
+var titleLeaveValue = '';
 
 
 $(document).ready(function() {
@@ -61,6 +61,7 @@ $(document).ready(function() {
             $("#categorySuggestion").empty();
             $("#categorySuggestion").html(data4);
             is_searching = false;
+            $("#catsearchbutton").removeClass("disabled");
         });
     };
 
@@ -80,7 +81,17 @@ $(document).ready(function() {
 
 
     });
-
+    $("#title").focusout((event) => {
+        titleLeaveValue = $("#title").val();
+        $("#categorySpinner").show();
+        $("#catsearchbutton").addClass("disabled");
+        getSuggestedCategories(titleLeaveValue);
+    })
+    $("#title").keyup((event) => {
+        if (titleLeaveValue !== $("#title").val()) {
+            $("#categorySuggestion").empty();
+        }
+    })
     var getShippingOptions = () => {
         $.ajax({
             url: "/api/get/shippingpolicies",
