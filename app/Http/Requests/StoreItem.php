@@ -25,19 +25,22 @@ class StoreItem extends FormRequest
     {
         return [
             'title' => 'required|max:80',
-            'price' => 'required',
+            'price' => 'required|numeric',
             'sku' => 'required',
-            'descriptionEditorArea' => 'nullable',
-            'ShippingPoliciesResponse' => 'required',
-            'ReturnPoliciesResponse' => 'required',
-            'PaymentPoliciesResponse' => 'required',
-            'shippingCost' => 'nullable',
-            'shippingLenght' => 'nullable',
-            'shippingWidth' => 'nullable',
-            'shippingHeight' => 'nullable',
-            'shippingWeight' => 'nullable',
-            'qty' => 'required',
-            'primaryCategory' => 'required',
+            'descriptionEditorArea' => 'required|string',
+            'ShippingPoliciesResponse' => 'required|numeric',
+            'ReturnPoliciesResponse' => 'required|numeric',
+            'PaymentPoliciesResponse' => 'required|numeric',
+            'shippingCost' => 'required|numeric',
+            'shippingLength' => 'required|numeric',
+            'shippingWidth' => 'required|numeric',
+            'shippingHeight' => 'required|numeric',
+            'shippingWeight' => 'required|numeric',
+            'qty' => 'required|numeric',
+            'primaryCategory' => 'required|numeric',
+            //'descriptionImageFile' => 'required|image|mimes:jpeg,png,jpg',
+            //'mainImageFile' => 'required|image|mimes:jpeg,png,jpg',
+
         ];
     }
 

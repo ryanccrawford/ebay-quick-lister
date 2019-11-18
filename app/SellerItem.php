@@ -3,14 +3,29 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
-class SellerItem extends Eloquent
+
+class SellerItem extends Model
 {
-    protected $connection = 'mongodb';
-    protected $collection = 'selleritems';
+ 
+    protected $connection = 'mysql';
     
     protected $fillable = [
-        'title', 'image','qoh'
+        'title', 
+        'price',
+        'sku',
+        'descriptionEditorArea',
+        'ShippingPoliciesResponse' ,
+        'ReturnPoliciesResponse' ,
+        'PaymentPoliciesResponse',
+        'shippingCost',
+        'shippingLength' ,
+        'shippingWidth',
+        'shippingHeight',
+        'shippingWeight',
+        'qty',
+        'primaryCategory',
+        'descriptionImageFile',
+        'mainImageFile'
     ];
 }

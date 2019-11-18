@@ -47,6 +47,7 @@
                     <strong>{{ $Errors['message'] }}</strong>
                 </div>
                 @endisset
+               
                 <h1 class="text-white">Creating Item</h1>
                 <div class="row">
                     <div class="col-md-12">
@@ -57,7 +58,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">Title</span>
                                     </div>
-                                    <input maxlength="80" name="title" id="title" type="text" id="ebaytitle" class="form-control" placeholder="Item Title" aria-label="ItemTitle" aria-describedby="ebaytitle" value="">
+                                    <input maxlength="80" name="title" type="text" id="ebaytitle" class="form-control" placeholder="Item Title" aria-label="ItemTitle" aria-describedby="ebaytitle" value="{{ old('title') ?? 'Test Antenna Mount'}}">
                                     @error('title')
                                         <div class="alert alert-danger">{{ $message }}</div>
                                     @enderror
@@ -75,20 +76,20 @@
                     </div>
                     <div class="col-md-12">
                         <div class="card mb-3">
-                            <img id="item-image" src="../../images/details.jpg" class="ml-3 mt-3 right" alt="..." style="width:50px;">
+                            <img id="item-image" src="{{ $request->file('mainImageFileName') }}" class="ml-3 mt-3 right" alt="..." style="width:50px;">
                             <div class="card-body">
                                 <h4 class="card-title">Item Details</h4>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">SKU</span>
                                     </div>
-                                    <input maxlength="50" type="text" name="sku" id="sku" class="form-control" placeholder="Item SKU" aria-label="sku" aria-describedby="sku" value="">
+                                    <input maxlength="50" type="text" name="sku" id="sku" class="form-control" placeholder="Item SKU" aria-label="sku" aria-describedby="sku" value="{{old('sku') ?? 'MOUNT33433'}}">
                                 </div>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">QTY</span>
                                     </div>
-                                    <input type="number" name="qty" id="qty" min="1" max="9000" class="form-control" aria-label="qty" aria-describedby="qty" value="">
+                                    <input type="number" name="qty" id="qty" min="1" max="9000" class="form-control" aria-label="qty" aria-describedby="qty" value="{{old('qty') ?? '100'}}">
                                     @error('qty')
                                         <div class="alert alert-danger">{{ $message }}</div>
                                     @enderror
@@ -97,7 +98,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="price">Price $</span>
                                     </div>
-                                    <input type="number" name="price" min=".01" max="9999999.00" step=".01" class="form-control" aria-label="price" aria-describedby="price" value="">
+                                    <input type="number" name="price" min=".01" max="9999999.00" step=".01" class="form-control" aria-label="price" aria-describedby="price" value="{{old('price') ?? '123.00'}}">
                                     @error('price')
                                         <div class="alert alert-danger">{{ $message }}</div>
                                     @enderror
@@ -123,7 +124,7 @@
                                                             </button>
                                                         </div>
                                                     </div>
-                                                    <img class="card-img" id="mainImage" src="..." alt="..." style="border: 2px dashed black">
+                                                    <img class="card-img" id="mainImage" src="{{ $request->file('mainImageFile') ?? ''}}" alt="..." style="border: 2px dashed black">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -137,7 +138,7 @@
                                                             </button>
                                                         </div>
                                                     </div>
-                                                    <img class="card-img" id="descriptionImage" src="..." alt="..." style="border: 2px dashed black">
+                                                    <img class="card-img" id="descriptionImage" src="{{ $request->file('descriptionImageFile') ?? ''}}" alt="..." style="border: 2px dashed black">
                                                 </div>
                                             </div>
                                         </div>
@@ -157,7 +158,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="shippingWeight">Weight (lbs.)</span>
                                             </div>
-                                            <input type="number" name="shippingWeight" min="0" max="500" class="form-control" placeholder="0" aria-label="shippingWeight" aria-describedby="shippingWidth">
+                                            <input type="number" name="shippingWeight" min="0" max="500" class="form-control" placeholder="0" aria-label="shippingWeight" aria-describedby="shippingWidth" value="{{ old('shippingWeight') ?? '10' }}">
                                         </div>
                                     </div>
                                     <div class="col">
@@ -165,7 +166,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="shippingHeight">Height</span>
                                             </div>
-                                            <input type="number" name="shippingHeight" min="0" max="500" class="form-control" placeholder="0" aria-label="shippingHeight" aria-describedby="shippingHeight">
+                                            <input type="number" name="shippingHeight" min="0" max="500" class="form-control" placeholder="0" aria-label="shippingHeight" aria-describedby="shippingHeight" value="{{ old('shippingHeight') ?? '10' }}">
                                         </div>
                                     </div>
                                     <div class="col">
@@ -173,15 +174,15 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="shippingWidth">Width</span>
                                             </div>
-                                            <input type="number" name="shippingWidth" min="0" max="500" class="form-control" placeholder="0" aria-label="shippingWidth" aria-describedby="shippingWidth">
+                                            <input type="number" name="shippingWidth" min="0" max="500" class="form-control" placeholder="0" aria-label="shippingWidth" aria-describedby="shippingWidth" value="{{ old('shippingWidth') ?? '10'}}">
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="shippingLenght">Length</span>
+                                                <span class="input-group-text" id="shippingLength">Length</span>
                                             </div>
-                                            <input type="number" name="shippingLenght" min="0" max="500" class="form-control" placeholder="0" aria-label="shippingLenght" aria-describedby="shippingLenght">
+                                            <input type="number" name="shippingLength" min="0" max="500" class="form-control" placeholder="0" aria-label="shippingLength" aria-describedby="shippingLength" value="{{ old('shippingLength') ?? '10' }}">
                                         </div>
                                     </div>
                                 </div>
@@ -189,7 +190,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="shippingCost">Shipping Cost $</span>
                                     </div>
-                                    <input type="number" name="shippingCost" min=".01" max="9999999.00" step=".01" class="form-control" aria-label="shippingCost" aria-describedby="shippingCost">
+                                    <input type="number" name="shippingCost" min=".01" max="9999999.00" step=".01" class="form-control" aria-label="shippingCost" aria-describedby="shippingCost" value="{{ old('shippingCost') ?? '1.00' }}">
                                 </div>
 
                                         <div class="form-group col-md-12" id="shipping">
@@ -232,7 +233,12 @@
                                 <h4 class="card-title">Description Output</h4>
                                 <textarea id="descriptionEditorArea" name="descriptionEditorArea">
                                     <?php
-                                    echo htmlentities($descriptionTemplate);
+                                    if($request->old('descriptionEditorArea') != ''){
+                                        echo $request->old('descriptionEditorArea');
+                                    }else{
+                                        echo htmlentities($descriptionTemplate);
+                                    }
+                                    
                                     ?>
                                 </textarea>
                             </div>

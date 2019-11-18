@@ -8,6 +8,9 @@ use Exception;
 use Illuminate\Support\Facades\Cache;
 use \App\Http\Requests\StoreItem;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use \App\SellerItem;
 
 class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
 {
@@ -252,9 +255,10 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
      */
     public function store(StoreItem $request)
     {
-        $validated = $request->validated();
-        dump($validated);
-
+        if (session('user_token') === null) {
+            $this->doOAuth(url()->current());
+            return redirect('getauth');
+        }
         $serviceRequest = new \DTS\eBaySDK\Trading\Types\VerifyAddFixedPriceItemRequestType();
         $serviceRequest->Item = new \DTS\eBaySDK\Trading\Types\ItemType();
         $serviceRequest->Item->AutoPay = true;
@@ -274,66 +278,39 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
         $serviceRequest->Item->Location = "Ashland, VA";
 
         $serviceRequest->Item->PictureDetails = new \DTS\eBaySDK\Trading\Types\PictureDetailsType();
-
-        $imagePaths = [
-            'main' => '',
-            'description' => '',
-        ];
-
-        $isMainImage = request()->input('mainImageFile') ? true : false;
-        $isDescriptionImage =  request()->input('descriptionImageFile') ? true : false;
-
-        if ($isMainImage) {
-
-            request()->validate(
-                [
-                    'mainImageFile' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-                ]
-            );
-            $mainImageFileName = time() . '.' . request()->image->getClientOriginalExtension();
-
-            $imagePaths['main'] = $mainImageFileName;
-            dump($imagePaths['main']);
-            request()->image->move(public_path('images'), $mainImageFileName);
+        $imagePaths = [];
+        $mainImageFile = $request->file('mainImageFile');
+        if ($mainImageFile !== null) {
+            $extension = $mainImageFile->getClientOriginalExtension();
+            Storage::disk('public')->put($mainImageFile->getFilename().'.'.$extension, File::get($mainImageFile));
         }
-        if ($isDescriptionImage) {
-
-            request()->validate(
-                [
-                    'descriptionImageFile' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-                ]
-            );
-            $descriptionImageFileName = time() . '.' . request()->image->getClientOriginalExtension();
-
-            $imagePaths['description'] = $mainImageFileName;
-            dump($imagePaths['description']);
-            request()->image->move(public_path('images'), $descriptionImageFileName);
+       
+        $descriptionImageFile = $request->file('descriptionImageFile');
+        if ($mainImageFile !== null) {
+            $extension = $descriptionImageFile->getClientOriginalExtension();
+            Storage::disk('public')->put($descriptionImageFile->getFilename().'.'.$extension, File::get($descriptionImageFile));
         }
-        $images = [];
-        foreach ($imagePaths as $key => $value) {
-            if ($key === 'main') {
-                $images[0] = $value;
-            } else {
-                $images[1] = $value;
-            }
+           
+        if (($mainImageFile !== null) && ($mainImageFile !== null)) {
+            $imagePaths = [
+                $mainImageFile->getFilename().'.'.$extension, $descriptionImageFile->getFilename().'.'.$extension,
+            ];
+    
+
+
+            $serviceRequest->Item->PictureDetails->PictureURL =  $imagePaths;
         }
+            $serviceRequest->Item->PrimaryCategory = new \DTS\eBaySDK\Trading\Types\CategoryType();
+            $serviceRequest->Item->PrimaryCategory->CategoryID = $request->input('primaryCategory');
+            $serviceRequest->Item->ProductListingDetails = new \DTS\eBaySDK\Trading\Types\ProductListingDetailsType();
+            $serviceRequest->Item->ProductListingDetails->BrandMPN = new \DTS\eBaySDK\Trading\Types\BrandMPNType();
+            $serviceRequest->Item->ProductListingDetails->BrandMPN->Brand = "3 Star Inc";
+            $serviceRequest->Item->ProductListingDetails->BrandMPN->MPN = $request->input('sku');
+            $serviceRequest->Item->Quantity = intval($request->input('qty'));
+        
+      
 
-
-        $serviceRequest->Item->PrimaryCategory = new \DTS\eBaySDK\Trading\Types\CategoryType();
-        $serviceRequest->Item->PrimaryCategory->CategoryID = "32834";
-        $serviceRequest->Item->ProductListingDetails = new \DTS\eBaySDK\Trading\Types\ProductListingDetailsType();
-        $serviceRequest->Item->ProductListingDetails->BrandMPN = new \DTS\eBaySDK\Trading\Types\BrandMPNType();
-        $serviceRequest->Item->ProductListingDetails->BrandMPN->Brand = "3 Star Inc";
-        $serviceRequest->Item->ProductListingDetails->BrandMPN->MPN = $request->input('sku');
-        $serviceRequest->Item->Quantity = intval($request->input('qty'));
-
-
-        if (session('user_token') === null) {
-            $this->doOAuth(url()->current());
-            return redirect('getauth');
-        }
-
-        $this->service = new \DTS\eBaySDK\Trading\Services\TradingService(
+            $this->service = new \DTS\eBaySDK\Trading\Services\TradingService(
             [
                 'siteId' => '0',
                 'authorization' => session('user_token'),
@@ -341,13 +318,38 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
             ]
         );
 
-        $serviceResponse = $this->service->verifyAddFixedPriceItem($serviceRequest);
+            $serviceResponse = $this->service->verifyAddFixedPriceItem($serviceRequest);
+            if ($serviceResponse->Ack === 200) {
+                $serviceRealRequest = new \DTS\eBaySDK\Trading\Types\AddFixedPriceItemRequestType();
+                $serviceRealRequest->Item = $serviceRequest->Item;
+            
+                $serviceRealResponse = $this->service->addFixedPriceItem($serviceRealRequest);
+                if ($serviceRealResponse->Ack === 200) {
+                    $SellerItem = new \App\SellerItem();
+                    $SellerItem->title = $request->input('title');
+                    $SellerItem->price = doubleval($request->input('price'));
+                    $SellerItem->sku = $request->input('sku');
+                    $SellerItem->descriptionEditorArea = $request->input('descriptionEditorArea');
+                    $SellerItem->ShippingPoliciesResponse = intval($request->input('ShippingPoliciesResponse'));
+                    $SellerItem->ReturnPoliciesResponse = intval($request->input('ReturnPoliciesResponse'));
+                    $SellerItem->shippingCost = doubleval($request->input('shippingCost'));
+                    $SellerItem->shippingLength = intval($request->input('shippingLength'));
+                    $SellerItem->shippingWidth = intval($request->input('shippingWidth'));
+                    $SellerItem->shippingHeight = intval($request->input('shippingHeight'));
+                    $SellerItem->shippingWeight = intval($request->input('shippingWeight'));
+                    $SellerItem->primaryCategory = intval($request->input('primaryCategory'));
+                    $SellerItem->mainImageFile =  $mainImageFile->getFilename().'.'.$extension;
+                    $SellerItem->descriptionImageFile = $descriptionImageFile->getFilename().'.'.$extension;
+                    $SellerItem->save();
 
-        return redirect(url()->previous());
+                    return redirect()->route('trading/edit')
+                ->with('success', 'Item Added Successfully');
+                }
+            }
 
-        //$serviceRequest->Item->ConditionID =
+            return redirect()->route('trading/edit', ['create' => 'true'])->withInput($request->input);
+        
     }
-
 
     /**
      * Display one specified resource.
@@ -377,7 +379,7 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
                 $this->doOAuth(url()->current());
                 return redirect('getauth');
             }
-            return view('ebay.trading.listings.listingitemcreate', compact('descriptionTemplate'));
+            return view('ebay.trading.listings.listingitemcreate', compact('descriptionTemplate', 'request'));
         }
 
 
