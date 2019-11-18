@@ -7,11 +7,12 @@
     <!-- CSRF Token -->
     <!-- <meta name="csrf-token" content="{{ csrf_token() }}"> -->
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name') }}</title>
 
     <!-- Scripts -->
-    <script src="https://cdn.ckeditor.com/4.13.0/standard/ckeditor.js"></script>
-    <script src="{{ asset('js/app.js') }}" defer></script>
+
+
+    <script src="{{ asset('js/app.js') }}"></script>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -32,8 +33,12 @@
         </main>
     </div>
 
-
-    @yield('last')
+                 @yield('last')
+                
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" ></script>
+                <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" ></script>
+                <script src="{{ asset('vendor/ckeditor/ckeditor/ckeditor.js') }}"></script>
+                <script src="{{ asset('vendor/ckeditor/ckeditor/adapters/jquery.js') }}"></script>
     @stack('end')
 
 </body>

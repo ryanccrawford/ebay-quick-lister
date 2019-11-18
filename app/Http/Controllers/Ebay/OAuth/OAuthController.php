@@ -3,100 +3,197 @@
 namespace App\Http\Controllers\Ebay\OAuth;
 
 use App\Http\Controllers\Controller;
+use DateInterval;
+use DateTime;
 use Illuminate\Http\Request;
 use DTS\eBaySDK\OAuth;
 use DTS\eBaySDK\OAuth\Services;
 
+use function HighlightUtilities\getAvailableStyleSheets;
 
 class OAuthController extends Controller
 {
-    protected $credentials;
-    protected $OAuthService;
-    protected $code;
+    public $credentials;
+    public $OAuthService;
+    protected $scope;
+    protected $token;
+
+
     /**
      * Gets a user OAuth Token.
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-
-    public function __construct()
+    public function __construct(Request $request)
     {
-        $this->middleware('auth');
+        
+            $this->scope = explode(' ', 'https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account');
+
+           $this->credentials = [
+                'appId' => env('EBAY_PROD_APP_ID'),
+                'certId' => env('EBAY_PROD_CERT_ID'),
+                'devId' => env('EBAY_PROD_DEV_ID'),
+                'authToken' => env('EBAY_PROD_AUTH_TOKEN'),
+                'globalId' => env('EBAY_GLOBAL_ID')
+            ];
+           
+            $this->OAuthService = new \DTS\eBaySDK\OAuth\Services\OAuthService(
+                [
+                    'credentials' => $this->credentials,
+                    'ruName' => env('EBAY_PROD_RUNAME'),
+                ]
+            );
+      
+       
     }
 
     public function getauth(Request $request)
     {
+       
+        if ($request->session()->has('user_token')) {
 
-        $this->credentials = [
-            'appId' => env('EBAY_PROD_APP_ID'),
-            'certId' => env('EBAY_PROD_CERT_ID'),
-            'devId' => env('EBAY_PROD_DEV_ID'),
-        ];
-        echo var_dump($this->credentials);
-        $this->OAuthService = new \DTS\eBaySDK\OAuth\Services\OAuthService(
-            [
-                'credentials' => $this->credentials,
-                'ruName' => getenv('EBAY_PROD_RUNAME'),
-            ]
-        );
+            if (!$this->isTokenExpired()) {
+                session()->forget('return');
+                return redirect(url()->previous());
+            }
 
-        // $scope = $request->session('scope');
-        $scope = 'https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account';
+            if ($this->isTokenExpired() && $request->session()->has('refresh_token')) {
 
-        $s = explode(' ', $scope);
+                session()->forget('user_token');
+
+                $RefreshUserTokenRequest =  new \DTS\eBaySDK\OAuth\Types\RefreshUserTokenRestRequest(
+                    [
+                        'refresh_token' => session('refresh_token'),
+                        'scope' => $this->scope,
+                    ]
+                );
+
+                $OauthUserTokenResponse = $this->OAuthService->refreshUserToken($RefreshUserTokenRequest);
+
+                if ($OauthUserTokenResponse->getStatusCode() == 200) {
+                    $this->setSessionToken($OauthUserTokenResponse);
+                    return redirect(url()->previous());
+                } else {
+                    session()->forget(
+                        [
+                            'user_token',
+                            'expires_in',
+                            'refresh_token'
+                        ]
+                    );
+                    abort(401);
+                   //return $this->getauth($request);
+                }
+            }
+        }
+
+
         $url =  $this->OAuthService->redirectUrlForUser(
             [
-                'state' => 'full',
-                'scope' => $s
+                'state' => url()->previous(),
+                'scope' => $this->scope,
             ]
         );
-        session()->forget('scope');
+
         return redirect()->away($url);
     }
 
+    public function doOAuth(string $returnURL)
+    {
+        session()->forget('totalPages');
+        session()->forget('user_token');
+        session()->forget('scope');
+        session()->forget('return');
+      
+        session(['scope' => $this->scope]);
+        session(['return' => $returnURL]);
+      
+    }
+
+
+    public function setSessionToken($response)
+    {
+       
+        $seconds = $response->expires_in;
+        $expiresdatetime = date("Y-m-d H:i:s", strtotime(('+' . $seconds . ' seconds'), strtotime(date("Y-m-d H:i:s"))));
+        session(
+            [
+                'user_token' => $response->access_token,
+                'expires_in' => $expiresdatetime,
+                'refresh_token' => $response->refresh_token
+            ]
+        );
+    }
+
+    public function isTokenExpired()
+    {
+
+        if (session('expires_in') === null || session('expires_in') === '') {
+            return true;
+        }
+        $ed = new DateTime(session('expires_in'));
+        $nd = new DateTime(now());
+
+        if ($ed > $nd) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function getReturnUrl(string $returnURL = 'prev')
+    {
+        $return = '';
+        if ($returnURL === 'prev') {
+
+            $return = url()->current();
+        } elseif (session('return') !== null && session('return')  !== '') {
+
+            $return = session('return');
+            session()->forget('return');
+        }
+        dump($return);
+        return $return;
+    }
 
     public function oauth(Request $request)
     {
+        $code = $request->query('code');
+       
+        if (strlen($code)) {
 
-        $this->credentials = [
-            'appId' => env('EBAY_PROD_APP_ID'),
-            'certId' => env('EBAY_PROD_CERT_ID'),
-            'devId' => env('EBAY_PROD_DEV_ID'),
-        ];
+            $userTokenRequest = new \DTS\eBaySDK\OAuth\Types\GetUserTokenRestRequest(
+                                    [
+                                        'code' => $code,
+                                    ]
+                );
 
-        $this->OAuthService = new \DTS\eBaySDK\OAuth\Services\OAuthService(
-            [
-                'credentials' => $this->credentials,
-                'ruName' => env('EBAY_PROD_RUNAME'),
-            ]
-        );
+            $userTokenresponse = $this->OAuthService->getUserToken($userTokenRequest);
 
-        $this->code = $request->query('code');
+            $rt = $request->query('state');
+            
+            if ($userTokenresponse->getStatusCode() !== 200) {
 
-        if (strlen($this->code)) {
-            $response = $this->OAuthService->getUserToken(
-                new \DTS\eBaySDK\OAuth\Types\GetUserTokenRestRequest(
+                session()->forget(
                     [
-                        'code' => $this->code,
+                        'user_token',
+                        'expires_in',
+                        'refresh_token',
                     ]
-                )
-            );
-
-            if ($response->getStatusCode() !== 200) {
-
-                return redirect('home');
+                );
+                //TODO: Create Error page that shows OAuth Errors
+                abort(401);
             } else {
-                session(['token' => $response->access_token]);
-                if ($request->session()->has('return')) {
-
-                    $rd = session('return') ? session('return') : 'home'; //  session('return');
-                    session()->forget('return');
-                    return redirect($rd);
-                }
+                
+                $this->setSessionToken($userTokenresponse);
+                $rd = $rt;
+                return redirect($rd);
+                
             }
-
-            return redirect('home');
         }
+
+        $rd = $this->getReturnUrl('');
+        return redirect($rd);
     }
 }

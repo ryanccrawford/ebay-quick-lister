@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME'),
 
     /*
     |--------------------------------------------------------------------------
@@ -71,6 +71,7 @@ return [
     */
 
     'timezone' => 'UTC',
+    'log' => 'errorlog',
 
     /*
     |--------------------------------------------------------------------------
@@ -164,8 +165,8 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-        Hkonnet\LaravelEbay\EbayServiceProvider::class,
         Jenssegers\Mongodb\MongodbServiceProvider::class,
+
 
         /*
          * Package Service Providers...
@@ -178,8 +179,9 @@ return [
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
+        App\Providers\TelescopeServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
+        App\Providers\CkServiceProvider::class,
 
     ],
 
@@ -231,7 +233,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-        'Ebay' => Hkonnet\LaravelEbay\Facade\Ebay::class,
+        'Moloquent' => Jenssegers\Mongodb\Eloquent\Model::class,
 
     ],
 
