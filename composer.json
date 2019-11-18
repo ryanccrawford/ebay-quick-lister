@@ -10,16 +10,17 @@
     "require": {
         "php": "^7.2",
         "ext-mongodb": "^1.5",
+        "ckeditor/ckeditor": "dev-full/4.11.x",
         "dts/ebay-sdk-php": "^18.0",
         "fideloper/proxy": "^4.0",
+        "heroku/heroku-buildpack-php": "^164.0",
         "hkonnet/laravel-ebay": "^1.4",
         "jenssegers/mongodb": "^3.6",
         "laravel/framework": "^6.0",
         "laravel/tinker": "^1.0",
         "symfony/process": "^4.3",
         "symfony/psr-http-message-bridge": "^1.2",
-        "vlucas/phpdotenv": "^3.6",
-        "ckeditor/ckeditor": "dev-full/4.11.x"
+        "vlucas/phpdotenv": "^3.6"
     },
     "require-dev": {
         "facade/ignition": "^1.4",
