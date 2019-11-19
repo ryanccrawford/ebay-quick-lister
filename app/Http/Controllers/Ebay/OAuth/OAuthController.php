@@ -14,6 +14,7 @@ use function HighlightUtilities\getAvailableStyleSheets;
 class OAuthController extends Controller
 {
     public $credentials;
+    public $service;
     public $OAuthService;
     protected $scope;
     protected $token;
@@ -29,7 +30,7 @@ class OAuthController extends Controller
     {
         
             $this->scope = explode(' ', 'https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account');
-
+            $this->marketPlaceId = \DTS\eBaySDK\Account\Enums\MarketplaceIdEnum::C_EBAY_US;
            $this->credentials = [
                 'appId' => env('EBAY_PROD_APP_ID'),
                 'certId' => env('EBAY_PROD_CERT_ID'),
@@ -196,4 +197,23 @@ class OAuthController extends Controller
         $rd = $this->getReturnUrl('');
         return redirect($rd);
     }
+
+    public function getService($serviceName, $serviceRequest)
+    {
+       // 'verifyAddFixedPriceItem', ($serviceRequest)
+       
+       if ($this->service === null) {
+           $this->service = new \DTS\eBaySDK\Trading\Services\TradingService(
+                [
+                    'siteId' => '0',
+                    'authorization' => session('user_token'),
+                    'credentials' => $this->credentials
+                ]
+            );
+       }
+
+       return $this->service->$serviceName($serviceRequest);
+
+    }
+
 }

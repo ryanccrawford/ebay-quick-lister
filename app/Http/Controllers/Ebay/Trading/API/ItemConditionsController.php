@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 
-class ItemConditionsController extends Controller
+class ItemConditionsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
 {
     protected $service;
 

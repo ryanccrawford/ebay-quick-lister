@@ -11,12 +11,13 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use \App\SellerItem;
+use \lluminate\Http\UploadedFile;
 
 class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
 {
 
 
-    public $service;
+   
     public $config;
     public $AccountService;
     public $marketPlaceId;
@@ -29,7 +30,7 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
     {
         parent::__construct($request);
         $this->middleware('auth');
-        $this->marketPlaceId = \DTS\eBaySDK\Account\Enums\MarketplaceIdEnum::C_EBAY_US;
+    
     }
 
     /**
@@ -253,78 +254,71 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreItem $request)
+    public function store(Request $request)
     {
-        if (session('user_token') === null) {
-            $this->doOAuth(url()->current());
-            return redirect('getauth');
-        }
-        $serviceRequest = new \DTS\eBaySDK\Trading\Types\VerifyAddFixedPriceItemRequestType();
-        $serviceRequest->Item = new \DTS\eBaySDK\Trading\Types\ItemType();
-        $serviceRequest->Item->AutoPay = true;
-        $serviceRequest->Item->ConditionID = 1000;
-        $serviceRequest->Item->Country = \DTS\eBaySDK\Trading\Enums\CountryCodeType::C_US;
-        $serviceRequest->Item->Currency = \DTS\eBaySDK\Trading\Enums\CurrencyCodeType::C_USD;
-        $serviceRequest->Item->BuyItNowPrice = new \DTS\eBaySDK\Trading\Types\AmountType();
-        $serviceRequest->Item->BuyItNowPrice->currencyID = \DTS\eBaySDK\Trading\Enums\CurrencyCodeType::C_USD;
-        $serviceRequest->Item->BuyItNowPrice->value = doubleval(trim($request->input('price')));
-        $serviceRequest->Item->Description =  trim($request->input('descriptionEditorArea'));
-        $serviceRequest->Item->DispatchTimeMax = 1;
-        $serviceRequest->Item->SKU =  trim($request->input('sku'));
-        $serviceRequest->Item->IncludeRecommendations = false;
-        $serviceRequest->Item->InventoryTrackingMethod = \DTS\eBaySDK\Trading\Enums\InventoryTrackingMethodCodeType::C_SKU;
-        $serviceRequest->Item->ListingType = \DTS\eBaySDK\Trading\Enums\ListingTypeCodeType::C_FIXED_PRICE_ITEM;
-        $serviceRequest->Item->ListingDuration = \DTS\eBaySDK\Trading\Enums\ListingDurationCodeType::C_GTC;
-        $serviceRequest->Item->Location = "Ashland, VA";
+        $stuff =  $request->all();
+        echo var_dump($stuff);
+        // $serviceRequest = new \DTS\eBaySDK\Trading\Types\VerifyAddFixedPriceItemRequestType();
+        // $serviceRequest->Item = new \DTS\eBaySDK\Trading\Types\ItemType();
+        // $serviceRequest->Item->AutoPay = true;
+        // $serviceRequest->Item->ConditionID = 1000;
+        // $serviceRequest->Item->Country = \DTS\eBaySDK\Trading\Enums\CountryCodeType::C_US;
+        // $serviceRequest->Item->Currency = \DTS\eBaySDK\Trading\Enums\CurrencyCodeType::C_USD;
+        // $serviceRequest->Item->BuyItNowPrice = new \DTS\eBaySDK\Trading\Types\AmountType();
+        // $serviceRequest->Item->BuyItNowPrice->currencyID = \DTS\eBaySDK\Trading\Enums\CurrencyCodeType::C_USD;
+        // $serviceRequest->Item->BuyItNowPrice->value = doubleval(trim($request->input('price')));
+        // $serviceRequest->Item->Description =  trim($request->input('descriptionEditorArea'));
+        // $serviceRequest->Item->DispatchTimeMax = 1;
+        // $serviceRequest->Item->SKU =  trim($request->input('sku'));
+        // $serviceRequest->Item->IncludeRecommendations = false;
+        // $serviceRequest->Item->InventoryTrackingMethod = \DTS\eBaySDK\Trading\Enums\InventoryTrackingMethodCodeType::C_SKU;
+        // $serviceRequest->Item->ListingType = \DTS\eBaySDK\Trading\Enums\ListingTypeCodeType::C_FIXED_PRICE_ITEM;
+        // $serviceRequest->Item->ListingDuration = \DTS\eBaySDK\Trading\Enums\ListingDurationCodeType::C_GTC;
+        // $serviceRequest->Item->Location = "Ashland, VA";
 
-        $serviceRequest->Item->PictureDetails = new \DTS\eBaySDK\Trading\Types\PictureDetailsType();
+        // $serviceRequest->Item->PictureDetails = new \DTS\eBaySDK\Trading\Types\PictureDetailsType();
         $imagePaths = [];
-        $mainImageFile = $request->file('mainImageFile');
+        $mainImageFile =$request->mainImageFile->path();
+       
+       
         if ($mainImageFile !== null) {
-            $extension = $mainImageFile->getClientOriginalExtension();
-            Storage::disk('public')->put($mainImageFile->getFilename().'.'.$extension, File::get($mainImageFile));
+            $extension1 =  explode(".", $mainImageFile)[1];
+            Storage::disk('public')->put($mainImageFile.'.'.$extension1, File::get($mainImageFile));
         }
        
-        $descriptionImageFile = $request->file('descriptionImageFile');
+        $descriptionImageFile = $request->descriptionImageFile;
+
         if ($mainImageFile !== null) {
-            $extension = $descriptionImageFile->getClientOriginalExtension();
-            Storage::disk('public')->put($descriptionImageFile->getFilename().'.'.$extension, File::get($descriptionImageFile));
+            $extension2 = explode(".", $descriptionImageFile)[1];
+            Storage::disk('public')->put($descriptionImageFile.'.'.$extension2, File::get($descriptionImageFile));
         }
            
         if (($mainImageFile !== null) && ($mainImageFile !== null)) {
             $imagePaths = [
-                $mainImageFile->getFilename().'.'.$extension, $descriptionImageFile->getFilename().'.'.$extension,
+                $mainImageFile.'.'.$extension1, $mainImageFile.'.'.$extension2,
             ];
     
 
 
-            $serviceRequest->Item->PictureDetails->PictureURL =  $imagePaths;
+           // $serviceRequest->Item->PictureDetails->PictureURL =  $imagePaths;
         }
-            $serviceRequest->Item->PrimaryCategory = new \DTS\eBaySDK\Trading\Types\CategoryType();
-            $serviceRequest->Item->PrimaryCategory->CategoryID = $request->input('primaryCategory');
-            $serviceRequest->Item->ProductListingDetails = new \DTS\eBaySDK\Trading\Types\ProductListingDetailsType();
-            $serviceRequest->Item->ProductListingDetails->BrandMPN = new \DTS\eBaySDK\Trading\Types\BrandMPNType();
-            $serviceRequest->Item->ProductListingDetails->BrandMPN->Brand = "3 Star Inc";
-            $serviceRequest->Item->ProductListingDetails->BrandMPN->MPN = $request->input('sku');
-            $serviceRequest->Item->Quantity = intval($request->input('qty'));
+            // $serviceRequest->Item->PrimaryCategory = new \DTS\eBaySDK\Trading\Types\CategoryType();
+            // $serviceRequest->Item->PrimaryCategory->CategoryID = $request->input('primaryCategory');
+            // $serviceRequest->Item->ProductListingDetails = new \DTS\eBaySDK\Trading\Types\ProductListingDetailsType();
+            // $serviceRequest->Item->ProductListingDetails->BrandMPN = new \DTS\eBaySDK\Trading\Types\BrandMPNType();
+            // $serviceRequest->Item->ProductListingDetails->BrandMPN->Brand = "3 Star Inc";
+            // $serviceRequest->Item->ProductListingDetails->BrandMPN->MPN = $request->input('sku');
+            // $serviceRequest->Item->Quantity = intval($request->input('qty'));
         
-      
+           
 
-            $this->service = new \DTS\eBaySDK\Trading\Services\TradingService(
-            [
-                'siteId' => '0',
-                'authorization' => session('user_token'),
-                'credentials' => $this->credentials
-            ]
-        );
-
-            $serviceResponse = $this->service->verifyAddFixedPriceItem($serviceRequest);
-            if ($serviceResponse->Ack === 200) {
-                $serviceRealRequest = new \DTS\eBaySDK\Trading\Types\AddFixedPriceItemRequestType();
-                $serviceRealRequest->Item = $serviceRequest->Item;
+            //$serviceResponse = $this->getService('verifyAddFixedPriceItem', ($serviceRequest)); 
+           // if ($serviceResponse->Ack === 200) {
+              //  $serviceRealRequest = new \DTS\eBaySDK\Trading\Types\AddFixedPriceItemRequestType();
+              //  $serviceRealRequest->Item = $serviceRequest->Item;
             
-                $serviceRealResponse = $this->service->addFixedPriceItem($serviceRealRequest);
-                if ($serviceRealResponse->Ack === 200) {
+             //   $serviceRealResponse = $this->service->addFixedPriceItem($serviceRealRequest);
+             //   if ($serviceRealResponse->Ack === 200) {
                     $SellerItem = new \App\SellerItem();
                     $SellerItem->title = $request->input('title');
                     $SellerItem->price = doubleval($request->input('price'));
@@ -338,18 +332,20 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
                     $SellerItem->shippingHeight = intval($request->input('shippingHeight'));
                     $SellerItem->shippingWeight = intval($request->input('shippingWeight'));
                     $SellerItem->primaryCategory = intval($request->input('primaryCategory'));
-                    $SellerItem->mainImageFile =  $mainImageFile->getFilename().'.'.$extension;
-                    $SellerItem->descriptionImageFile = $descriptionImageFile->getFilename().'.'.$extension;
+                    $SellerItem->mainImageFile =  $mainImageFile.'.'. $extension1;
+                    $SellerItem->descriptionImageFile = $descriptionImageFile.'.'.$extension2;
                     $SellerItem->save();
 
                     return redirect()->route('trading/edit')
                 ->with('success', 'Item Added Successfully');
-                }
-            }
+               // }
+          //  }
 
-            return redirect()->route('trading/edit', ['create' => 'true'])->withInput($request->input);
+         //   return redirect()->route('trading/edit', ['create' => 'true'])->withInput($request->input);
         
     }
+
+    
 
     /**
      * Display one specified resource.
