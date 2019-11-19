@@ -17,7 +17,7 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
 {
 
 
-   
+
     public $config;
     public $AccountService;
     public $marketPlaceId;
@@ -30,7 +30,6 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
     {
         parent::__construct($request);
         $this->middleware('auth');
-    
     }
 
     /**
@@ -278,74 +277,74 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
 
         // $serviceRequest->Item->PictureDetails = new \DTS\eBaySDK\Trading\Types\PictureDetailsType();
         $imagePaths = [];
-        $mainImageFile =$request->mainImageFile->path();
-       
-       
+        $mainImageFile = $request->mainImageFile->path();
+
+
         if ($mainImageFile !== null) {
             $extension1 =  explode(".", $mainImageFile)[1];
-            Storage::disk('public')->put($mainImageFile.'.'.$extension1, File::get($mainImageFile));
+            Storage::disk('public')->put($mainImageFile . '.' . $extension1, File::get($mainImageFile));
         }
-       
+
         $descriptionImageFile = $request->descriptionImageFile;
 
         if ($mainImageFile !== null) {
             $extension2 = explode(".", $descriptionImageFile)[1];
-            Storage::disk('public')->put($descriptionImageFile.'.'.$extension2, File::get($descriptionImageFile));
+            Storage::disk('public')->put($descriptionImageFile . '.' . $extension2, File::get($descriptionImageFile));
         }
-           
+
         if (($mainImageFile !== null) && ($mainImageFile !== null)) {
             $imagePaths = [
-                $mainImageFile.'.'.$extension1, $mainImageFile.'.'.$extension2,
+                $mainImageFile . '.' . $extension1, $mainImageFile . '.' . $extension2,
             ];
-    
 
 
-           // $serviceRequest->Item->PictureDetails->PictureURL =  $imagePaths;
+
+            // $serviceRequest->Item->PictureDetails->PictureURL =  $imagePaths;
         }
-            // $serviceRequest->Item->PrimaryCategory = new \DTS\eBaySDK\Trading\Types\CategoryType();
-            // $serviceRequest->Item->PrimaryCategory->CategoryID = $request->input('primaryCategory');
-            // $serviceRequest->Item->ProductListingDetails = new \DTS\eBaySDK\Trading\Types\ProductListingDetailsType();
-            // $serviceRequest->Item->ProductListingDetails->BrandMPN = new \DTS\eBaySDK\Trading\Types\BrandMPNType();
-            // $serviceRequest->Item->ProductListingDetails->BrandMPN->Brand = "3 Star Inc";
-            // $serviceRequest->Item->ProductListingDetails->BrandMPN->MPN = $request->input('sku');
-            // $serviceRequest->Item->Quantity = intval($request->input('qty'));
-        
-           
+        // $serviceRequest->Item->PrimaryCategory = new \DTS\eBaySDK\Trading\Types\CategoryType();
+        // $serviceRequest->Item->PrimaryCategory->CategoryID = $request->input('primaryCategory');
+        // $serviceRequest->Item->ProductListingDetails = new \DTS\eBaySDK\Trading\Types\ProductListingDetailsType();
+        // $serviceRequest->Item->ProductListingDetails->BrandMPN = new \DTS\eBaySDK\Trading\Types\BrandMPNType();
+        // $serviceRequest->Item->ProductListingDetails->BrandMPN->Brand = "3 Star Inc";
+        // $serviceRequest->Item->ProductListingDetails->BrandMPN->MPN = $request->input('sku');
+        // $serviceRequest->Item->Quantity = intval($request->input('qty'));
 
-            //$serviceResponse = $this->getService('verifyAddFixedPriceItem', ($serviceRequest)); 
-           // if ($serviceResponse->Ack === 200) {
-              //  $serviceRealRequest = new \DTS\eBaySDK\Trading\Types\AddFixedPriceItemRequestType();
-              //  $serviceRealRequest->Item = $serviceRequest->Item;
-            
-             //   $serviceRealResponse = $this->service->addFixedPriceItem($serviceRealRequest);
-             //   if ($serviceRealResponse->Ack === 200) {
-                    $SellerItem = new \App\SellerItem();
-                    $SellerItem->title = $request->input('title');
-                    $SellerItem->price = doubleval($request->input('price'));
-                    $SellerItem->sku = $request->input('sku');
-                    $SellerItem->descriptionEditorArea = $request->input('descriptionEditorArea');
-                    $SellerItem->ShippingPoliciesResponse = intval($request->input('ShippingPoliciesResponse'));
-                    $SellerItem->ReturnPoliciesResponse = intval($request->input('ReturnPoliciesResponse'));
-                    $SellerItem->shippingCost = doubleval($request->input('shippingCost'));
-                    $SellerItem->shippingLength = intval($request->input('shippingLength'));
-                    $SellerItem->shippingWidth = intval($request->input('shippingWidth'));
-                    $SellerItem->shippingHeight = intval($request->input('shippingHeight'));
-                    $SellerItem->shippingWeight = intval($request->input('shippingWeight'));
-                    $SellerItem->primaryCategory = intval($request->input('primaryCategory'));
-                    $SellerItem->mainImageFile =  $mainImageFile.'.'. $extension1;
-                    $SellerItem->descriptionImageFile = $descriptionImageFile.'.'.$extension2;
-                    $SellerItem->save();
 
-                    return redirect()->route('trading/edit')
-                ->with('success', 'Item Added Successfully');
-               // }
-          //  }
 
-         //   return redirect()->route('trading/edit', ['create' => 'true'])->withInput($request->input);
-        
+        //$serviceResponse = $this->getService('verifyAddFixedPriceItem', ($serviceRequest));
+        // if ($serviceResponse->Ack === 200) {
+        //  $serviceRealRequest = new \DTS\eBaySDK\Trading\Types\AddFixedPriceItemRequestType();
+        //  $serviceRealRequest->Item = $serviceRequest->Item;
+
+        //   $serviceRealResponse = $this->service->addFixedPriceItem($serviceRealRequest);
+        //   if ($serviceRealResponse->Ack === 200) {
+        $SellerItem = new \App\SellerItem();
+        $SellerItem->title = $request->input('title');
+        $SellerItem->price = doubleval($request->input('price'));
+        $SellerItem->sku = $request->input('sku');
+        $SellerItem->descriptionEditorArea = $request->input('descriptionEditorArea');
+        $SellerItem->ShippingPoliciesResponse = intval($request->input('ShippingPoliciesResponse'));
+        $SellerItem->ReturnPoliciesResponse = intval($request->input('ReturnPoliciesResponse'));
+        $SellerItem->shippingCost = doubleval($request->input('shippingCost'));
+        $SellerItem->shippingLength = intval($request->input('shippingLength'));
+        $SellerItem->shippingWidth = intval($request->input('shippingWidth'));
+        $SellerItem->shippingHeight = intval($request->input('shippingHeight'));
+        $SellerItem->shippingWeight = intval($request->input('shippingWeight'));
+        $SellerItem->primaryCategory = intval($request->input('primaryCategory'));
+        $SellerItem->mainImageFile =  $mainImageFile . '.' . $extension1;
+        $SellerItem->descriptionImageFile = $descriptionImageFile . '.' . $extension2;
+        $SellerItem->save();
+
+        return redirect()->route('trading/edit')
+            ->with($request->input);
+        // }
+        //  }
+
+        //   return redirect()->route('trading/edit', ['create' => 'true'])->withInput($request->input);
+
     }
 
-    
+
 
     /**
      * Display one specified resource.

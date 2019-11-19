@@ -40,14 +40,14 @@
                 </div>
             @endif
             <div class="container">
-                <form method="POST" action="{{ route('trading/new') }}">
+                <form method="POST" action="{{ route('trading/new') }}" id="itemForm" name="itemForm">
                 @csrf
                 @isset($Errors)
                 <div class="alert alert-danger Errors" role="alert">
                     <strong>{{ $Errors['message'] }}</strong>
                 </div>
                 @endisset
-               
+
                 <h1 class="text-white">Creating Item</h1>
                 <div class="row">
                     <div class="col-md-12">
@@ -238,7 +238,7 @@
                                     }else{
                                         echo htmlentities($descriptionTemplate);
                                     }
-                                    
+
                                     ?>
                                 </textarea>
                             </div>
@@ -275,7 +275,9 @@
             @endsection
             @push('end')
 
-
+            <script>
+            var postUrl = "{{ route('trading/new') }}";
+            </script>
             <script src="{{ asset('js/createListing.js') }}"></script>
 
             @endpush

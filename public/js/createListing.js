@@ -1,7 +1,14 @@
 var descriptionEditor = CKEDITOR.replace('descriptionEditorArea', { 'height': '600' });
 
-var titleLeaveValue = '';
-
+var titleLeaveValue = {
+    blob: "",
+    string: ""
+};
+var mainImageAsImage = {
+    blob: '',
+    string: ''
+};
+var descriptionImageAsImage = '';
 
 $(document).ready(function() {
     $("#categorySpinner").hide();
@@ -12,8 +19,10 @@ $(document).ready(function() {
             var reader1 = new FileReader();
             reader1.onload = function(e) {
                 $('#mainImage').attr('src', e.target.result);
+                mainImageAsImage.string = e.target.result;
             }
-
+            console.log(input.files)
+            mainImageAsImage.blob = input.files[0];
             reader1.readAsDataURL(input.files[0]);
         }
     }
@@ -24,8 +33,10 @@ $(document).ready(function() {
             var reader2 = new FileReader();
             reader2.onload = function(e) {
                 $('#descriptionImage').attr('src', e.target.result);
+                descriptionImageAsImage.string = e.target.result;
             }
-
+            console.log(input.files)
+            descriptionImageAsImage.blob = input.files[0];
             reader2.readAsDataURL(input.files[0]);
         }
     }
@@ -140,4 +151,76 @@ $(document).ready(function() {
     getShippingOptions();
     getReturnOptions();
 
+    var itemform = document.getElementById('itemForm');
+
+    itemform.onsubmit((event) => {
+        event.preventDefault();
+
+        if (supportAjaxUploadWithProgress) {
+
+
+            $('#savetoebay').text('Saving...')
+
+
+            var file1 = document.getElementById('mainImageFile');
+            var file2 = document.getElementById('descriptionImageFile');
+            var image1 = file1.files[0];
+            var image2 = file2.files[0];
+            var formData = new FormData();
+            if (!image1.type.match('image.*') || !image2.type.match('image.*')) {
+                alert("Not an image file.")
+                return;
+            }
+            formData.append('mainImageFile', image1, image1.name);
+            formData.append('descriptionImageFile', image2, image2.name);
+
+            var xhr = new XMLHttpRequest();
+            xhr.upload.addEventListener('progress', onprogressHandler, false);
+            xhr.open('POST', postUrl, true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    // File(s) uploaded.
+                    $('#savetoebay').text('Save');
+                } else {
+                    alert('An error occurred!');
+                }
+            };
+            xhr.send(formData);
+
+
+
+        } else {
+
+            alert("Your browser is not supported at this time. Please use Google Chrome.")
+
+        }
+
+    });
+
+    function onprogressHandler(evt) {
+        var percent = evt.loaded / evt.total * 100;
+        $('#savetoebay').text('Saving ' + percent + '%');
+
+    }
+
 })
+
+//https://thoughtbot.com/blog/html5-powered-ajax-file-uploads
+//by Pablo Brasero  July 30, 2010 UPDATED ON March 9, 2019
+function supportAjaxUploadWithProgress() {
+    return supportFileAPI() & amp; & amp;
+    supportAjaxUploadProgressEvents();
+
+    function supportFileAPI() {
+        var fi = document.createElement('INPUT');
+        fi.type = 'file';
+        return 'files' in fi;
+    };
+
+    function supportAjaxUploadProgressEvents() {
+        var xhr = new XMLHttpRequest();
+        return !!(xhr & amp; & amp;
+            ('upload' in xhr) & amp; & amp;
+            ('onprogress' in xhr.upload));
+    };
+}
