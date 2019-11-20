@@ -314,22 +314,22 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
 
         //   $serviceRealResponse = $this->service->addFixedPriceItem($serviceRealRequest);
         //   if ($serviceRealResponse->Ack === 200) {
-        $SellerItem = new \App\SellerItem();
-        $SellerItem->title = $request->input('title');
-        $SellerItem->price = doubleval($request->input('price'));
-        $SellerItem->sku = $request->input('sku');
-        $SellerItem->descriptionEditorArea = $request->input('descriptionEditorArea');
-        $SellerItem->ShippingPoliciesResponse = intval($request->input('ShippingPoliciesResponse'));
-        $SellerItem->ReturnPoliciesResponse = intval($request->input('ReturnPoliciesResponse'));
-        $SellerItem->shippingCost = doubleval($request->input('shippingCost'));
-        $SellerItem->shippingLength = intval($request->input('shippingLength'));
-        $SellerItem->shippingWidth = intval($request->input('shippingWidth'));
-        $SellerItem->shippingHeight = intval($request->input('shippingHeight'));
-        $SellerItem->shippingWeight = intval($request->input('shippingWeight'));
-        $SellerItem->primaryCategory = intval($request->input('primaryCategory'));
-        $SellerItem->mainImageFile =  $imageName1;
-        $SellerItem->descriptionImageFile = $imageName2;
-        $SellerItem->save();
+        // $SellerItem = new \App\SellerItem();
+        // $SellerItem->title = $request->input('title');
+        // $SellerItem->price = doubleval($request->input('price'));
+        // $SellerItem->sku = $request->input('sku');
+        // $SellerItem->descriptionEditorArea = $request->input('descriptionEditorArea');
+        // $SellerItem->ShippingPoliciesResponse = intval($request->input('ShippingPoliciesResponse'));
+        // $SellerItem->ReturnPoliciesResponse = intval($request->input('ReturnPoliciesResponse'));
+        // $SellerItem->shippingCost = doubleval($request->input('shippingCost'));
+        // $SellerItem->shippingLength = intval($request->input('shippingLength'));
+        // $SellerItem->shippingWidth = intval($request->input('shippingWidth'));
+        // $SellerItem->shippingHeight = intval($request->input('shippingHeight'));
+        // $SellerItem->shippingWeight = intval($request->input('shippingWeight'));
+        // $SellerItem->primaryCategory = intval($request->input('primaryCategory'));
+        // $SellerItem->mainImageFile =  $imageName1;
+        // $SellerItem->descriptionImageFile = $imageName2;
+        // $SellerItem->save();
 
         return redirect()->route('trading/edit')
             ->with($request->input);
