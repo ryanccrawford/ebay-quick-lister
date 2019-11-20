@@ -17,7 +17,7 @@ $(document).ready(function(e) {
     })
     var dropZone = document.getElementById('upload-image-drop-zone');
 
-
+ 
     $('#desc').keyup((e) => {
         if (templateLoaded) {
             var detext = $('#desc').val()

@@ -46,7 +46,7 @@ Route::get('trading', 'Ebay\Trading\API\ItemsController@index')->name('trading')
 Route::get('trading/search', 'Ebay\Trading\API\ItemsController@index')->name('trading/search');
 Route::get('trading/edit', 'Ebay\Trading\API\ItemsController@show')->name('trading/edit');
 
-Route::post('trading/new', 'Ebay\Trading\API\ItemsController@store')->name('trading/new');
+
 Route::put('trading/edit', 'Ebay\Trading\API\ItemsController@update')->name('trading/edit');
 
 

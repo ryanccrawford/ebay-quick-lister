@@ -260,7 +260,9 @@
                                 </div>
                                 <div class="col-md-3">
                                     <button id="preview" class="btn bg-primary text-white right" disabled>Preview</button>
-                                    <button type="submit" id="savetoebay" class="btn bg-primary text-white right">Save Item</button>
+                                    <button type="submit" id="savetoebay" class="btn bg-primary text-white right">Save Item <div class="progress" id="progress" style="display:none">
+  <div class="progress-bar" id="uploadProgress" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+</div></button>
                                 </div>
                             </div>
                         </div>

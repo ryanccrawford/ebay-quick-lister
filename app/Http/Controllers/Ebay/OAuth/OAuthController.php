@@ -198,12 +198,17 @@ class OAuthController extends Controller
         return redirect($rd);
     }
 
-    public function getService($serviceName, $serviceRequest)
+    public function getService($serviceName, $serviceRequest,  $apiName = "Trading", $serviceType = "TradingService")
     {
+        
        // 'verifyAddFixedPriceItem', ($serviceRequest)
-       
+       $type = '\\DTS\\eBaySDK\\';
+       $type .= $apiName;
+       $type .= '\\Services\\';
+       $type .= $serviceType;
+
        if ($this->service === null) {
-           $this->service = new \DTS\eBaySDK\Trading\Services\TradingService(
+           $this->service = new $type(
                 [
                     'siteId' => '0',
                     'authorization' => session('user_token'),

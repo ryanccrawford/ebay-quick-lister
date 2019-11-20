@@ -29,7 +29,7 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
     public function __construct(Request $request)
     {
         parent::__construct($request);
-        $this->middleware('auth');
+       // $this->middleware('auth');
     }
 
     /**
@@ -255,8 +255,20 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
      */
     public function store(Request $request)
     {
-        $stuff =  $request->all();
-        echo var_dump($stuff);
+        // $request->validate(
+        //     [
+        //         'mainImageFile' => 'required|image|mimes:jpeg,png,jpg,gif',
+        //         'descriptionImageFile' => 'required|image|mimes:jpeg,png,jpg,gif'
+        //     ]
+        // );
+        
+     
+        $imageName1 = $request->mainImageFile->store('images');
+        $imageName2 = $request->descriptionImageFile->store('images');
+       
+      echo $imageName1;
+      
+
         // $serviceRequest = new \DTS\eBaySDK\Trading\Types\VerifyAddFixedPriceItemRequestType();
         // $serviceRequest->Item = new \DTS\eBaySDK\Trading\Types\ItemType();
         // $serviceRequest->Item->AutoPay = true;
@@ -276,31 +288,15 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
         // $serviceRequest->Item->Location = "Ashland, VA";
 
         // $serviceRequest->Item->PictureDetails = new \DTS\eBaySDK\Trading\Types\PictureDetailsType();
-        $imagePaths = [];
-        $mainImageFile = $request->mainImageFile->path();
+    
+       
 
-
-        if ($mainImageFile !== null) {
-            $extension1 =  explode(".", $mainImageFile)[1];
-            Storage::disk('public')->put($mainImageFile . '.' . $extension1, File::get($mainImageFile));
-        }
-
-        $descriptionImageFile = $request->descriptionImageFile;
-
-        if ($mainImageFile !== null) {
-            $extension2 = explode(".", $descriptionImageFile)[1];
-            Storage::disk('public')->put($descriptionImageFile . '.' . $extension2, File::get($descriptionImageFile));
-        }
-
-        if (($mainImageFile !== null) && ($mainImageFile !== null)) {
-            $imagePaths = [
-                $mainImageFile . '.' . $extension1, $mainImageFile . '.' . $extension2,
-            ];
+        
 
 
 
             // $serviceRequest->Item->PictureDetails->PictureURL =  $imagePaths;
-        }
+        
         // $serviceRequest->Item->PrimaryCategory = new \DTS\eBaySDK\Trading\Types\CategoryType();
         // $serviceRequest->Item->PrimaryCategory->CategoryID = $request->input('primaryCategory');
         // $serviceRequest->Item->ProductListingDetails = new \DTS\eBaySDK\Trading\Types\ProductListingDetailsType();
@@ -331,8 +327,8 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
         $SellerItem->shippingHeight = intval($request->input('shippingHeight'));
         $SellerItem->shippingWeight = intval($request->input('shippingWeight'));
         $SellerItem->primaryCategory = intval($request->input('primaryCategory'));
-        $SellerItem->mainImageFile =  $mainImageFile . '.' . $extension1;
-        $SellerItem->descriptionImageFile = $descriptionImageFile . '.' . $extension2;
+        $SellerItem->mainImageFile =  $imageName1;
+        $SellerItem->descriptionImageFile = $imageName2;
         $SellerItem->save();
 
         return redirect()->route('trading/edit')
@@ -371,7 +367,7 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
                     );
                 }
             } catch (Exception $e) {
-                $this->doOAuth(url()->current());
+                $this->doOAuth($request->fullUrl());
                 return redirect('getauth');
             }
             return view('ebay.trading.listings.listingitemcreate', compact('descriptionTemplate', 'request'));

@@ -13,13 +13,12 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 Route::post('imagepost', 'ImageUploadController@imagepost')->name('imagepost');
 
 Route::post('api/quickupdate/price', 'QuickUpdateController@price')->name('api/quickupdate/price');
 Route::post('api/quickupdate/qoh', 'QuickUpdateController@qoh')->name('api/quickupdate/qoh');
+Route::post('trading/new', 'Ebay\Trading\API\ItemsController@store')->name('trading/new');
 
-// Route::get('api/get/returnpolicies', 'Ebay\Trading\API\ItemsController@returnpolicies')->name('api/get/returnpolicies');
-// Route::get('api/get/paymentpolicies', 'Ebay\Trading\API\ItemsController@paymentpolicies')->name('api/get/paymentpolicies');
