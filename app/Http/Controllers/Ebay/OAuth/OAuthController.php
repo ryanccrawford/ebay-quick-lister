@@ -16,8 +16,10 @@ class OAuthController extends Controller
     public $credentials;
     public $service;
     public $OAuthService;
-    protected $scope;
-    protected $token;
+    public $scope;
+    public $token;
+    public $marketPlaceId;
+    public $config;
 
 
     /**
@@ -28,30 +30,28 @@ class OAuthController extends Controller
      */
     public function __construct(Request $request)
     {
-        
-            $this->scope = explode(' ', 'https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account');
-            $this->marketPlaceId = \DTS\eBaySDK\Account\Enums\MarketplaceIdEnum::C_EBAY_US;
-           $this->credentials = [
-                'appId' => env('EBAY_PROD_APP_ID'),
-                'certId' => env('EBAY_PROD_CERT_ID'),
-                'devId' => env('EBAY_PROD_DEV_ID'),
-                'authToken' => env('EBAY_PROD_AUTH_TOKEN'),
-                'globalId' => env('EBAY_GLOBAL_ID')
-            ];
-           
-            $this->OAuthService = new \DTS\eBaySDK\OAuth\Services\OAuthService(
-                [
-                    'credentials' => $this->credentials,
-                    'ruName' => env('EBAY_PROD_RUNAME'),
-                ]
-            );
-      
-       
+
+        $this->scope = explode(' ', 'https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account');
+        $this->marketPlaceId = \DTS\eBaySDK\Account\Enums\MarketplaceIdEnum::C_EBAY_US;
+        $this->credentials = [
+            'appId' => env('EBAY_PROD_APP_ID'),
+            'certId' => env('EBAY_PROD_CERT_ID'),
+            'devId' => env('EBAY_PROD_DEV_ID'),
+            'authToken' => env('EBAY_PROD_AUTH_TOKEN'),
+            'globalId' => env('EBAY_GLOBAL_ID')
+        ];
+
+        $this->OAuthService = new \DTS\eBaySDK\OAuth\Services\OAuthService(
+            [
+                'credentials' => $this->credentials,
+                'ruName' => env('EBAY_PROD_RUNAME'),
+            ]
+        );
     }
 
     public function getauth(Request $request)
     {
-       
+
         if ($request->session()->has('user_token')) {
 
             if (!$this->isTokenExpired()) {
@@ -84,7 +84,7 @@ class OAuthController extends Controller
                         ]
                     );
                     abort(401);
-                   //return $this->getauth($request);
+                    //return $this->getauth($request);
                 }
             }
         }
@@ -106,16 +106,15 @@ class OAuthController extends Controller
         session()->forget('user_token');
         session()->forget('scope');
         session()->forget('return');
-      
+
         session(['scope' => $this->scope]);
         session(['return' => $returnURL]);
-      
     }
 
 
     public function setSessionToken($response)
     {
-       
+
         $seconds = $response->expires_in;
         $expiresdatetime = date("Y-m-d H:i:s", strtotime(('+' . $seconds . ' seconds'), strtotime(date("Y-m-d H:i:s"))));
         session(
@@ -161,19 +160,19 @@ class OAuthController extends Controller
     public function oauth(Request $request)
     {
         $code = $request->query('code');
-       
+
         if (strlen($code)) {
 
             $userTokenRequest = new \DTS\eBaySDK\OAuth\Types\GetUserTokenRestRequest(
-                                    [
-                                        'code' => $code,
-                                    ]
-                );
+                [
+                    'code' => $code,
+                ]
+            );
 
             $userTokenresponse = $this->OAuthService->getUserToken($userTokenRequest);
 
             $rt = $request->query('state');
-            
+
             if ($userTokenresponse->getStatusCode() !== 200) {
 
                 session()->forget(
@@ -186,39 +185,14 @@ class OAuthController extends Controller
                 //TODO: Create Error page that shows OAuth Errors
                 abort(401);
             } else {
-                
+
                 $this->setSessionToken($userTokenresponse);
                 $rd = $rt;
                 return redirect($rd);
-                
             }
         }
 
         $rd = $this->getReturnUrl('');
         return redirect($rd);
     }
-
-    public function getService($serviceName, $serviceRequest,  $apiName = "Trading", $serviceType = "TradingService")
-    {
-        
-       // 'verifyAddFixedPriceItem', ($serviceRequest)
-       $type = '\\DTS\\eBaySDK\\';
-       $type .= $apiName;
-       $type .= '\\Services\\';
-       $type .= $serviceType;
-
-       if ($this->service === null) {
-           $this->service = new $type(
-                [
-                    'siteId' => '0',
-                    'authorization' => session('user_token'),
-                    'credentials' => $this->credentials
-                ]
-            );
-       }
-
-       return $this->service->$serviceName($serviceRequest);
-
-    }
-
 }

@@ -10,76 +10,24 @@ use DTS\eBaySDK\Credentials\Credentialsl;
 use App\User;
 use \App\inventoryPart;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use \App\Http\Controllers\Ebay\Trading\EbayItemBaseController;
 
-class EbayInventoryController extends Controller
+class EbayInventoryController extends EbayItemBaseController
 {
-    protected $configuation;
-    protected $provider;
-    protected $inventoryService;
-    protected $OAuthService;
-    protected $credentials;
-    protected $token = '';
-    protected $code = '';
+    public $configuation;
+    public $provider;
+    public $inventoryService;
+
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Request $request)
     {
+        parent::__construct($request);
         $this->middleware('auth');
-        $this->doCreateOAuth();
-    }
-
-    /**
-     * Do OAuth.
-     *
-     * @return void
-     */
-    public function doCreateOAuth()
-    {
-        $this->credentials = [
-            'appId' => getenv('EBAY_PROD_APP_ID'),
-            'certId' => getenv('EBAY_PROD_CERT_ID'),
-            'devId' => getenv('EBAY_PROD_DEV_ID'),
-        ];
-
-        $this->OAuthService = new \DTS\eBaySDK\OAuth\Services\OAuthService(
-            [
-                'credentials' => $this->credentials,
-                'ruName' => getenv('EBAY_PROD_RUNAME'),
-            ]
-        );
-    }
-
-    /**
-     * Get ebay Token
-     *
-     * @return Illuminate\Routing\Redirector
-     */
-    public function getToken()
-    {
-        $url =  $this->OAuthService->redirectUrlForUser(
-            [
-                'state' => 'bar',
-                'scope' => [
-                    'https://api.ebay.com/oauth/api_scope',
-                    'https://api.ebay.com/oauth/api_scope/sell.inventory',
-                    'https://api.ebay.com/oauth/api_scope/sell.fulfillment'
-                ]
-            ]
-        );
-        return redirect()->away($url);
-    }
-
-    /**
-     * Starts SDK Service.
-     *
-     * @return void
-     */
-    public function startService()
-    {
         if (!isset($this->inventoryService)) {
             $this->inventoryService = new \DTS\eBaySDK\Inventory\Services\InventoryService(
                 [
@@ -88,6 +36,7 @@ class EbayInventoryController extends Controller
             );
         }
     }
+
 
     /**
      * Display a listing of the resource.
@@ -112,13 +61,9 @@ class EbayInventoryController extends Controller
      */
     public function showlocations(Request $request)
     {
-        if ($request->session()->has('token')) {
-            $this->token = session('token');
-            $inventoryLocations = $this->getInventoryLocations();
-            return view('ebay.inventory.locations.locationlist', compact('inventoryLocations'));
-        } else {
-            return $this->getToken();
-        }
+
+        $inventoryLocations = $this->getInventoryLocations();
+        return view('ebay.inventory.locations.locationlist', compact('inventoryLocations'));
     }
 
     /**
@@ -127,9 +72,7 @@ class EbayInventoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create(Request $request)
-    {
-       
-    }
+    { }
 
     /**
      * Gets all Inventory Items.
@@ -138,7 +81,6 @@ class EbayInventoryController extends Controller
      */
     public function getInventoryItems()
     {
-        $this->startService();
         $request = new \DTS\eBaySDK\Inventory\Types\GetInventoryItemsRestRequest();
         $response = $this->inventoryService->getInventoryItems($request);
         return $response->inventoryItems;

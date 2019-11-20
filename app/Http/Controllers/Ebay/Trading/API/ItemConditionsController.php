@@ -1,16 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace \App\Http\Controllers\Ebay\Trading\API;
 
 use Illuminate\Http\Request;
+use \App\Http\Controllers\Ebay\Trading\EbayItemBaseController;
 
-
-class ItemConditionsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
+class ItemConditionsController extends EbayItemBaseController
 {
-    protected $service;
 
-    public function __construct()
-    { }
+
+    public function __construct(Request $request)
+    {
+        parent::__construct($request);
+    }
     /**
      * Handle the incoming request.
      *

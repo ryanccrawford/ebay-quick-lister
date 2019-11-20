@@ -7,13 +7,10 @@ use \Illuminate\Http\Request;
 use \DTS\eBaySDK\Trading\Types;
 use \DTS\eBaySDK\Trading\Enums;
 use \DTS\eBaySDK\Constants;
+use \App\Http\Controllers\Ebay\Trading\EbayItemBaseController;
 
-class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
+class ItemsController extends EbayItemBaseController
 {
-
-
-    protected $service;
-    protected $config;
 
     /**
      * Create a new controller instance.
@@ -21,14 +18,7 @@ class ItemsController extends \App\Http\Controllers\Ebay\OAuth\OAuthController
      * @return void
      */
     public function __construct(Request $request)
-    {
-        if(!$request->session()->has('user_token')){
-            
-            return redirect('getauth');
-
-        }
-        
-    }
+    { }
 
     /**
      * Show the form for creating a new resource.
