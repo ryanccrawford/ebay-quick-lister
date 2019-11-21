@@ -40,7 +40,7 @@
                 </div>
             @endif
             <div class="container">
-                <form method="POST" action="{{ route('trading/new') }}" id="itemForm" name="itemForm">
+                <form enctype="multipart/form-data" method="POST" id="itemForm" name="itemForm">
                 @csrf
                 @isset($Errors)
                 <div class="alert alert-danger Errors" role="alert">

@@ -15,16 +15,16 @@ class CreateItemsTable extends Migration
     {
         Schema::create('SellerItem', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('title',80);
+            $table->string('title', 80);
             $table->integer('qty');
             $table->double('price', 10, 2);
             $table->string('sku');
             $table->longText('descriptionEditorArea');
-            $table->integer('ShippingPoliciesResponse' );
-            $table->integer('ReturnPoliciesResponse' );
+            $table->integer('ShippingPoliciesResponse');
+            $table->integer('ReturnPoliciesResponse');
             $table->integer('PaymentPoliciesResponse');
             $table->double('shippingCost', 10, 2);
-            $table->integer('shippingLength' );
+            $table->integer('shippingLength');
             $table->integer('shippingWidth');
             $table->integer('shippingHeight');
             $table->integer('shippingWeight');

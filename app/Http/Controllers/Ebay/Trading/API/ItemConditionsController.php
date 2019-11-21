@@ -1,6 +1,6 @@
 <?php
 
-namespace \App\Http\Controllers\Ebay\Trading\API;
+namespace App\Http\Controllers\Ebay\Trading\API;
 
 use Illuminate\Http\Request;
 use \App\Http\Controllers\Ebay\Trading\EbayItemBaseController;

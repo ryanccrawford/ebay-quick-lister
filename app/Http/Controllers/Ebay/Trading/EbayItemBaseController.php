@@ -170,19 +170,13 @@ class EbayItemBaseController extends OAuthController
     public function activeView(Request $request)
     {
 
-        $page_num = $request->query('page_num') !== null  ? intval($request->query('page_num')) : 1;
-        $limit = $request->query('limit') !== null ? intval($request->query('limit')) : 10;
+        $page_num = $request->query('page_num') ? intval($request->query('page_num')) : 1;
+        $limit = $request->query('limit') ? intval($request->query('limit')) : 10;
 
         $pagination = new \DTS\eBaySDK\Trading\Types\PaginationType();
         $pagination->EntriesPerPage = $limit;
         $pagination->PageNumber = $page_num;
         $include = ['ActiveList'];
-
-
-        if (session('user_token') === null || $this->isTokenExpired()) {
-            $this->doOAuth(url()->full());
-            return redirect('getauth');
-        }
 
 
         $mySellingResults = $this->GetMyeBaySelling($include, $pagination);

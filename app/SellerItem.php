@@ -7,19 +7,33 @@ use Illuminate\Database\Eloquent\Model;
 
 class SellerItem extends Model
 {
- 
+
     protected $connection = 'mysql';
-    
+    protected $table = 'SellerItem';
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $attributes = [
+        'shippingWidth' => 10,
+        'shippingLength' => 10,
+        'shippingHeight' => 10,
+        'shippingCost' => 0.00,
+        'ebayItemId' => '',
+    ];
+
     protected $fillable = [
-        'title', 
+        'title',
         'price',
         'sku',
         'descriptionEditorArea',
-        'ShippingPoliciesResponse' ,
-        'ReturnPoliciesResponse' ,
+        'ShippingPoliciesResponse',
+        'ReturnPoliciesResponse',
         'PaymentPoliciesResponse',
         'shippingCost',
-        'shippingLength' ,
+        'shippingLength',
         'shippingWidth',
         'shippingHeight',
         'shippingWeight',

@@ -27,7 +27,7 @@
                             @endif
                         @else
                             <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('trading') }}">{{ __('Trading') }}</a>
+                                    <a class="nav-link" href="{{ route('trading') . '?page_num=1&limit=10' }}">{{ __('Trading') }}</a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a id="inventoryDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

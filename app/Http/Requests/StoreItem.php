@@ -38,8 +38,8 @@ class StoreItem extends FormRequest
             'shippingWeight' => 'required|numeric',
             'qty' => 'required|numeric',
             'primaryCategory' => 'required|numeric',
-            //'descriptionImageFile' => 'required|image|mimes:jpeg,png,jpg',
-            //'mainImageFile' => 'required|image|mimes:jpeg,png,jpg',
+            'descriptionImageFile' => 'required|image|mimes:jpeg,png,jpg',
+            'mainImageFile' => 'required|image|mimes:jpeg,png,jpg',
 
         ];
     }

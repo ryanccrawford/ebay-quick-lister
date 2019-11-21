@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Ebay\Trading\API;
 use \Illuminate\Http\Request;
 use Exception;
 use \App\Http\Controllers\Ebay\Trading\EbayItemBaseController;
+use App\Http\Requests\StoreItem;
+use App\SellerItem;
+use Illuminate\Foundation\Http\FormRequest;
 
 class ItemsController extends EbayItemBaseController
 {
@@ -26,6 +29,7 @@ class ItemsController extends EbayItemBaseController
      */
     public function index(Request $request)
     {
+        $this->middleware('auth');
         return $this->activeView($request);
     }
 
@@ -37,18 +41,9 @@ class ItemsController extends EbayItemBaseController
      */
     public function store(Request $request)
     {
-        // $request->validate(
-        //     [
-        //         'mainImageFile' => 'required|image|mimes:jpeg,png,jpg,gif',
-        //         'descriptionImageFile' => 'required|image|mimes:jpeg,png,jpg,gif'
-        //     ]
-        // );
 
 
-        $imageName1 = $request->mainImageFile->store('images');
-        $imageName2 = $request->descriptionImageFile->store('images');
 
-        echo $imageName1;
 
 
         // $serviceRequest = new \DTS\eBaySDK\Trading\Types\VerifyAddFixedPriceItemRequestType();
@@ -96,8 +91,31 @@ class ItemsController extends EbayItemBaseController
 
         //   $serviceRealResponse = $this->service->addFixedPriceItem($serviceRealRequest);
         //   if ($serviceRealResponse->Ack === 200) {
-        // $SellerItem = new \App\SellerItem();
-        // $SellerItem->title = $request->input('title');
+        try {
+            $imageName1 = $request->mainImageFile->store('images');
+            $imageName2 = $request->descriptionImageFile->store('images');
+            $inputData = $request->all();
+            //$inputData->mainImageFile = $imageName1;
+            //$inputData->descriptionImageFile = $imageName2;
+            $sku = array('sku' => $request->sku);
+            $item = SellerItem::updateOrCreate($sku, $inputData);
+            if ($item instanceof App\SellerItem) {
+                $i = var_dump($item);
+                die;
+                return response()->json(['data' => $i]);
+            } else {
+                return response()->json(['error' => 'unknown']);
+            }
+        } catch (Exception $ex) {
+            return response()->json(['error' => $ex->getMessage()]);
+        }
+        $rto = route('trading/edit', ['create' => 'true']);
+        return redirect($rto)
+            ->with($request->input);
+
+        // $SellerItem->
+        // $title = $request->input('title');
+        // $SellerItem->title = $title;
         // $SellerItem->price = doubleval($request->input('price'));
         // $SellerItem->sku = $request->input('sku');
         // $SellerItem->descriptionEditorArea = $request->input('descriptionEditorArea');
@@ -113,8 +131,7 @@ class ItemsController extends EbayItemBaseController
         // $SellerItem->descriptionImageFile = $imageName2;
         // $SellerItem->save();
 
-        return redirect()->route('trading/edit')
-            ->with($request->input);
+
         // }
         //  }
 
@@ -132,7 +149,7 @@ class ItemsController extends EbayItemBaseController
      */
     public function show(Request $request)
     {
-
+        $this->middleware('auth');
         $item_id = $request->query('item_id');
         $create = $request->query('create');
         if ($create === 'true') {
@@ -185,7 +202,7 @@ class ItemsController extends EbayItemBaseController
      */
     public function update(Request $request, $id)
     {
-        //
+        $this->middleware('auth');
     }
 
     /**
@@ -196,6 +213,6 @@ class ItemsController extends EbayItemBaseController
      */
     public function destroy($id)
     {
-        //
+        $this->middleware('auth');
     }
 }

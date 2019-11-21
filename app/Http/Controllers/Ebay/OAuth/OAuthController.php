@@ -47,6 +47,16 @@ class OAuthController extends Controller
                 'ruName' => env('EBAY_PROD_RUNAME'),
             ]
         );
+        $uri = $request->path();
+        if ($uri === 'getauth' || $uri === 'oauth') {
+
+            $this->$uri($request);
+        }
+        if (!$request->session()->has('user_token') || $this->isTokenExpired()) {
+
+            $this->doOAuth($request->fullUrl());
+            return redirect('getauth');
+        }
     }
 
     public function getauth(Request $request)

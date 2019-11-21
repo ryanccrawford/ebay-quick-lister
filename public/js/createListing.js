@@ -5,79 +5,80 @@ var titleLeaveValue = {
     string: ""
 };
 
+var mainImageAsImage = {
+    dom: document.getElementById("mainImageFile"),
+    binary: null,
+    string: null
+};
+var descriptionImageAsImage = {
+    dom: document.getElementById("descriptionImageFile"),
+    binary: null,
+    string: null
+};
 
-
+var isShowing = false;
+var retries = 0;
 
 $(document).ready(function() {
 
-    var inputValues = document.getElementsByTagName('input');
 
-    var mainImageAsImage = {
-        dom    : document.getElementById("mainImageFile"),
-        binary : null,
-        string : null
-      };
-    var descriptionImageAsImage = {
-        dom    : document.getElementById("descriptionImageFile"),
-        binary : null,
-        string : null
-    };
+
 
     $("#categorySpinner").hide();
     // https://stackoverflow.com/questions/4459379/preview-an-image-before-it-is-uploaded
-    
+
     function readURL1(input) {
-        
+
         if (input.files && input.files[0]) {
 
             var reader1 = new FileReader();
-            
+
             reader1.onload = function(e) {
-                
+
                 $('#mainImage').attr('src', e.target.result);
-                
+
                 mainImageAsImage.string = e.target.result;
-                
+
                 var binaryStringReader = new FileReader();
-                
+
                 binaryStringReader.onload = (ee) => {
-                   
+
                     mainImageAsImage.binary = ee.target.result;
-    
-                  
+
+
                 }
-                
+
                 binaryStringReader.readAsBinaryString(mainImageAsImage.dom.files[0]);
             }
-                      
+
             reader1.readAsDataURL(input.files[0]);
         }
     }
 
     function readURL2(input) {
-        
+
         if (input.files && input.files[0]) {
 
             var reader2 = new FileReader();
-            
+
             reader2.onload = function(e) {
-                
+
                 $('#descriptionImage').attr('src', e.target.result);
-                
+
                 descriptionImageAsImage.string = e.target.result;
-                
+
                 var binaryStringReader2 = new FileReader();
-                
+
                 binaryStringReader2.onload = (ee) => {
-                   
+
                     descriptionImageAsImage.binary = ee.target.result;
-    
-                  
+
+
                 }
-                
+
                 binaryStringReader2.readAsBinaryString(descriptionImageAsImage.dom.files[0]);
             }
-                      
+
             reader2.readAsDataURL(input.files[0]);
         }
     }
@@ -192,32 +193,36 @@ $(document).ready(function() {
     getShippingOptions();
     getReturnOptions();
 
-  
-    var isShowing = false;
-    var retries = 0;
 
-    var sendData = () => {
-        if(retries > 5){
+
+
+    function sendData() {
+
+        if (retries > 5) {
             retries = 0;
             return;
         }
-
+        let currentForm = document.getElementById("itemForm");
         $('#savetoebay').text('Saving...')
-        
-        if((!mainImageAsImage.binary && mainImageAsImage.dom.files.length > 0) && (!descriptionImageAsImage.binary && descriptionImageAsImage.dom.files.length > 0)) {
+        var formDatatoSend = new FormData(currentForm);
+        if ((!mainImageAsImage.binary && mainImageAsImage.dom.files.length > 0) && (!descriptionImageAsImage.binary && descriptionImageAsImage.dom.files.length > 0)) {
             retries++
             setTimeout(sendData, 10);
             return;
-          }
-          formDatatoSend = new FormData(itemForm);
-          formDatatoSend.append('mainImageFile', mainImageAsImage.dom.files[0], mainImageAsImage.dom.files[0].name);
-          formDatatoSend.append('descriptionImageFile', descriptionImageAsImage.dom.files[0], descriptionImageAsImage.dom.files[0].name);
-                   
-      
+        }
+
+
+        // formDatatoSend.delete('mainImageFile');
+        //formDatatoSend.delete('descriptionImageFile');
+        //console.log(formDatatoSend);
+        //formDatatoSend.append('mainImageFile', mainImageAsImage.dom.files[0], mainImageAsImage.dom.files[0].name);
+        // formDatatoSend.append('descriptionImageFile', descriptionImageAsImage.dom.files[0], descriptionImageAsImage.dom.files[0].name);
+
+
         var xhr = new XMLHttpRequest();
- 
+
         var onprogressHandler = (evt) => {
-            if(!isShowing){
+            if (!isShowing) {
                 isShowing = true;
                 $('#uploadProgress').text('0%')
                 $('#uploadProgress').attr('aria-valuenow', '0')
@@ -227,7 +232,7 @@ $(document).ready(function() {
             $('#uploadProgress').attr('aria-valuenow', percent.toString())
             $('#uploadProgress').text(percent + '%')
             $('#savetoebay').text('Saving ' + percent + '%');
-    
+
         }
         xhr.upload.addEventListener('progress', onprogressHandler, false);
         xhr.open('POST', postUrl, true);
@@ -236,34 +241,35 @@ $(document).ready(function() {
             $('#progress').hide();
             if (xhr.status === 200) {
                 // File(s) uploaded.
-                
+
                 $('#savetoebay').text('Save');
             } else {
-                $('#progress').hide();
+
                 $('#savetoebay').text('Save');
                 alert('An error occurred!');
             }
         };
-        
+
         xhr.send(formDatatoSend);
     }
 
-    $('#itemForm').on("submit", function(event) {
+    var formwatch = document.forms.namedItem('itemForm');
+    formwatch.addEventListener("submit", function(event) {
         event.preventDefault();
-        
+
         if (supportAjaxUploadWithProgress()) {
             sendData();
         } else {
-            $('#progress').hide();
-            $('#savetoebay').text('Save');
-            alert("Your browser is not supported at this time. Please use Google Chrome.")
-
+            $("#progress").hide();
+            $("#savetoebay").text("Save");
+            alert(
+                "Your browser is not supported at this time. Please use Google Chrome."
+            );
+            return;
         }
-
-      
     });
 
-    
+
 
 })
 
