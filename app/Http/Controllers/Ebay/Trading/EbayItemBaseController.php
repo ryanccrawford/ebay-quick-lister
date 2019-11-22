@@ -131,7 +131,10 @@ class EbayItemBaseController extends OAuthController
         }
 
         //
-
+        if (session('user_token') === null) {
+            dump(request());
+            die;
+        }
         $this->service = new \DTS\eBaySDK\Trading\Services\TradingService(
             [
                 'siteId' => '0',

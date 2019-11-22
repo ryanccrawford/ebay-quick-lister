@@ -13,13 +13,12 @@ use function HighlightUtilities\getAvailableStyleSheets;
 
 class OAuthController extends Controller
 {
-    public $credentials;
-    public $service;
-    public $OAuthService;
-    public $scope;
-    public $token;
-    public $marketPlaceId;
-    public $config;
+    protected $credentials;
+    protected $OAuthService;
+    protected $scope;
+    protected $token;
+    protected $marketPlaceId;
+    protected $config;
 
 
     /**
@@ -49,19 +48,20 @@ class OAuthController extends Controller
         );
         $uri = $request->path();
         if ($uri === 'getauth' || $uri === 'oauth') {
-
-            $this->$uri($request);
-        }
-        if (!$request->session()->has('user_token') || $this->isTokenExpired()) {
+            dump($uri);
+            die;
+            return $this->$uri($request);
+        } elseif (!session('user_token') || $this->isTokenExpired()) {
 
             $this->doOAuth($request->fullUrl());
-            return redirect('getauth');
+            return route('getauth');
         }
     }
 
     public function getauth(Request $request)
     {
-
+        dump($request);
+        die;
         if ($request->session()->has('user_token')) {
 
             if (!$this->isTokenExpired()) {
@@ -139,7 +139,7 @@ class OAuthController extends Controller
     public function isTokenExpired()
     {
 
-        if (session('expires_in') === null || session('expires_in') === '') {
+        if (!session('expires_in') || session('expires_in') === null || session('expires_in') === '') {
             return true;
         }
         $ed = new DateTime(session('expires_in'));
