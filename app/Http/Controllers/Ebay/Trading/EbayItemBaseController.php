@@ -201,6 +201,7 @@ class EbayItemBaseController extends OAuthController
 
             if (!$request->session()->has('totalPages') && isset($mySellingResults->ActiveList->PaginationResult)) {
                 session(['totalPages' => self::getTotalPages($mySellingResults->ActiveList->PaginationResult)]);
+                $totalPages = session('totalPages');
             } elseif ($request->session()->has('totalPages')) {
                 $totalPages = session('totalPages');
             }
