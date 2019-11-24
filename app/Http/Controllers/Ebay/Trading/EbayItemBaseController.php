@@ -96,7 +96,7 @@ class EbayItemBaseController extends OAuthController
 
     public function GetMyeBaySelling(array $include = [], \DTS\eBaySDK\Trading\Types\PaginationType $pageination = null, DetailLevelCodeType $detailLevel = null, $outputSelector = []): \DTS\eBaySDK\Trading\Types\GetMyeBaySellingResponseType
     {
-        $this->middleware('auth');
+
 
         $onlyInclude = ['ActiveList', 'DeletedFromSoldList', 'DeletedFromUnsoldList', 'ScheduledList', 'SellingSummary', 'SoldList', 'UnsoldList'];
 
@@ -131,10 +131,7 @@ class EbayItemBaseController extends OAuthController
         }
 
         //
-        if (session('user_token') === null) {
-            dump(request());
-            die;
-        }
+
         $this->service = new \DTS\eBaySDK\Trading\Services\TradingService(
             [
                 'siteId' => '0',
@@ -187,13 +184,8 @@ class EbayItemBaseController extends OAuthController
 
         if ($mySellingResults->Ack == 'Failure') {
             $Errors = $mySellingResults->Errors;
-
-            if ($Errors[0]->ErrorCode === '21917053') {
-                return redirect('getauth');
-            } else {
-                dump($Errors);
-                return view('ebay.trading.listings.listingitems', compact('Errors'));
-            }
+            $this->middleware('ebayauth');
+            return redirect('getauth');
         }
         if ($mySellingResults->Ack !== 'Failure' && isset($mySellingResults->ActiveList->ItemArray)) {
 
@@ -283,7 +275,7 @@ class EbayItemBaseController extends OAuthController
                     ]
                 );
             } catch (Exception $e) {
-                $this->doOAuth(url()->current());
+                $this->middleware('ebayauth');
                 return redirect('getauth');
             }
         }
@@ -301,11 +293,13 @@ class EbayItemBaseController extends OAuthController
         if (!$request->session()->has('retry')) {
             session(['retry' => 1]);
             session(['return' => $retryRoute]);
+            $this->middleware('ebayauth');
             return redirect('getauth');
         }
         if ($request->session()->has('retry') && intval(session('retry')) <= 2) {
             $r = intval(session('retry')) + 1;
             session(['retry' => $retryRoute]);
+            $this->middleware('ebayauth');
             return redirect('getauth');
         }
         session()->forget('retry');
@@ -320,6 +314,7 @@ class EbayItemBaseController extends OAuthController
         $type .= $apiName;
         $type .= '\\Services\\';
         $type .= $serviceType;
+
 
         if ($this->service === null) {
             $this->service = new $type(

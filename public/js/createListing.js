@@ -18,10 +18,12 @@ var descriptionImageAsImage = {
 
 var isShowing = false;
 var retries = 0;
-
+var selectBoxesReady = 0;
+const numberOfSelectBoxes = 4;
 $(document).ready(function() {
 
-
+    $("#savetoebay").addClass("disabled");
+    $("#savetoebay").prop("disabled", true);
 
 
     $("#categorySpinner").hide();
@@ -115,6 +117,13 @@ $(document).ready(function() {
             $("#categorySuggestion").html(data4);
             is_searching = false;
             $("#catsearchbutton").removeClass("disabled");
+            if (selectBoxesReady !== numberOfSelectBoxes) {
+                selectBoxesReady++;
+            }
+            if (selectBoxesReady === numberOfSelectBoxes) {
+                $("#savetoebay").prop("disabled", false);
+                $("#savetoebay").removeClass("disabled");
+            }
         });
     };
 
@@ -154,7 +163,15 @@ $(document).ready(function() {
 
                 $("#shipping").empty()
                 $("#shipping").html(data3);
+                if (selectBoxesReady !== numberOfSelectBoxes) {
+                    selectBoxesReady++;
 
+                }
+                if (selectBoxesReady === numberOfSelectBoxes) {
+                    $("#savetoebay").prop("disabled", false);
+                    $("#savetoebay").removeClass("disabled");
+
+                }
             });
     };
 
@@ -167,6 +184,13 @@ $(document).ready(function() {
                 $("#payments").empty()
                 $("#payments").html(data1);
 
+                if (selectBoxesReady !== numberOfSelectBoxes) {
+                    selectBoxesReady++;
+                }
+                if (selectBoxesReady === numberOfSelectBoxes) {
+                    $("#savetoebay").prop("disabled", false);
+                    $("#savetoebay").removeClass("disabled");
+                }
 
             }
         );
@@ -183,7 +207,13 @@ $(document).ready(function() {
 
                 $('#returns').empty()
                 $('#returns').html(data2);
-
+                if (selectBoxesReady !== numberOfSelectBoxes) {
+                    selectBoxesReady++;
+                }
+                if (selectBoxesReady === numberOfSelectBoxes) {
+                    $("#savetoebay").prop("disabled", false);
+                    $("#savetoebay").removeClass("disabled");
+                }
 
             }
         );
@@ -197,56 +227,74 @@ $(document).ready(function() {
 
 
     function sendData() {
-
         if (retries > 5) {
             retries = 0;
             return;
         }
-        let currentForm = document.getElementById("itemForm");
-        $('#savetoebay').text('Saving...')
+        let currentForm = document.getElementById(
+            "itemForm"
+        );
+        $("#savetoebay").text("Saving...");
         var formDatatoSend = new FormData(currentForm);
-        if ((!mainImageAsImage.binary && mainImageAsImage.dom.files.length > 0) && (!descriptionImageAsImage.binary && descriptionImageAsImage.dom.files.length > 0)) {
-            retries++
+        if (!mainImageAsImage.binary &&
+            mainImageAsImage.dom.files.length > 0 &&
+            !descriptionImageAsImage.binary &&
+            descriptionImageAsImage.dom.files.length > 0
+        ) {
+            retries++;
             setTimeout(sendData, 10);
             return;
         }
 
-
+        for (var pair of formDatatoSend.entries()) {
+            console.log(pair[0] + ", " + pair[1]);
+        }
         // formDatatoSend.delete('mainImageFile');
         //formDatatoSend.delete('descriptionImageFile');
         //console.log(formDatatoSend);
         //formDatatoSend.append('mainImageFile', mainImageAsImage.dom.files[0], mainImageAsImage.dom.files[0].name);
         // formDatatoSend.append('descriptionImageFile', descriptionImageAsImage.dom.files[0], descriptionImageAsImage.dom.files[0].name);
 
-
         var xhr = new XMLHttpRequest();
 
-        var onprogressHandler = (evt) => {
+        var onprogressHandler = evt => {
             if (!isShowing) {
                 isShowing = true;
-                $('#uploadProgress').text('0%')
-                $('#uploadProgress').attr('aria-valuenow', '0')
-                $('#progress').show();
+                $("#uploadProgress").text("0%");
+                $("#uploadProgress").attr(
+                    "aria-valuenow",
+                    "0"
+                );
+                $("#progress").show();
             }
-            var percent = evt.loaded / evt.total * 100;
-            $('#uploadProgress').attr('aria-valuenow', percent.toString())
-            $('#uploadProgress').text(percent + '%')
-            $('#savetoebay').text('Saving ' + percent + '%');
-
-        }
-        xhr.upload.addEventListener('progress', onprogressHandler, false);
-        xhr.open('POST', postUrl, true);
+            var percent = (evt.loaded / evt.total) * 100;
+            $("#uploadProgress").attr(
+                "aria-valuenow",
+                percent.toString()
+            );
+            $("#uploadProgress").text(percent + "%");
+            $("#savetoebay").text(
+                "Saving " + percent + "%"
+            );
+        };
+        xhr.upload.addEventListener(
+            "progress",
+            onprogressHandler,
+            false
+        );
+        xhr.open("POST", postUrl, true);
         xhr.onload = function() {
             isShowing = false;
-            $('#progress').hide();
+            $("#progress").hide();
             if (xhr.status === 200) {
-                // File(s) uploaded.
-
-                $('#savetoebay').text('Save');
+                console.log(xhr)
+                $("#result").html(xhr.response);
+                $("#savetoebay").prop("disabled", false);
+                $("#savetoebay").removeClass("disabled");
+                $("#savetoebay").text("Save");
             } else {
-
-                $('#savetoebay').text('Save');
-                alert('An error occurred!');
+                $("#savetoebay").text("Save");
+                alert("An error occurred!");
             }
         };
 
@@ -256,7 +304,8 @@ $(document).ready(function() {
     var formwatch = document.forms.namedItem('itemForm');
     formwatch.addEventListener("submit", function(event) {
         event.preventDefault();
-
+        $("#savetoebay").addClass("disabled");
+        $("#savetoebay").prop('disabled', true);
         if (supportAjaxUploadWithProgress()) {
             sendData();
         } else {
@@ -265,6 +314,8 @@ $(document).ready(function() {
             alert(
                 "Your browser is not supported at this time. Please use Google Chrome."
             );
+            $("#savetoebay").prop("disabled", false);
+            $("#savetoebay").removeClass("disabled");
             return;
         }
     });

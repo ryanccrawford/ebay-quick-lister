@@ -21,7 +21,7 @@ class AjaxController extends EbayItemBaseController
     public function __construct(Request $request)
     {
         parent::__construct($request);
-        $this->middleware('auth');
+        //$this->middleware('auth');
     }
 
     public function GetSuggestedCategories(Request $request)

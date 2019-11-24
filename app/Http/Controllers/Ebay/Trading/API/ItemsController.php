@@ -30,6 +30,7 @@ class ItemsController extends EbayItemBaseController
     public function index(Request $request)
     {
         $this->middleware('auth');
+        $this->middleware('ebayauth');
         return $this->activeView($request);
     }
 
@@ -44,7 +45,7 @@ class ItemsController extends EbayItemBaseController
 
 
 
-
+        $this->middleware('ebayauth');
 
         // $serviceRequest = new \DTS\eBaySDK\Trading\Types\VerifyAddFixedPriceItemRequestType();
         // $serviceRequest->Item = new \DTS\eBaySDK\Trading\Types\ItemType();
@@ -99,13 +100,8 @@ class ItemsController extends EbayItemBaseController
             //$inputData->descriptionImageFile = $imageName2;
             $sku = array('sku' => $request->sku);
             $item = SellerItem::updateOrCreate($sku, $inputData);
-            if ($item instanceof App\SellerItem) {
-                $i = var_dump($item);
-                die;
-                return response()->json(['data' => $i]);
-            } else {
-                return response()->json(['error' => 'unknown']);
-            }
+            $i = var_dump($item);
+            return response($i, 200); //->json(['error' => $i]);
         } catch (Exception $ex) {
             return response()->json(['error' => $ex->getMessage()]);
         }
@@ -150,6 +146,7 @@ class ItemsController extends EbayItemBaseController
     public function show(Request $request)
     {
         $this->middleware('auth');
+        $this->middleware('ebayauth');
         $item_id = $request->query('item_id');
         $create = $request->query('create');
         if ($create === 'true') {
@@ -166,7 +163,7 @@ class ItemsController extends EbayItemBaseController
                     );
                 }
             } catch (Exception $e) {
-                $this->doOAuth($request->fullUrl());
+                $this->middleware('ebayauth');
                 return redirect('getauth');
             }
             return view('ebay.trading.listings.listingitemcreate', compact('descriptionTemplate', 'request'));
@@ -203,6 +200,7 @@ class ItemsController extends EbayItemBaseController
     public function update(Request $request, $id)
     {
         $this->middleware('auth');
+        $this->middleware('ebayauth');
     }
 
     /**
@@ -214,5 +212,6 @@ class ItemsController extends EbayItemBaseController
     public function destroy($id)
     {
         $this->middleware('auth');
+        $this->middleware('ebayauth');
     }
 }

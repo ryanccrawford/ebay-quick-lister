@@ -8,6 +8,7 @@ use DateTime;
 use Illuminate\Http\Request;
 use DTS\eBaySDK\OAuth;
 use DTS\eBaySDK\OAuth\Services;
+use App\Setting;
 
 use function HighlightUtilities\getAvailableStyleSheets;
 
@@ -29,76 +30,61 @@ class OAuthController extends Controller
      */
     public function __construct(Request $request)
     {
+        $settings = \App\Setting::where('groupName', 'ebay')
+            ->get();
+        $credential = [];
+        $ebaysettings = [];
+        foreach ($settings as $key => $value) {
+            if (in_array($value->name, ['ruName', 'ebayMode', 'siteId'])) {
+                $ebaysettings[$value->name] = $value->value;
+                continue;
+            }
+            $credential[$value->name] = $value->value;
+        }
 
         $this->scope = explode(' ', 'https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account');
         $this->marketPlaceId = \DTS\eBaySDK\Account\Enums\MarketplaceIdEnum::C_EBAY_US;
-        $this->credentials = [
-            'appId' => env('EBAY_PROD_APP_ID'),
-            'certId' => env('EBAY_PROD_CERT_ID'),
-            'devId' => env('EBAY_PROD_DEV_ID'),
-            'authToken' => env('EBAY_PROD_AUTH_TOKEN'),
-            'globalId' => env('EBAY_GLOBAL_ID')
-        ];
+        $this->credentials =  $credential;
+
 
         $this->OAuthService = new \DTS\eBaySDK\OAuth\Services\OAuthService(
             [
                 'credentials' => $this->credentials,
-                'ruName' => env('EBAY_PROD_RUNAME'),
+                'ruName' => $ebaysettings['ruName'],
             ]
         );
-        $uri = $request->path();
-        if ($uri === 'getauth' || $uri === 'oauth') {
-            dump($uri);
-            die;
-            return $this->$uri($request);
-        } elseif (!session('user_token') || $this->isTokenExpired()) {
+    }
 
-            $this->doOAuth($request->fullUrl());
-            return route('getauth');
+
+    public function refreshauth(Request $request)
+    {
+        $RefreshUserTokenRequest =  new \DTS\eBaySDK\OAuth\Types\RefreshUserTokenRestRequest(
+            [
+                'refresh_token' => session('refresh_token'),
+                'scope' => $this->scope,
+            ]
+        );
+
+        $OauthUserTokenResponse = $this->OAuthService->refreshUserToken($RefreshUserTokenRequest);
+
+        if ($OauthUserTokenResponse->getStatusCode() == 200) {
+            $this->setSessionToken($OauthUserTokenResponse);
+            return redirect(url()->previous());
+        } else {
+            session()->forget(
+                [
+                    'user_token',
+                    'expires_in',
+                    'refresh_token'
+                ]
+            );
+            abort(401);
+            //return $this->getauth($request);
         }
     }
 
     public function getauth(Request $request)
     {
-        dump($request);
-        die;
-        if ($request->session()->has('user_token')) {
-
-            if (!$this->isTokenExpired()) {
-                session()->forget('return');
-                return redirect(url()->previous());
-            }
-
-            if ($this->isTokenExpired() && $request->session()->has('refresh_token')) {
-
-                session()->forget('user_token');
-
-                $RefreshUserTokenRequest =  new \DTS\eBaySDK\OAuth\Types\RefreshUserTokenRestRequest(
-                    [
-                        'refresh_token' => session('refresh_token'),
-                        'scope' => $this->scope,
-                    ]
-                );
-
-                $OauthUserTokenResponse = $this->OAuthService->refreshUserToken($RefreshUserTokenRequest);
-
-                if ($OauthUserTokenResponse->getStatusCode() == 200) {
-                    $this->setSessionToken($OauthUserTokenResponse);
-                    return redirect(url()->previous());
-                } else {
-                    session()->forget(
-                        [
-                            'user_token',
-                            'expires_in',
-                            'refresh_token'
-                        ]
-                    );
-                    abort(401);
-                    //return $this->getauth($request);
-                }
-            }
-        }
-
 
         $url =  $this->OAuthService->redirectUrlForUser(
             [
@@ -110,16 +96,7 @@ class OAuthController extends Controller
         return redirect()->away($url);
     }
 
-    public function doOAuth(string $returnURL)
-    {
-        session()->forget('totalPages');
-        session()->forget('user_token');
-        session()->forget('scope');
-        session()->forget('return');
 
-        session(['scope' => $this->scope]);
-        session(['return' => $returnURL]);
-    }
 
 
     public function setSessionToken($response)
@@ -136,21 +113,7 @@ class OAuthController extends Controller
         );
     }
 
-    public function isTokenExpired()
-    {
 
-        if (!session('expires_in') || session('expires_in') === null || session('expires_in') === '') {
-            return true;
-        }
-        $ed = new DateTime(session('expires_in'));
-        $nd = new DateTime(now());
-
-        if ($ed > $nd) {
-            return false;
-        }
-
-        return true;
-    }
 
     public function getReturnUrl(string $returnURL = 'prev')
     {

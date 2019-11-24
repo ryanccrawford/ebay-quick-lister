@@ -7,12 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Setting extends Model
 {
 
-    public function constuctor()
-    {
-        
-    }
+    protected $connection = 'mysql';
 
-	protected $fillable = [
-		'name', 'value'
-	];
+    protected $fillable = [
+        'name', 'groupName', 'value'
+    ];
 }

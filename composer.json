@@ -11,6 +11,7 @@
         "php": "^7.2",
         "ext-mongodb": "^1.5",
         "ckeditor/ckeditor": "dev-full/4.11.x",
+        "doctrine/dbal": "^2.10",
         "dts/ebay-sdk-php": "^18.0",
         "fideloper/proxy": "^4.0",
         "hkonnet/laravel-ebay": "^1.4",

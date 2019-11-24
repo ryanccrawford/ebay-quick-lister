@@ -13,24 +13,45 @@ class SettingsTableSeeder extends Seeder
     public function run()
     {
         DB::table('settings')->insert([
-            'name' => 'EBAY_PROD_APP_ID',
-            'value' => ''
+            'name' => 'appId',
+            'groupName' => 'ebay',
+            'value' => env('EBAY_PROD_APP_ID'),
         ]);
 
         DB::table('settings')->insert([
-            'name' => 'EBAY_PROD_DEV_ID',
-            'value' => ''
+            'name' => 'devId',
+            'groupName' => 'ebay',
+            'value' => env('EBAY_PROD_DEV_ID')
         ]);
 
         DB::table('settings')->insert([
-            'name' => 'EBAY_PROD_CERT_ID',
-            'value' => ''
+            'name' => 'certId',
+            'groupName' => 'ebay',
+            'value' => env('EBAY_PROD_CERT_ID')
         ]);
 
         DB::table('settings')->insert([
-            'name' => 'EBAY_PROD_RUNAME',
-            'value' => ''
+            'name' => 'ruName',
+            'groupName' => 'ebay',
+            'value' =>  env('EBAY_PROD_RUNAME')
         ]);
 
+        DB::table('settings')->insert([
+            'name' => 'authToken',
+            'groupName' => 'ebay',
+            'value' =>  env('EBAY_PROD_AUTH_TOKEN')
+        ]);
+
+        DB::table('settings')->insert([
+            'name' => 'ebayMode',
+            'groupName' => 'ebay',
+            'value' =>  'production'
+        ]);
+
+        DB::table('settings')->insert([
+            'name' => 'siteId',
+            'groupName' => 'ebay',
+            'value' =>  '0'
+        ]);
     }
 }

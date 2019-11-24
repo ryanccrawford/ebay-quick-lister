@@ -39,7 +39,7 @@ Route::group(['middleware' => ['web']], function () {
     //Ebay OAuth
     Route::get('oauth', 'Ebay\OAuth\OAuthController@oauth')->name('oauth');
     Route::get('getauth', 'Ebay\OAuth\OAuthController@getauth')->name('getauth');
-
+    Route::get('refreshauth', 'Ebay\OAuth\OAuthController@refreshauth')->name('refreshauth');
 
     //Inventory Locations
     Route::get('inventory/locations', 'EbayInventoryController@showlocations')->name('inventory/locations');
