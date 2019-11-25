@@ -250,17 +250,17 @@
                         <div class="card-body">
                         <h4 class="card-title">Submit Item</h4>
                             <div class="row">
-                                <div class="col-md-9">
-                                    <div id="alertarea">
+                                <div class="col-md-8">
+                                    <div id="result">
                                     </div>
                                     <div id="alertarea2" style="display:none;">
                                     </div>
                                     <div id="alertarea3" style="display:none;">
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <button id="preview" class="btn bg-primary text-white right" disabled>Preview</button>
-                                    <button type="submit" id="savetoebay" class="btn bg-primary text-white right">Save Item <div class="progress" id="progress" style="display:none">
+                                <div class="col-md-4">
+                                    <button type="submit" id="savetoebay" class="btn bg-primary text-white right">Save For Later <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="verifySpinner" style="display:none;"></span></button>
+                                    <button type="submit" id="saveforlater"  class="btn bg-primary text-white right">Verify and List <div class="progress" id="progress" style="display:none">
   <div class="progress-bar" id="uploadProgress" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
 </div></button>
                                 </div>
@@ -271,17 +271,13 @@
             </div>
             </form>
         </div>
-        <div id="result" class="container">
-
-        </div>
-
-
 
             @endsection
             @push('end')
 
             <script>
             var postUrl = "{{ route('trading/new') }}";
+            var postUrlVerify = "{{ route('trading/verify') }}"
             </script>
             <script src="{{ asset('js/createListing.js') }}"></script>
 

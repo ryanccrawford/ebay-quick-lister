@@ -20,11 +20,10 @@ var isShowing = false;
 var retries = 0;
 var selectBoxesReady = 0;
 const numberOfSelectBoxes = 4;
+var buttonPressed = "none"
 $(document).ready(function() {
 
-    $("#savetoebay").addClass("disabled");
-    $("#savetoebay").prop("disabled", true);
-
+    disableElement("savetoebay");
 
     $("#categorySpinner").hide();
     // https://stackoverflow.com/questions/4459379/preview-an-image-before-it-is-uploaded
@@ -121,8 +120,7 @@ $(document).ready(function() {
                 selectBoxesReady++;
             }
             if (selectBoxesReady === numberOfSelectBoxes) {
-                $("#savetoebay").prop("disabled", false);
-                $("#savetoebay").removeClass("disabled");
+                enableElement("savetoebay");
             }
         });
     };
@@ -146,7 +144,7 @@ $(document).ready(function() {
     $("#title").focusout((event) => {
         titleLeaveValue = $("#title").val();
         $("#categorySpinner").show();
-        $("#catsearchbutton").addClass("disabled");
+        disableElement("catsearchbutton");
         getSuggestedCategories(titleLeaveValue);
     })
     $("#title").keyup((event) => {
@@ -168,8 +166,7 @@ $(document).ready(function() {
 
                 }
                 if (selectBoxesReady === numberOfSelectBoxes) {
-                    $("#savetoebay").prop("disabled", false);
-                    $("#savetoebay").removeClass("disabled");
+                    enableElement("savetoebay");
 
                 }
             });
@@ -188,8 +185,7 @@ $(document).ready(function() {
                     selectBoxesReady++;
                 }
                 if (selectBoxesReady === numberOfSelectBoxes) {
-                    $("#savetoebay").prop("disabled", false);
-                    $("#savetoebay").removeClass("disabled");
+                    enableElement("savetoebay");
                 }
 
             }
@@ -211,8 +207,7 @@ $(document).ready(function() {
                     selectBoxesReady++;
                 }
                 if (selectBoxesReady === numberOfSelectBoxes) {
-                    $("#savetoebay").prop("disabled", false);
-                    $("#savetoebay").removeClass("disabled");
+                    enableElement("savetoebay");
                 }
 
             }
@@ -223,10 +218,18 @@ $(document).ready(function() {
     getShippingOptions();
     getReturnOptions();
 
+    $("#savetoebay").on("click", function(event) {
 
+        buttonPressed = event.target.id
 
+    })
+    $("#saveforlater").on("click", function(event) {
 
-    function sendData() {
+        buttonPressed = event.target.id;
+
+    });
+
+    function sendData(url, button) {
         if (retries > 5) {
             retries = 0;
             return;
@@ -234,68 +237,70 @@ $(document).ready(function() {
         let currentForm = document.getElementById(
             "itemForm"
         );
-        $("#savetoebay").text("Saving...");
+        $("#" + button).text("Saving...");
         var formDatatoSend = new FormData(currentForm);
         if (!mainImageAsImage.binary &&
             mainImageAsImage.dom.files.length > 0 &&
             !descriptionImageAsImage.binary &&
             descriptionImageAsImage.dom.files.length > 0
         ) {
-            retries++;
-            setTimeout(sendData, 10);
+
             return;
         }
-
-        for (var pair of formDatatoSend.entries()) {
-            console.log(pair[0] + ", " + pair[1]);
-        }
-        // formDatatoSend.delete('mainImageFile');
-        //formDatatoSend.delete('descriptionImageFile');
-        //console.log(formDatatoSend);
-        //formDatatoSend.append('mainImageFile', mainImageAsImage.dom.files[0], mainImageAsImage.dom.files[0].name);
-        // formDatatoSend.append('descriptionImageFile', descriptionImageAsImage.dom.files[0], descriptionImageAsImage.dom.files[0].name);
 
         var xhr = new XMLHttpRequest();
 
         var onprogressHandler = evt => {
             if (!isShowing) {
                 isShowing = true;
-                $("#uploadProgress").text("0%");
-                $("#uploadProgress").attr(
-                    "aria-valuenow",
-                    "0"
-                );
-                $("#progress").show();
+                if (buttonPressed === "savetoebay") {
+                    $("#uploadProgress").text("0%");
+                    style = "width: 0%;";
+                    $("#uploadProgress").css("width", "0%");
+
+                    $("#uploadProgress").attr("aria-valuenow", "0");
+                    $("#progress").show();
+                }
             }
             var percent = (evt.loaded / evt.total) * 100;
-            $("#uploadProgress").attr(
-                "aria-valuenow",
-                percent.toString()
-            );
-            $("#uploadProgress").text(percent + "%");
-            $("#savetoebay").text(
-                "Saving " + percent + "%"
-            );
+            if (buttonPressed === "savetoebay") {
+                $("#uploadProgress").attr("aria-valuenow", percent.toString());
+                $("#uploadProgress").text(percent + "%");
+                $("#uploadProgress").css("width", percent + "%");
+                $("#savetoebay").text("Saving " + percent + "%");
+            }
         };
         xhr.upload.addEventListener(
             "progress",
             onprogressHandler,
             false
         );
-        xhr.open("POST", postUrl, true);
+        console.log(url)
+        xhr.open("POST", url, true);
         xhr.onload = function() {
             isShowing = false;
             $("#progress").hide();
             if (xhr.status === 200) {
                 console.log(xhr)
                 $("#result").html(xhr.response);
-                $("#savetoebay").prop("disabled", false);
-                $("#savetoebay").removeClass("disabled");
-                $("#savetoebay").text("Save");
+
+                $("#".buttonPressed).text("Saved");
+                setTimeout(function() {
+                    if (buttonPressed === "savetoebay") {
+                        $("#savetoebay").text("Verify and List");
+                    } else {
+                        $("#saveforlater").text("Save For Later");
+                    }
+                }, 2000);
             } else {
-                $("#savetoebay").text("Save");
-                alert("An error occurred!");
+                if (buttonPressed === "savetoebay") {
+                    $("#savetoebay").text("Verify and List");
+                } else {
+                    $("#saveforlater").text("Save For Later");
+                }
+                $("#result").html(xhr.response);
             }
+            enableElement(buttonPressed);
         };
 
         xhr.send(formDatatoSend);
@@ -303,19 +308,33 @@ $(document).ready(function() {
 
     var formwatch = document.forms.namedItem('itemForm');
     formwatch.addEventListener("submit", function(event) {
+        console.log(buttonPressed);
         event.preventDefault();
-        $("#savetoebay").addClass("disabled");
-        $("#savetoebay").prop('disabled', true);
+        url = '';
+
+        disableElement(buttonPressed);
+        if (this.id === "savetoebay") {
+            url = postUrlVerify;
+        } else {
+
+            url = postUrl;
+        }
+
+
+
         if (supportAjaxUploadWithProgress()) {
-            sendData();
+            sendData(url, buttonPressed);
         } else {
             $("#progress").hide();
-            $("#savetoebay").text("Save");
+            if (buttonPressed === "savetoebay") {
+                $("#savetoebay").text("Verify and List");
+            } else {
+                $("#saveforlater").text("Save For Later");
+            }
             alert(
                 "Your browser is not supported at this time. Please use Google Chrome."
             );
-            $("#savetoebay").prop("disabled", false);
-            $("#savetoebay").removeClass("disabled");
+            enableElement(buttonPressed);
             return;
         }
     });
@@ -323,6 +342,17 @@ $(document).ready(function() {
 
 
 })
+
+function enableElement(id) {
+    $("#" + id).prop("disabled", false);
+    $("#" + id).removeClass("disabled");
+}
+
+
+function disableElement(id) {
+    $("#" + id).prop("disabled", true);
+    $("#" + id).addClass("disabled");
+}
 
 //https://thoughtbot.com/blog/html5-powered-ajax-file-uploads
 //by Pablo Brasero  July 30, 2010 UPDATED ON March 9, 2019

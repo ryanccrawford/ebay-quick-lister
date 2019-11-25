@@ -20,5 +20,6 @@ Route::post('imagepost', 'ImageUploadController@imagepost')->name('imagepost');
 
 Route::post('api/quickupdate/price', 'QuickUpdateController@price')->name('api/quickupdate/price');
 Route::post('api/quickupdate/qoh', 'QuickUpdateController@qoh')->name('api/quickupdate/qoh');
-Route::post('trading/new', 'Ebay\Trading\API\ItemsController@store')->name('trading/new');
 
+Route::post('trading/new', 'Ebay\Trading\API\ItemsController@store')->name('trading/new');
+Route::post('trading/verify', 'Ebay\Trading\API\ItemsController@verify')->name('trading/verify');
