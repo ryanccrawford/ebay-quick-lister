@@ -1,5 +1,5 @@
 var descriptionEditor = CKEDITOR.replace('descriptionEditorArea', { 'height': '600' });
-
+//descriptionHtml
 var titleLeaveValue = {
     blob: "",
     string: ""
@@ -22,7 +22,7 @@ var selectBoxesReady = 0;
 const numberOfSelectBoxes = 4;
 var buttonPressed = "none"
 $(document).ready(function() {
-
+    $("#item-image").hide();
     disableElement("savetoebay");
 
     $("#categorySpinner").hide();
@@ -37,6 +37,9 @@ $(document).ready(function() {
             reader1.onload = function(e) {
 
                 $('#mainImage').attr('src', e.target.result);
+
+                $("#item-image").attr("src", e.target.result);
+                $("#item-image").show();
 
                 mainImageAsImage.string = e.target.result;
 
@@ -65,6 +68,9 @@ $(document).ready(function() {
             reader2.onload = function(e) {
 
                 $('#descriptionImage').attr('src', e.target.result);
+                let mImage = e.target.result;
+                let temp = descriptionHtml.replace("@descriptionImage", mImage);
+                descriptionEditor.setData(temp);
 
                 descriptionImageAsImage.string = e.target.result;
 
@@ -141,17 +147,22 @@ $(document).ready(function() {
 
 
     });
-    $("#title").focusout((event) => {
-        titleLeaveValue = $("#title").val();
-        $("#categorySpinner").show();
-        disableElement("catsearchbutton");
-        getSuggestedCategories(titleLeaveValue);
-    })
-    $("#title").keyup((event) => {
-        if (titleLeaveValue !== $("#title").val()) {
+    $("#ebaytitle").focusout(event => {
+        if (titleLeaveValue !== $("#ebaytitle").val()) {
+            titleLeaveValue = $("#ebaytitle").val();
+            $("#categorySpinner").show();
+            disableElement("catsearchbutton");
+            $("#catsearchbutton").click();
+        }
+    });
+    $("#ebaytitle").keyup(event => {
+        let tempTitle = descriptionHtml.replace("@title", $("#ebaytitle").text());
+        descriptionEditor.setData(tempTitle);
+        if (titleLeaveValue !== $("#ebaytitle").val()) {
+
             $("#categorySuggestion").empty();
         }
-    })
+    });
     var getShippingOptions = () => {
         $.ajax({
             url: "/api/get/shippingpolicies",
@@ -310,7 +321,7 @@ $(document).ready(function() {
     formwatch.addEventListener("submit", function(event) {
         console.log(buttonPressed);
         event.preventDefault();
-        url = '';
+        let url = '';
 
         disableElement(buttonPressed);
         if (this.id === "savetoebay") {

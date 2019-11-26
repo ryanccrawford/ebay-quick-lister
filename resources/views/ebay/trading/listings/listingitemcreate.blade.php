@@ -76,7 +76,7 @@
                     </div>
                     <div class="col-md-12">
                         <div class="card mb-3">
-                            <img id="item-image" src="{{ $request->file('mainImageFileName') }}" class="ml-3 mt-3 right" alt="..." style="width:50px;">
+                            <img id="item-image" src="{{ $request->file('mainImageFileName') ?? '...'}}" class="ml-3 mt-3 right" alt="..." style="width:50px;">
                             <div class="card-body">
                                 <h4 class="card-title">Item Details</h4>
                                 <div class="input-group mb-3">
@@ -274,10 +274,19 @@
 
             @endsection
             @push('end')
-
+            <?php
+              $decodedhtml =  preg_replace( "/\r|\n|\r\n/", "", html_entity_decode($descriptionTemplate));
+            ?>
             <script>
             var postUrl = "{{ route('trading/new') }}";
             var postUrlVerify = "{{ route('trading/verify') }}"
+            var decodeHTML = function(html) {
+                var txt = document.createElement("textarea");
+                txt.innerHTML = html;
+                return txt.value;
+            };
+            var descriptionHtml = '{!! $decodedhtml !!}';
+
             </script>
             <script src="{{ asset('js/createListing.js') }}"></script>
 

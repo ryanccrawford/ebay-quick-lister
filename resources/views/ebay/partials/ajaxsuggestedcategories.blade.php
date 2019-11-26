@@ -7,11 +7,16 @@
                 <option value="{{ $category->Category->CategoryID }}">{{ $category->Category->CategoryName }}</option>
             @endforeach
         @endisset
-@else    
+@else
         @isset($cats->SuggestedCategoryArray)
-             <option selected value="">Choose...</option>
+                <?php
+                   $catCount = 0;
+                ?>
                 @foreach($cats->SuggestedCategoryArray->SuggestedCategory as $category)
-                    <option value="{{ $category->Category->CategoryID }}">{{ $category->Category->CategoryName }}</option>
+                    <option {{ $catCount == 0  ? "selected" : "" }} value="{{ $category->Category->CategoryID }}">{{ $category->Category->CategoryName }}</option>
+                <?php
+                    $catCount++;
+                ?>
                 @endforeach
         @endisset
 @endif
