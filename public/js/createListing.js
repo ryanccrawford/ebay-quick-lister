@@ -70,7 +70,9 @@ $(document).ready(function() {
                 $('#descriptionImage').attr('src', e.target.result);
                 let mImage = e.target.result;
                 let temp = descriptionHtml.replace("@descriptionImage", mImage);
-                descriptionEditor.setData(temp);
+                let tempTitle = temp.replace("@title", $("#ebaytitle").val());
+                descriptionEditor.setData(tempTitle);
+
 
                 descriptionImageAsImage.string = e.target.result;
 
@@ -156,7 +158,7 @@ $(document).ready(function() {
         }
     });
     $("#ebaytitle").keyup(event => {
-        let tempTitle = descriptionHtml.replace("@title", $("#ebaytitle").text());
+        let tempTitle = descriptionHtml.replace("@title", $("#ebaytitle").val());
         descriptionEditor.setData(tempTitle);
         if (titleLeaveValue !== $("#ebaytitle").val()) {
 
@@ -245,9 +247,22 @@ $(document).ready(function() {
             retries = 0;
             return;
         }
+        var htmljq = descriptionEditor.getData()
+        var tempdoc = document.implementation.createHTMLDocument(
+            "ebay Item Description"
+        );
+
+        tempdoc.body.innerHTML = htmljq;
+
+        $(tempdoc).find("title").text($('#ebaytitle').val());
+        $(tempdoc).find("#image").attr('src', '@image');
+
+
+
         let currentForm = document.getElementById(
             "itemForm"
         );
+        currentForm.descriptionEditorArea.value = tempdoc.body.innerHTML;
         $("#" + button).text("Saving...");
         var formDatatoSend = new FormData(currentForm);
         if (!mainImageAsImage.binary &&

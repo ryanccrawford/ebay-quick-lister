@@ -8,18 +8,21 @@ use \App\Http\Controllers\Ebay\Trading\EbayItemBaseController;
 use App\Http\Requests\StoreItem;
 use App\SellerItem;
 use Illuminate\Foundation\Http\FormRequest;
+use Symfony\Component\Routing\Generator\UrlGenerator;
 
 class ItemsController extends EbayItemBaseController
 {
 
+    protected $url;
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, UrlGenerator $url)
     {
         parent::__construct($request);
+        $this->url = $url;
     }
 
     /**
@@ -42,23 +45,25 @@ class ItemsController extends EbayItemBaseController
      */
     public function store(StoreItem $request)
     {
-
-
-
         $this->middleware('ebayauth');
         try {
             $imageName1 = $request->mainImageFile->store('images');
             $imageName2 = $request->descriptionImageFile->store('images');
             $inputData = $request->all();
+            $temp = $inputData['descriptionEditorArea'];
+
+            $temp = str_replace("@title", $imageName2, $temp);
+            $temp = str_replace("@descriptionImage", $this->url->to('/') . $imageName2, $temp);
+            $inputData['descriptionEditorArea'] =  $temp;
+
             $inputData['mainImageFile'] = $imageName1;
             $inputData['descriptionImageFile'] = $imageName2;
             $sku = array('sku' => $request->sku);
             $item = SellerItem::updateOrCreate($sku, $inputData);
-            $i = var_dump($item);
-            return response($i, 200); //->json(['error' => $i]);
         } catch (Exception $ex) {
             return response()->json(['error' => $ex->getMessage()]);
         }
+
         $serviceRequest = new \DTS\eBaySDK\Trading\Types\VerifyAddFixedPriceItemRequestType();
         $serviceRequest->Item = new \DTS\eBaySDK\Trading\Types\ItemType();
         $serviceRequest->Item->AutoPay = true;
@@ -67,10 +72,10 @@ class ItemsController extends EbayItemBaseController
         $serviceRequest->Item->Currency = \DTS\eBaySDK\Trading\Enums\CurrencyCodeType::C_USD;
         $serviceRequest->Item->BuyItNowPrice = new \DTS\eBaySDK\Trading\Types\AmountType();
         $serviceRequest->Item->BuyItNowPrice->currencyID = \DTS\eBaySDK\Trading\Enums\CurrencyCodeType::C_USD;
-        $serviceRequest->Item->BuyItNowPrice->value = doubleval(trim($request->input('price')));
-        $serviceRequest->Item->Description =  trim($request->input('descriptionEditorArea'));
+        $serviceRequest->Item->BuyItNowPrice->value = doubleval(trim($inputData['price']));
+        $serviceRequest->Item->Description =  trim($inputData['descriptionEditorArea']);
         $serviceRequest->Item->DispatchTimeMax = 1;
-        $serviceRequest->Item->SKU =  trim($request->input('sku'));
+        $serviceRequest->Item->SKU =  trim($inputData['sku']);
         $serviceRequest->Item->IncludeRecommendations = false;
         $serviceRequest->Item->InventoryTrackingMethod = \DTS\eBaySDK\Trading\Enums\InventoryTrackingMethodCodeType::C_SKU;
         $serviceRequest->Item->ListingType = \DTS\eBaySDK\Trading\Enums\ListingTypeCodeType::C_FIXED_PRICE_ITEM;
@@ -79,43 +84,35 @@ class ItemsController extends EbayItemBaseController
         $serviceRequest->Item->PictureDetails = new \DTS\eBaySDK\Trading\Types\PictureDetailsType();
 
         $imagePaths = [
-            URL::to('/') . $imageName1,
-            URL::to('/') . $imageName2
+            $this->url->to('/') . $imageName1,
+            $this->url->to('/') . $imageName2
         ];
 
         $serviceRequest->Item->PictureDetails->PictureURL =  $imagePaths;
         $serviceRequest->Item->PrimaryCategory = new \DTS\eBaySDK\Trading\Types\CategoryType();
-        $serviceRequest->Item->PrimaryCategory->CategoryID = $request->input('primaryCategory');
+        $serviceRequest->Item->PrimaryCategory->CategoryID = $inputData['primaryCategory'];
         $serviceRequest->Item->ProductListingDetails = new \DTS\eBaySDK\Trading\Types\ProductListingDetailsType();
         $serviceRequest->Item->ProductListingDetails->BrandMPN = new \DTS\eBaySDK\Trading\Types\BrandMPNType();
         $serviceRequest->Item->ProductListingDetails->BrandMPN->Brand = "3 Star Inc";
-        $serviceRequest->Item->ProductListingDetails->BrandMPN->MPN = $request->input('sku');
-        $serviceRequest->Item->Quantity = intval($request->input('qty'));
+        $serviceRequest->Item->ProductListingDetails->BrandMPN->MPN = $inputData['sku'];
+        $serviceRequest->Item->Quantity = intval($inputData['qty']);
 
 
 
-        //$serviceResponse = $this->getService('verifyAddFixedPriceItem', ($serviceRequest));
-        // if ($serviceResponse->Ack === 200) {
-        //  $serviceRealRequest = new \DTS\eBaySDK\Trading\Types\AddFixedPriceItemRequestType();
-        //  $serviceRealRequest->Item = $serviceRequest->Item;
+        $serviceResponse = $this->getService('verifyAddFixedPriceItem', ($serviceRequest));
+        if ($serviceResponse->Ack === 200) {
+            $serviceRealRequest = new \DTS\eBaySDK\Trading\Types\AddFixedPriceItemRequestType();
+            $serviceRealRequest->Item = $serviceRequest->Item;
 
-        //   $serviceRealResponse = $this->service->addFixedPriceItem($serviceRealRequest);
-        //   if ($serviceRealResponse->Ack === 200) {
-
-
-
-
-
-
-        $rto = route('trading/edit', ['create' => 'true']);
-        return redirect($rto)
-            ->with($request->input);
-
-
-        //   return redirect()->route('trading/edit', ['create' => 'true'])->withInput($request->input);
-
+            $serviceRealResponse = $this->service->addFixedPriceItem($serviceRealRequest);
+            if ($serviceRealResponse->Ack === 200) {
+                $rto = route('trading/edit', ['create' => 'true']);
+                return redirect($rto)
+                    ->with($request->input);
+            }
+            //   return redirect()->route('trading/edit', ['create' => 'true'])->withInput($request->input);
+        }
     }
-
 
 
     /**
