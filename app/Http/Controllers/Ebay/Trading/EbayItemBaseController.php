@@ -20,6 +20,8 @@ class EbayItemBaseController extends OAuthController
 
     public $AccountService;
     public $service;
+    public $TradingService;
+    public $InventoryService;
 
     /**
      * Create a new controller instance.
@@ -130,17 +132,7 @@ class EbayItemBaseController extends OAuthController
             $serviceRequest->OutputSelector = $outputSelector;
         }
 
-        //
-
-        $this->service = new \DTS\eBaySDK\Trading\Services\TradingService(
-            [
-                'siteId' => '0',
-                'authorization' => session('user_token'),
-                'credentials' => $this->credentials
-            ]
-        );
-
-        return $this->service->getMyeBaySelling($serviceRequest);
+        return  $this->getService('getMyeBaySelling', $serviceRequest,  $apiName = "Trading", $serviceType = "TradingService");
     }
 
     public function GetItemResponse($itemId = '', $SKU = ''): \DTS\eBaySDK\Trading\Types\GetItemResponseType
@@ -156,7 +148,7 @@ class EbayItemBaseController extends OAuthController
         $serviceRequest->DetailLevel = [\DTS\eBaySDK\Trading\Enums\DetailLevelCodeType::C_ITEM_RETURN_DESCRIPTION];
 
 
-        $this->service = new \DTS\eBaySDK\Trading\Services\TradingService(
+        $this->TradingService = new \DTS\eBaySDK\Trading\Services\TradingService(
             [
                 'siteId' => '0',
                 'authorization' => session('user_token'),
@@ -164,32 +156,40 @@ class EbayItemBaseController extends OAuthController
             ]
         );
 
-        return $this->service->getItem($serviceRequest);
+        return $this->TradingService->getItem($serviceRequest);
     }
 
     public function activeView(Request $request)
     {
-
+        $isActiveList = 0;
+        $isSoldList = 0;
+        $isActiveList = $request->query('isactivelist') ? intval($request->query('isactivelist')) : false;
+        $isSoldList = !$isActiveList;
         $page_num = $request->query('page_num') ? intval($request->query('page_num')) : 1;
         $limit = $request->query('limit') ? intval($request->query('limit')) : 10;
-
+        $showList = $isActiveList ? 'ActiveList' : 'SoldList';
+        $showListurl = $isActiveList ? 'isactivelist' : 'issoldlist';
         $pagination = new \DTS\eBaySDK\Trading\Types\PaginationType();
         $pagination->EntriesPerPage = $limit;
         $pagination->PageNumber = $page_num;
-        $include = ['ActiveList'];
-
-
+        $include = [$showList];
         $mySellingResults = $this->GetMyeBaySelling($include, $pagination);
 
 
         if ($mySellingResults->Ack == 'Failure') {
             $Errors = $mySellingResults->Errors;
             $this->middleware('ebayauth');
+            session(['return' => '/trading?' . $showListurl . '=1&page_num=1']);
             return redirect('getauth');
         }
-        if ($mySellingResults->Ack !== 'Failure' && isset($mySellingResults->ActiveList->ItemArray)) {
 
-            if (sizeof($mySellingResults->ActiveList->ItemArray->Item) === 0) {
+        $itemArrayType = $showList === 'ActiveList' ? 'ItemArray' : 'OrderTransactionArray';
+        $itemType = $showList === 'ActiveList' ? 'Item' : 'OrderTransaction';
+        if ($mySellingResults->Ack !== 'Failure' && isset($mySellingResults->$showList->$itemArrayType)) {
+
+
+            $itemsArray =  $mySellingResults->$showList->$itemArrayType->$itemType;
+            if (sizeof($mySellingResults->$showList->$itemArrayType->$itemType) === 0) {
                 $errors = array(
                     'error' => true,
                     'messages' => "No Items Found!"
@@ -199,25 +199,25 @@ class EbayItemBaseController extends OAuthController
 
             $totalPages = 1;
 
-            if (!$request->session()->has('totalPages') && isset($mySellingResults->ActiveList->PaginationResult)) {
-                session(['totalPages' => self::getTotalPages($mySellingResults->ActiveList->PaginationResult)]);
-                $totalPages = session('totalPages');
+            if (!$request->session()->has('totalPages') && isset($mySellingResults->$showList->PaginationResult)) {
+                session(['totalPages' => self::getTotalPages($mySellingResults->$showList->PaginationResult)]);
+                $totalPages = intval(session('totalPages'));
             } elseif ($request->session()->has('totalPages')) {
-                $totalPages = session('totalPages');
+                $totalPages = intval(session('totalPages'));
             }
 
-            $limitParameter = '&limit=' . $limit . '';
+            $limitParameter = '&limit=' . $limit;
 
             $prev = $page_num > 5 ? $page_num - 5 : 1;
 
             $next = ($page_num  < ($totalPages - 10)) ? ($page_num + 5) + (5 - $prev) : $totalPages;
             $currentPage = $page_num;
-            $afterCurrentPageLinks = self::afterCurrentPage($page_num, $totalPages, 10 - $prev, '/trading?isactiveview=1&page_num=', $limitParameter);
-            $next_link = '/trading?isactiveview=1&page_num=' . $next . $limitParameter;
-            $prev_link = '/trading?isactiveview=1&page_num=' . $prev . $limitParameter;
-            $beforeCurrentPageLinks = self::beforeCurrentPage($page_num, $totalPages, 5, '/trading?isactiveview=1&page_num=', $limitParameter);
-            $itemsArray =  $mySellingResults->ActiveList->ItemArray->Item;
-            return view('ebay.trading.listings.listingitems', compact('itemsArray', 'next_link', 'prev_link', 'totalPages', 'limit', 'currentPage', 'afterCurrentPageLinks', 'beforeCurrentPageLinks'));
+            $afterCurrentPageLinks = self::afterCurrentPage($page_num, $totalPages, 10 - $prev, '/trading?' . $showListurl . '=1&page_num=', $limitParameter);
+            $next_link = '/trading?' . $showListurl . '=1&page_num=' . $next . $limitParameter;
+            $prev_link = '/trading?' . $showListurl . '=1&page_num=' . $prev . $limitParameter;
+            $beforeCurrentPageLinks = self::beforeCurrentPage($page_num, $totalPages, 5, '/trading?' . $showListurl . '=1&page_num=', $limitParameter);
+
+            return view('ebay.trading.listings.listingitems', compact('itemsArray', 'next_link', 'prev_link', 'totalPages', 'limit', 'currentPage', 'afterCurrentPageLinks', 'beforeCurrentPageLinks', 'isActiveList', 'isSoldList'));
         }
 
         $error = array(
@@ -309,24 +309,25 @@ class EbayItemBaseController extends OAuthController
 
     public function getService($serviceName, $serviceRequest,  $apiName = "Trading", $serviceType = "TradingService")
     {
-
+        $this->middleware('ebayauth');
         // 'verifyAddFixedPriceItem', ($serviceRequest)
         $type = '\\DTS\\eBaySDK\\';
         $type .= $apiName;
         $type .= '\\Services\\';
         $type .= $serviceType;
 
-
-        if ($this->service === null) {
-            $this->service = new $type(
+        if ($this->$serviceType === null) {
+            $this->$serviceType = new $type(
                 [
                     'siteId' => '0',
-                    'authorization' => session('user_token'),
+                    'authorization' => session('user_token') ? session('user_token') : $this->credentials['authToken'],
                     'credentials' => $this->credentials
                 ]
             );
         }
 
-        return $this->service->$serviceName($serviceRequest);
+        $response = $this->$serviceType->$serviceName($serviceRequest);
+
+        return $response;
     }
 }

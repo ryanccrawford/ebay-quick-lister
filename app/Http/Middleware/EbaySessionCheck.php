@@ -54,9 +54,6 @@ class EbaySessionCheck
     {
 
         session()->forget('user_token');
-        session()->forget('scope');
-        session()->forget('return');
-
         session(['scope' => $this->scope]);
         session(['return' => $returnURL]);
     }

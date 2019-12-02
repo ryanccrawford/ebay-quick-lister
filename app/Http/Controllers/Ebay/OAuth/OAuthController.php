@@ -14,12 +14,12 @@ use function HighlightUtilities\getAvailableStyleSheets;
 
 class OAuthController extends Controller
 {
-    protected $credentials;
-    protected $OAuthService;
-    protected $scope;
-    protected $token;
-    protected $marketPlaceId;
-    protected $config;
+    public $credentials;
+    public $OAuthService;
+    public $scope;
+    public $token;
+    public $marketPlaceId;
+    public $config;
 
 
     /**
@@ -88,7 +88,7 @@ class OAuthController extends Controller
 
         $url =  $this->OAuthService->redirectUrlForUser(
             [
-                'state' => url()->previous(),
+                'state' => session('return'),
                 'scope' => $this->scope,
             ]
         );
@@ -126,7 +126,7 @@ class OAuthController extends Controller
             $return = session('return');
             session()->forget('return');
         }
-        dump($return);
+
         return $return;
     }
 

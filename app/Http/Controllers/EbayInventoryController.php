@@ -14,10 +14,6 @@ use \App\Http\Controllers\Ebay\Trading\EbayItemBaseController;
 
 class EbayInventoryController extends EbayItemBaseController
 {
-    public $configuation;
-    public $provider;
-    public $inventoryService;
-
 
     /**
      * Create a new controller instance.
@@ -27,14 +23,6 @@ class EbayInventoryController extends EbayItemBaseController
     public function __construct(Request $request)
     {
         parent::__construct($request);
-        $this->middleware('auth');
-        if (!isset($this->inventoryService)) {
-            $this->inventoryService = new \DTS\eBaySDK\Inventory\Services\InventoryService(
-                [
-                    'authorization' => $this->token
-                ]
-            );
-        }
     }
 
 
@@ -45,13 +33,9 @@ class EbayInventoryController extends EbayItemBaseController
      */
     public function index(Request $request)
     {
-        if ($request->session()->has('token')) {
-            $this->token = session('token');
-            $inventoryItems = $this->getInventoryItems();
-            return view('ebay.inventory.items.itemlist', compact('inventoryItems'));
-        } else {
-            return $this->getToken();
-        }
+        $this->middleware('auth');
+        $inventoryItems = $this->getInventoryItems();
+        return view('ebay.inventory.items.itemlist', compact('inventoryItems'));
     }
 
     /**
@@ -61,7 +45,7 @@ class EbayInventoryController extends EbayItemBaseController
      */
     public function showlocations(Request $request)
     {
-
+        $this->middleware('auth');
         $inventoryLocations = $this->getInventoryLocations();
         return view('ebay.inventory.locations.locationlist', compact('inventoryLocations'));
     }
@@ -81,8 +65,10 @@ class EbayInventoryController extends EbayItemBaseController
      */
     public function getInventoryItems()
     {
-        $request = new \DTS\eBaySDK\Inventory\Types\GetInventoryItemsRestRequest();
-        $response = $this->inventoryService->getInventoryItems($request);
+        $this->middleware('ebayauth');
+        $serviceRequest = new \DTS\eBaySDK\Inventory\Types\GetInventoryItemsRestRequest();
+        $response = $this->getService('getInventoryItems', $serviceRequest,  $apiName = "Inventory", $serviceType = "InventoryService");
+        dump($response);
         return $response->inventoryItems;
     }
 
@@ -104,81 +90,64 @@ class EbayInventoryController extends EbayItemBaseController
      */
     public function saveInventoryLocation(Request $request)
     {
-        // $validatedData = $request->validate(
-        //     [
-        //         'name' => 'required|max:1000',
-        //         'locationTypes' => 'required',
-        //         'addressLine1' => 'required',
-        //         'addressLine2' => 'required',
-        //         'city' => 'required',
-        //         'state' => 'required',
-        //         'postalCode' => 'required',
-        //     ]
-        // );
+        $this->middleware('ebayauth');
+        $name = $request->name;
+        $addressArray = array(
+            'address' => array(
+                'addressLine1' => $request->addressLine1,
+                'addressLine2' => $request->addressLine2,
+                'city' => $request->city,
+                'country' => \DTS\eBaySDK\Inventory\Enums\CountryCodeEnum::C_US,
+                'postalCode' => $request->postalCode,
+                'stateOrProvince' => $request->state
+            )
+        );
+        $locationDetails = new \DTS\eBaySDK\Inventory\Types\LocationDetails($addressArray);
+        $locationTypesArray = $this->getLocationTypes($request->locationTypes);
+        $location = array(
+            'location' => $locationDetails,
+            'locationTypes' => $locationTypesArray,
+            'name' => $name,
+        );
+        $inventoryLocationFull = new \DTS\eBaySDK\Inventory\Types\InventoryLocationFull($location);
+        $eBayRequest = array(
+            'merchantLocationKey' => substr(str_replace(" ", "", $name), 0, 35),
+            'location' => $locationDetails,
+            'locationTypes' => $locationTypesArray,
+            'name' => $name,
+        );
+        $ebayRequestObj = new \DTS\eBaySDK\Inventory\Types\CreateInventoryLocationRestRequest($eBayRequest);
+        $ebayResponse = $this->getService('createInventoryLocation', $ebayRequestObj,  $apiName = "Inventory", $serviceType = "InventoryService");
 
-        if ($request->session()->has('token')) {
-            $this->token = session('token');
-            $this->startService();
-            $name = $request->name;
-            $addressArray = array(
-                'address' => array(
-                    'addressLine1' => $request->addressLine1,
-                    'addressLine2' => $request->addressLine2,
-                    'city' => $request->city,
-                    'country' => \DTS\eBaySDK\Inventory\Enums\CountryCodeEnum::C_US,
-                    'postalCode' => $request->postalCode,
-                    'stateOrProvince' => $request->state
-                )
-            );
-            $locationDetails = new \DTS\eBaySDK\Inventory\Types\LocationDetails($addressArray);
-            $locationTypesArray = $this->getLocationTypes($request->locationTypes);
-            $location = array(
-                'location' => $locationDetails,
-                'locationTypes' => $locationTypesArray,
-                'name' => $name,
-            );
-            $inventoryLocationFull = new \DTS\eBaySDK\Inventory\Types\InventoryLocationFull($location);
-            $eBayRequest = array(
-                'merchantLocationKey' => substr(str_replace(" ", "", $name), 0, 35),
-                'location' => $locationDetails,
-                'locationTypes' => $locationTypesArray,
-                'name' => $name,
-            );
-            $ebayRequestObj = new \DTS\eBaySDK\Inventory\Types\CreateInventoryLocationRestRequest($eBayRequest);
-            $ebayResponse = $this->inventoryService->createInventoryLocation($ebayRequestObj);
-            $responseArray = $ebayResponse->toArray();
+        $responseArray = $ebayResponse->toArray();
 
-            $wasError = false;
-            $statusCode = $ebayResponse->getStatusCode();
-            //Check for errors
-            if ($statusCode >= 400) {
-                $wasError = true;
-                if (isset($responseArray['errors'])) {
-                    $errorMessage = '';
-                    echo var_dump($responseArray['errors']);
-                    foreach ($responseArray['errors'] as $rerror) {
+        $wasError = false;
+        $statusCode = $ebayResponse->getStatusCode();
+        //Check for errors
+        if ($statusCode >= 400) {
+            $wasError = true;
+            if (isset($responseArray['errors'])) {
+                $errorMessage = '';
+                foreach ($responseArray['errors'] as $rerror) {
 
-                        if ($rerror['errorId'] === 25803) {
-                            $errorMessage += "The inventory location name is already in use.<br>";
-                        } else {
-                            $errorMessage += $rerror['message'] . "<br>";
-                        }
+                    if ($rerror['errorId'] === 25803) {
+                        $errorMessage += "The inventory location name is already in use.<br>";
+                    } else {
+                        $errorMessage += $rerror['message'] . "<br>";
                     }
-                    return view('ebay.inventory.locationadd', compact('wasError', 'request', 'errorMessage'));
                 }
-            }
-            //Check for success
-            if ($statusCode >= 200) {
-                if ($statusCode === 204) {
-                    return redirect()
-                        ->action(
-                            'EbayInventoryController@showlocations'
-                        );
-                }
+                return view('ebay.inventory.locationadd', compact('wasError', 'request', 'errorMessage'));
             }
         }
-        //Return getToken if totken has expired, Might need to handle this differnetly.
-        return $this->getToken();
+        //Check for success
+        if ($statusCode >= 200) {
+            if ($statusCode === 204) {
+                return redirect()
+                    ->action(
+                        'EbayInventoryController@showlocations'
+                    );
+            }
+        }
     }
 
     public function getLocationTypes($locationTypes)
@@ -211,11 +180,11 @@ class EbayInventoryController extends EbayItemBaseController
      */
     public function getInventoryLocations()
     {
-        $this->startService();
-        $request = new \DTS\eBaySDK\Inventory\Types\GetInventoryLocationsRestRequest();
-        $request->offset = "0";
-        $request->limit = "100";
-        $response = $this->inventoryService->getInventoryLocations($request);
+        $this->middleware('ebayauth');
+        $serviceRequest = new \DTS\eBaySDK\Inventory\Types\GetInventoryLocationsRestRequest();
+        $serviceRequest->offset = "0";
+        $serviceRequest->limit = "100";
+        $response = $this->getService('getInventoryLocations', $serviceRequest,  $apiName = "Inventory", $serviceType = "InventoryService");
         return $response->locations;
     }
 
@@ -237,11 +206,6 @@ class EbayInventoryController extends EbayItemBaseController
 
 
             $tradingRequest = new \DTS\eBaySDK\Trading\Types\Item;
-
-
-
-
-
             $this->token = session('token');
 
             $listingIds = [];
@@ -322,72 +286,5 @@ class EbayInventoryController extends EbayItemBaseController
     public function destroy(Listing $listing)
     {
         //
-    }
-
-    /**
-     * Gets a user OAuth Token.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function oauth(Request $request)
-    {
-        $uri = $request->path();
-        if ($request->is('oauth/clear')) {
-            $request->session()->forget('token');
-            return redirect('home');
-        }
-        $this->code = $request->query('code');
-        if (strlen($this->code)) {
-            $response = $this->OAuthService->getUserToken(
-                new \DTS\eBaySDK\OAuth\Types\GetUserTokenRestRequest(
-                    [
-                        'code' => $this->code,
-                    ]
-                )
-            );
-            if ($response->getStatusCode() !== 200) {
-                printf(
-                    "%s: %s\n\n",
-                    $response->error,
-                    $response->error_description
-                );
-            } else {
-                $this->token = $response->access_token;
-                session(['token' => $this->token]);
-                //$affected = DB::update('update users set ebay_token = "' . $this->token . '" where name = ?', ['John']);
-                return redirect('listings');
-            }
-        }
-
-        return redirect('home');
-    }
-
-    /**
-     * Gets eBay Credentials from Env Vars.
-     *
-     * @return \DTS\eBaySDK\Credentials\Credentials
-     * @throws InvalidArgumentException
-     */
-    public static function env()
-    {
-        // This function IS the credentials provider.
-        return function () {
-            // Use credentials from environment variables, if available
-            $appId = getenv(self::EBAY_PROD_APP_ID);
-            $certId = getenv(self::EBAY_PROD_CERT_ID);
-            $devId = getenv(self::EBAY_PROD_DEV_ID);
-
-            if ($appId && $certId && $devId) {
-                return new \DTS\eBaySDK\Credentials\Credentials($appId, $certId, $devId);
-            } else {
-                return new InvalidArgumentException(
-                    'Could not find environment variable '
-                        . 'credentials in ' . self::EBAY_PROD_APP_ID . '/'
-                        . self::EBAY_PROD_CERT_ID . '/'
-                        . self::EBAY_PROD_DEV_ID
-                );
-            }
-        };
     }
 }

@@ -264,17 +264,9 @@ $(document).ready(function() {
         );
         currentForm.descriptionEditorArea.value = tempdoc.body.innerHTML;
         $("#" + button).text("Saving...");
-        var formDatatoSend = new FormData(currentForm);
-        if (!mainImageAsImage.binary &&
-            mainImageAsImage.dom.files.length > 0 &&
-            !descriptionImageAsImage.binary &&
-            descriptionImageAsImage.dom.files.length > 0
-        ) {
+        const formData = new FormData(currentForm);
 
-            return;
-        }
-
-        var xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
 
         var onprogressHandler = evt => {
             if (!isShowing) {
@@ -329,7 +321,7 @@ $(document).ready(function() {
             enableElement(buttonPressed);
         };
 
-        xhr.send(formDatatoSend);
+        xhr.send(formData);
     }
 
     var formwatch = document.forms.namedItem('itemForm');
