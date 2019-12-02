@@ -278,6 +278,7 @@
               $decodedhtml =  preg_replace( "/\r|\n|\r\n/", "", html_entity_decode($descriptionTemplate));
             ?>
             <script>
+            
             var postUrl = "{{ route('trading/new') }}";
             var postUrlVerify = "{{ route('trading/verify') }}"
             var decodeHTML = function(html) {
@@ -286,8 +287,7 @@
                 return txt.value;
             };
             var descriptionHtml = '{!! $decodedhtml !!}';
-
+            CreateListing();
             </script>
-            <script src="{{ asset('js/createListing.js') }}"></script>
-
+           
             @endpush

@@ -219,7 +219,7 @@
 @endsection
 
 @push('end')
-    <script src="{{ asset('js/quickupdate.js') }}"></script>
+    
     <script>
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
