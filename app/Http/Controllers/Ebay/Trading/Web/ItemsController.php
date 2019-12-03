@@ -7,9 +7,9 @@ use \Illuminate\Http\Request;
 use \DTS\eBaySDK\Trading\Types;
 use \DTS\eBaySDK\Trading\Enums;
 use \DTS\eBaySDK\Constants;
-use \App\Http\Controllers\Ebay\Trading\EbayItemBaseController;
+use \App\Http\Controllers\Ebay\Trading\EbayBaseController;
 
-class ItemsController extends EbayItemBaseController
+class ItemsController extends EbayBaseController
 {
 
     /**

@@ -15,14 +15,14 @@ use \App\Http\Controllers\Ebay\OAuth\OAuthController;
 use \DTS\eBaySDK\MerchantData\Enums\DetailLevelCodeType;
 
 
-class EbayItemBaseController extends OAuthController
+class EbayBaseController extends OAuthController
 {
 
     public $AccountService;
     public $service;
     public $TradingService;
     public $InventoryService;
-
+    public $AnalyticsService;
     /**
      * Create a new controller instance.
      *
@@ -307,7 +307,7 @@ class EbayItemBaseController extends OAuthController
         return view($failRoute, compact('Errors'));
     }
 
-    public function getService($serviceName, $serviceRequest,  $apiName = "Trading", $serviceType = "TradingService")
+    public function getService($serviceName, $serviceRequest = null,  $apiName = "Trading", $serviceType = "TradingService")
     {
         $this->middleware('ebayauth');
         // 'verifyAddFixedPriceItem', ($serviceRequest)
@@ -315,7 +315,7 @@ class EbayItemBaseController extends OAuthController
         $type .= $apiName;
         $type .= '\\Services\\';
         $type .= $serviceType;
-
+        $serviceResponse = null;
         if ($this->$serviceType === null) {
             $this->$serviceType = new $type(
                 [
@@ -325,9 +325,11 @@ class EbayItemBaseController extends OAuthController
                 ]
             );
         }
-
-        $response = $this->$serviceType->$serviceName($serviceRequest);
-
-        return $response;
+        if ($serviceRequest === null) {
+            $serviceResponse = $this->$serviceType->$serviceName();
+        } else {
+            $serviceResponse = $this->$serviceType->$serviceName($serviceRequest);
+        }
+        return $serviceResponse;
     }
 }

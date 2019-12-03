@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Ebay\Trading\EbayBaseController;
 use DTS\eBaySDK\Trading\Types\InventoryStatusType;
 use Illuminate\Http\Request;
 
-class QuickUpdateController extends Controller
+class QuickUpdateController extends EbayBaseController
 {
 
     protected $Service;
     protected $changes = [];
 
-    public function __construct()
+    public function __construct(Request $request)
     {
+        parent::__construct($request);
         $this->Service = new \DTS\eBaySDK\Trading\Services\TradingService();
     }
 
@@ -22,7 +24,7 @@ class QuickUpdateController extends Controller
 
         $newPrice = $request->query('price');
         $itemId = $request->query('item_id');
-        $change = [
+        $this->change = [
             'price' => $newPrice,
             'itemId' => $itemId,
         ];
@@ -33,7 +35,7 @@ class QuickUpdateController extends Controller
 
         $newQoh = $request->query('qoh');
         $itemId = $request->query('item_id');
-        $change = [
+        $this->change = [
             'qoh' => $newQoh,
             'itemId' => $itemId,
         ];
@@ -41,14 +43,16 @@ class QuickUpdateController extends Controller
 
     public function update($changes)
     {
+        $this->middleware('auth');
+        $this->middleware('ebayauth');
         $changeRequest = new \DTS\eBaySDK\Trading\Types\ReviseInventoryStatusRequestType();
         $changeRequest->InventoryStatus = new InventoryStatusType();
-        $changeRequest->InventoryStatus->ItemID = $changes['itemId'];
-        if (isset($changes['qoh'])) {
-            $changeRequest->InventoryStatus->Quantity = intval($changes['qoh']);
+        $changeRequest->InventoryStatus->ItemID = $this->changes['itemId'];
+        if (isset($this->changes['qoh'])) {
+            $changeRequest->InventoryStatus->Quantity = intval($this->changes['qoh']);
         }
-        if (isset($changes['price'])) {
-            $changeRequest->InventoryStatus->StartPrice = intfloat($changes['price']);
+        if (isset($this->changes['price'])) {
+            $changeRequest->InventoryStatus->StartPrice = doubleval($this->changes['price']);
         }
     }
 }

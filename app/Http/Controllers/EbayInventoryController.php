@@ -10,9 +10,9 @@ use DTS\eBaySDK\Credentials\Credentialsl;
 use App\User;
 use \App\inventoryPart;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use \App\Http\Controllers\Ebay\Trading\EbayItemBaseController;
+use \App\Http\Controllers\Ebay\Trading\EbayBaseController;
 
-class EbayInventoryController extends EbayItemBaseController
+class EbayInventoryController extends EbayBaseController
 {
 
     /**

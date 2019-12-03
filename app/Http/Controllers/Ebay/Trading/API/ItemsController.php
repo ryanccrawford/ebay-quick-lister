@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Ebay\Trading\API;
 
 use \Illuminate\Http\Request;
 use Exception;
-use \App\Http\Controllers\Ebay\Trading\EbayItemBaseController;
+use \App\Http\Controllers\Ebay\Trading\EbayBaseController;
 use App\Http\Requests\StoreItem;
 use App\SellerItem;
+use DTS\eBaySDK\MerchantData\Enums\SiteCodeType;
 use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 
-class ItemsController extends EbayItemBaseController
+class ItemsController extends EbayBaseController
 {
 
     protected $url;
@@ -45,7 +46,9 @@ class ItemsController extends EbayItemBaseController
      */
     public function store(StoreItem $request)
     {
+        $this->middleware('auth');
         $this->middleware('ebayauth');
+        $item = null;
         try {
             $imageName1 = $request->mainImageFile->store('images');
             $imageName2 = $request->descriptionImageFile->store('images');
@@ -70,19 +73,18 @@ class ItemsController extends EbayItemBaseController
         $serviceRequest->Item->ConditionID = 1000;
         $serviceRequest->Item->Country = \DTS\eBaySDK\Trading\Enums\CountryCodeType::C_US;
         $serviceRequest->Item->Currency = \DTS\eBaySDK\Trading\Enums\CurrencyCodeType::C_USD;
-        $serviceRequest->Item->BuyItNowPrice = new \DTS\eBaySDK\Trading\Types\AmountType();
-        $serviceRequest->Item->BuyItNowPrice->currencyID = \DTS\eBaySDK\Trading\Enums\CurrencyCodeType::C_USD;
-        $serviceRequest->Item->BuyItNowPrice->value = doubleval(trim($inputData['price']));
-        $serviceRequest->Item->Description =  trim($inputData['descriptionEditorArea']);
+        $serviceRequest->Item->StartPrice = new \DTS\eBaySDK\Trading\Types\AmountType();
+        $serviceRequest->Item->StartPrice->currencyID = \DTS\eBaySDK\Trading\Enums\CurrencyCodeType::C_USD;
+        $serviceRequest->Item->StartPrice->value = $item->price;
+        $serviceRequest->Item->Description =  $item->descriptionEditorArea;
         $serviceRequest->Item->DispatchTimeMax = 1;
-        $serviceRequest->Item->SKU =  trim($inputData['sku']);
+        $serviceRequest->Item->SKU =  $item->sku;
         $serviceRequest->Item->IncludeRecommendations = false;
         $serviceRequest->Item->InventoryTrackingMethod = \DTS\eBaySDK\Trading\Enums\InventoryTrackingMethodCodeType::C_SKU;
         $serviceRequest->Item->ListingType = \DTS\eBaySDK\Trading\Enums\ListingTypeCodeType::C_FIXED_PRICE_ITEM;
         $serviceRequest->Item->ListingDuration = \DTS\eBaySDK\Trading\Enums\ListingDurationCodeType::C_GTC;
         $serviceRequest->Item->Location = "Ashland, VA";
         $serviceRequest->Item->PictureDetails = new \DTS\eBaySDK\Trading\Types\PictureDetailsType();
-
         $imagePaths = [
             $this->url->to('/') . $imageName1,
             $this->url->to('/') . $imageName2
@@ -90,16 +92,31 @@ class ItemsController extends EbayItemBaseController
 
         $serviceRequest->Item->PictureDetails->PictureURL =  $imagePaths;
         $serviceRequest->Item->PrimaryCategory = new \DTS\eBaySDK\Trading\Types\CategoryType();
-        $serviceRequest->Item->PrimaryCategory->CategoryID = $inputData['primaryCategory'];
+        $serviceRequest->Item->PrimaryCategory->CategoryID = $item->primaryCategory;
         $serviceRequest->Item->ProductListingDetails = new \DTS\eBaySDK\Trading\Types\ProductListingDetailsType();
         $serviceRequest->Item->ProductListingDetails->BrandMPN = new \DTS\eBaySDK\Trading\Types\BrandMPNType();
         $serviceRequest->Item->ProductListingDetails->BrandMPN->Brand = "3 Star Inc";
-        $serviceRequest->Item->ProductListingDetails->BrandMPN->MPN = $inputData['sku'];
-        $serviceRequest->Item->Quantity = intval($inputData['qty']);
-
-
+        $serviceRequest->Item->ProductListingDetails->BrandMPN->MPN = $item->sku;
+        $serviceRequest->Item->Quantity = $item->qty;
+        $serviceRequest->Item->ShippingPackageDetails = new \DTS\eBaySDK\Trading\Types\ShipPackageDetailsType();
+        $serviceRequest->Item->ShippingPackageDetail->PackageDepth =  $item->shippingHeight;
+        $serviceRequest->Item->ShippingPackageDetail->PackageLength = $item->shippingLength;
+        $serviceRequest->Item->ShippingPackageDetail->PackageWidth  = $item->shippingWidth;
+        $serviceRequest->Item->ShippingPackageDetail->WeightMajor = count(explode(".", floatval($item->shippingWeight))) > 0 ? explode(".", floatval($item->shippingWeight))[0] : 0;
+        $serviceRequest->Item->ShippingPackageDetail->WeightMinor  = count(explode(".", floatval($item->shippingWeight))) > 0 ? explode(".", floatval($item->shippingWeight))[1] : 0;
+        $serviceRequest->Item->SellerProfiles = new \DTS\eBaySDK\Trading\Types\SellerProfilesType();
+        $serviceRequest->Item->SellerProfiles->SellerPaymentProfile = new \DTS\eBaySDK\Trading\Types\SellerPaymentProfileType();
+        $serviceRequest->Item->SellerProfiles->SellerPaymentProfile->PaymentProfileID = $item->PaymentPoliciesResponse;
+        $serviceRequest->Item->SellerProfiles->SellerReturnProfile = new \DTS\eBaySDK\Trading\Types\SellerReturnProfileType();
+        $serviceRequest->Item->SellerProfiles->SellerReturnProfile->ReturnProfileID =  $item->ReturnPoliciesResponse;
+        $serviceRequest->Item->SellerProfiles->SellerShippingProfile = new \DTS\eBaySDK\Trading\Types\SellerShippingProfileType();
+        $serviceRequest->Item->SellerProfiles->SellerShippingProfile->ShippingProfileID =  $item->ShippingPoliciesResponse;
+        $serviceRequest->Item->Site = SiteCodeType::C_US;
+        $serviceRequest->Item->DispatchTimeMax = 1;
 
         $serviceResponse = $this->getService('verifyAddFixedPriceItem', ($serviceRequest));
+        dump($serviceRequest);
+        die;
         if ($serviceResponse->Ack === 200) {
             $serviceRealRequest = new \DTS\eBaySDK\Trading\Types\AddFixedPriceItemRequestType();
             $serviceRealRequest->Item = $serviceRequest->Item;

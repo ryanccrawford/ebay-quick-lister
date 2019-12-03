@@ -6,9 +6,9 @@ use \Illuminate\Http\Request;
 use DTS\eBaySDK\Trading\Services;
 use Exception;
 use Illuminate\Support\Facades\Cache;
-use \App\Http\Controllers\Ebay\Trading\EbayItemBaseController;
+use \App\Http\Controllers\Ebay\Trading\EbayBaseController;
 
-class AjaxController extends EbayItemBaseController
+class AjaxController extends EbayBaseController
 {
 
     public $AccountService;

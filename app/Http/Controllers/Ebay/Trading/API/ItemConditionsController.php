@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Ebay\Trading\API;
 
 use Illuminate\Http\Request;
-use \App\Http\Controllers\Ebay\Trading\EbayItemBaseController;
+use \App\Http\Controllers\Ebay\Trading\EbayBaseController;
 
-class ItemConditionsController extends EbayItemBaseController
+class ItemConditionsController extends EbayBaseController
 {
 
 

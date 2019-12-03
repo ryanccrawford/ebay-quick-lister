@@ -11,7 +11,7 @@
 
     <!-- Scripts -->
 
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.0.2/echarts-en.min.js" charset="utf-8"></script>
     <script src="{{ asset('js/manifest.js')}}"></script>
     <script src="{{ asset('js/vendor.js')}}"></script>
     <script src="{{ asset('js/app.js')}}"></script>

@@ -14,7 +14,8 @@
                         </div>
                     @endif
 
-                    Welcome. Seller Dashboard comming soon!
+                    <p>Welcome, Seller to your dashboard. </p>
+
                 </div>
             </div>
         </div>
