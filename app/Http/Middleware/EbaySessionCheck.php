@@ -18,7 +18,10 @@ class EbaySessionCheck
 
         $uri = $request->path();
         if ($uri === 'getauth' || $uri === 'oauth' || $uri === 'refreshauth') {
-            $next($request);
+            return  $next($request);
+        }
+        if(!$this->isTokenExpired()){
+            return $next($request);
         }
         if ((!$request->session()->has('user_token') || $this->isTokenExpired()) && !$request->session()->has('refresh_token')) {
             $this->doOAuth($request->fullUrl());

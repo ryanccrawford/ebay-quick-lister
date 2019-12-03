@@ -42,7 +42,7 @@ class OAuthController extends Controller
             $credential[$value->name] = $value->value;
         }
 
-        $this->scope = explode(' ', 'https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account');
+        $this->scope = explode(' ', 'https://api.ebay.com/oauth/api_scope https://api.ebay.com/oauth/api_scope/sell.marketing https://api.ebay.com/oauth/api_scope/sell.inventory https://api.ebay.com/oauth/api_scope/sell.account https://api.ebay.com/oauth/api_scope/sell.analytics.readonly');
         $this->marketPlaceId = \DTS\eBaySDK\Account\Enums\MarketplaceIdEnum::C_EBAY_US;
         $this->credentials =  $credential;
 
@@ -113,16 +113,14 @@ class OAuthController extends Controller
         );
     }
 
-
-
     public function getReturnUrl(string $returnURL = 'prev')
     {
         $return = '';
         if ($returnURL === 'prev') {
-
             $return = url()->current();
+        } elseif (strlen($returnURL) > 0) {
+            $return = $returnURL;
         } elseif (session('return') !== null && session('return')  !== '') {
-
             $return = session('return');
             session()->forget('return');
         }
@@ -167,5 +165,13 @@ class OAuthController extends Controller
 
         $rd = $this->getReturnUrl('');
         return redirect($rd);
+    }
+
+    public function doOAuth(string $returnURL)
+    {
+
+        session()->forget('user_token');
+        session(['scope' => $this->scope]);
+        session(['return' => $returnURL]);
     }
 }

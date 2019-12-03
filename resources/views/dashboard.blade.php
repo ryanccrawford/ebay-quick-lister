@@ -15,7 +15,7 @@
                     @endif
 
                     <p>Welcome, Seller to your dashboard. </p>
-
+                        <p><?php dump($dash); ?></p>
                 </div>
             </div>
         </div>
