@@ -94,7 +94,9 @@
             <div class="card-group">
                     <!-- { 'listingArray', 'next_link', 'prev_link', 'totalPages', 'limit', 'currentPage', 'afterCurrentPageLinks', 'beforeCurrentPageLinks' } -->
             @if($isActiveList)
-                    @foreach ($itemsArray as $listingItem)
+                <input type="hidden" value="{{ url("/api/quickupdate/price") }}" id="priceupdateurl">
+                <input type="hidden" value="{{ url("/api/quickupdate/qoh") }}" id="qohupdateurl">
+                @foreach ($itemsArray as $listingItem)
                         <div class="col-sm-6">
                         <div class="card shadow rounded mb-3">
                         <div class="row no-gutters">
@@ -112,31 +114,31 @@
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text bg-primary text-white"><strong>Price: </strong></span>
-                                            <span class="input-group-text">
+                                            <span class="input-group-text" id="current_price_{{$listingItem->ItemID}}">
                                                 @php
                                                     $number = floatval($listingItem->BuyItNowPrice->value );
                                                 @endphp
                                                 ${{  number_format($number, 2) }}
                                             </span>
                                         </div>
-                                    <input type="number" name="price_{{$listingItem->ItemID}}" min="0.00" max="999999.99" placeholder="0.00" class="form-control text-right" aria-label="Dollar amount (with dot and two decimal places)" value="{{number_format($number, 2) }}">
+                                    <input type="number" name="price_{{$listingItem->ItemID}}" id="price_{{$listingItem->ItemID}}" min="0.00" max="999999.99" class="form-control text-right" aria-label="Dollar amount (with dot and two decimal places)" value="{{number_format($number, 2) }}">
                                         <div class="input-group-append">
-                                            <button class="btn btn-info text-white change-price" type="button" name="change_price_{{$listingItem->ItemID}}">Update</button>
+                                            <button class="btn btn-info text-white change-price" type="button" id="change_price_{{$listingItem->ItemID}}" data-item="{{$listingItem->ItemID}}" name="change_price_{{$listingItem->ItemID}}">Update</button>
                                         </div>
                                     </div>
                                     <div class="input-group mt-1">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text bg-primary text-white"><strong>QOH: </strong></span>
-                                                <span class="input-group-text">
+                                                <span class="input-group-text" id="current_qoh_{{$listingItem->ItemID}}">
                                                     @php
                                                         $qty = intval($listingItem->QuantityAvailable);
                                                     @endphp
                                                     {{  number_format($qty, 0) }}
                                                 </span>
                                         </div>
-                                    <input type="number" min="0" max="9999" name="qoh_{{$listingItem->ItemID}}" placeholder="0" class="form-control text-right" aria-label="Quantity on Hand" value="{{number_format($qty, 0)}}">
+                                    <input type="number" min="0" max="9999" id="qoh_{{$listingItem->ItemID}}" name="qoh_{{$listingItem->ItemID}}" placeholder="0" class="form-control text-right" aria-label="Quantity on Hand" value="{{number_format($qty, 0)}}">
                                                     <div class="input-group-append">
-                                                        <button class="btn btn-info text-white change-qoh" type="button" name="change_qoh_{{$listingItem->ItemID}}">Update</button>
+                                                        <button class="btn btn-info text-white change-qoh" type="button" id="change_qoh_{{$listingItem->ItemID}}" data-item="{{$listingItem->ItemID}}" name="change_qoh_{{$listingItem->ItemID}}">Update</button>
                                                     </div>
                                                 </div>
 
@@ -219,7 +221,7 @@
 @endsection
 
 @push('end')
-    
+
     <script>
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()

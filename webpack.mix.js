@@ -10,11 +10,13 @@ const mix = require('laravel-mix');
  | file for the application as well as bundling up all the JS files.
  |
  */
-
+mix.browserSync({
+    proxy: "eb"
+});
 mix.react("resources/js/app.js", "public/js")
     .sass("resources/sass/app.scss", "public/css");
 
-    mix.scripts([
+mix.scripts([
     'resources/js/createListing.js',
     'resources/js/editItemListing.js',
     'resources/js/quickupdate.js',
