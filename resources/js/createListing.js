@@ -1,3 +1,4 @@
+if (currentPath === "trading/edit?create=true") {
 
     var descriptionEditor = CKEDITOR.replace("descriptionEditorArea", {
         height: "600"
@@ -362,4 +363,4 @@
             return !!(xhr && "upload" in xhr && "onprogress" in xhr.upload);
         }
     }
-
+}
