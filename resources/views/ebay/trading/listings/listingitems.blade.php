@@ -94,8 +94,8 @@
             <div class="card-group">
                     <!-- { 'listingArray', 'next_link', 'prev_link', 'totalPages', 'limit', 'currentPage', 'afterCurrentPageLinks', 'beforeCurrentPageLinks' } -->
             @if($isActiveList)
-                <input type="hidden" value="{{ url("/api/quickupdate/price") }}" id="priceupdateurl">
-                <input type="hidden" value="{{ url("/api/quickupdate/qoh") }}" id="qohupdateurl">
+                <input type="hidden" value="{{ url('/api/quickupdate/price') }}" id="priceupdateurl">
+                <input type="hidden" value="{{ url('/api/quickupdate/qoh') }}" id="qohupdateurl">
                 @foreach ($itemsArray as $listingItem)
                         <div class="col-sm-6">
                         <div class="card shadow rounded mb-3">
@@ -142,7 +142,9 @@
                                                     </div>
                                                 </div>
 
-
+                                            <div id="error_{{$listingItem->ItemID}}" class="alert alert-danger alert-dismissible fade show" style="display:none;">
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            </div>
                                         </div>
                                         <div class="card-body">
                                                     <div class="btn-group">

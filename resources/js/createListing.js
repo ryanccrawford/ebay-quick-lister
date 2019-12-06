@@ -1,3 +1,11 @@
+let dbugdumps = (dataToDump) => {
+
+    let temp = document.createElement("div");
+    temp.innerHTML=dataToDump;
+    document.getElementById('debugdumps').append(temp);
+    
+}
+
 if (currentPath === "trading/edit?create=true") {
 
     var descriptionEditor = CKEDITOR.replace("descriptionEditorArea", {

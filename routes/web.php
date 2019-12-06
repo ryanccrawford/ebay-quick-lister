@@ -62,6 +62,10 @@ Route::group(['middleware' => ['web']], function () {
 
 
     Route::get('api/get/suggestions', 'Ebay\Trading\API\AjaxController@GetSuggestedCategories')->name('api/get/suggestions');
+    Route::get('api/quickupdate/price', 'QuickUpdateController@price')->name('api/quickupdate/price');
+    Route::get('api/quickupdate/qoh', 'QuickUpdateController@qoh')->name('api/quickupdate/qoh');
+    
+
 });
 
 

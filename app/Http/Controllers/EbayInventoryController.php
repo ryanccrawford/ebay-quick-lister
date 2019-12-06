@@ -6,9 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use \DTS\eBaySDK\Inventory;
 use \DTS\eBaySDK\OAuth;
-use DTS\eBaySDK\Credentials\Credentialsl;
 use App\User;
-use \App\inventoryPart;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use \App\Http\Controllers\Ebay\Trading\EbayBaseController;
 

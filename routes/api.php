@@ -18,8 +18,6 @@ use Illuminate\Http\Request;
 // });
 Route::post('imagepost', 'ImageUploadController@imagepost')->name('imagepost');
 
-Route::get('api/quickupdate/price', 'QuickUpdateController@price')->name('api/quickupdate/price');
-Route::get('api/quickupdate/qoh', 'QuickUpdateController@qoh')->name('api/quickupdate/qoh');
 
 Route::post('trading/new', 'Ebay\Trading\API\ItemsController@store')->name('trading/new');
 Route::post('trading/verify', 'Ebay\Trading\API\ItemsController@verify')->name('trading/verify');

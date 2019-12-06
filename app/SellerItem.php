@@ -9,7 +9,7 @@ class SellerItem extends Model
 {
 
     protected $connection = 'mysql';
-    protected $table = 'SellerItem';
+    protected $table = 'selleritem';
 
     /**
      * The model's default values for attributes.
