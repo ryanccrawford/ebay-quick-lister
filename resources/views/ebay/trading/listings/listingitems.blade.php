@@ -3,10 +3,10 @@
 
 
 @section('content')
-<div class="container">
+<div class="fluid-container">
 
     <div class="row justify-content-center">
-        <div class="col-md-12">
+        <div class="col-md-10">
 
             @if (count($errors) > 0)
             <div class="alert alert-danger" role="alert">
@@ -22,7 +22,7 @@
                     @endforeach
                 @endforeach
             @endisset
-            <div class="container">
+            <div class="fluid-container">
                 @if($isActiveList)
                     <span><h1 class="mt-1 mb-2 left text-white">Listings<a class="btn btn-danger round ml-2" href="{{ route('trading/edit') . '?create=true' }}">{{ __('Add') }}</a></h1></span>
                 @else
