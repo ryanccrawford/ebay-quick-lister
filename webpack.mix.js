@@ -16,9 +16,12 @@ mix.browserSync({
 mix.react("resources/js/app.js", "public/js")
     .sass("resources/sass/app.scss", "public/css");
 
-mix.scripts([
-    'resources/js/createListing.js',
-    'resources/js/editItemListing.js',
-    'resources/js/quickupdate.js',
-    'resources/js/createinventory.js'
-], 'public/js/jscode.js');
+mix.scripts(
+    [
+        "resources/js/christmas.js",
+        "resources/js/createListing.js",
+        "resources/js/editItemListing.js",
+        "resources/js/createinventory.js"
+    ],
+    "public/js/jscode.js"
+);

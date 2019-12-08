@@ -1,7 +1,6 @@
-if (currentPath === "inventory/create") {
+$(document).ready(function(e) {
 
-    $(document).ready(function(e) {
-
+    if (currentPath === "inventory/create") {
         var uploadFinished = $('.js-upload-finished');
         var progressBar = $('.progress');
         var imageButton = $('#upload-image-submit');
@@ -197,14 +196,14 @@ if (currentPath === "inventory/create") {
         function createAlert(title, message) {
             //
             /*
-                <div class="alert alert-warning alert-dismissible fade show" role="alert" id="mainalertmessage">
-                    <strong id="messagealert"></strong>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert" id="mainalertmessage">
+                        <strong id="messagealert"></strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
 
-            */
+                */
             var alert = $('<div>').addClass('alert').addClass('alert-warning').addClass('alert-dismissible').addClass('fade').addClass('show')
             alert.attr('role', 'alert')
 
@@ -229,5 +228,5 @@ if (currentPath === "inventory/create") {
                 $('#alertarea3').show();
             });
         }
-    })
-}
+    }
+})

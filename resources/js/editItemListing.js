@@ -1,9 +1,9 @@
-if (currentPath.startsWith("trading/edit?item_id=")) {
+$(document).ready(function(e) {
 
-    var htmleditor = CKEDITOR.replace("HTMLeditor1", { height: "600" });
-    var rawHTML = "";
+    if (currentPath.startsWith("trading/edit?item_id=")) {
 
-    $(document).ready(function(e) {
+        var htmleditor = CKEDITOR.replace("HTMLeditor1", { height: "600" });
+        var rawHTML = "";
         var templateLoaded = false;
 
         $.get("../files/policy.html", data => {
@@ -202,5 +202,5 @@ if (currentPath.startsWith("trading/edit?item_id=")) {
                 }
             );
         }
-    });
-};
+    }
+});

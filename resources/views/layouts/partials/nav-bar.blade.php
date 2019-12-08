@@ -61,5 +61,12 @@
                         @endguest
                     </ul>
                 </div>
+                <div id="loading">
+
+ </div>
+
             </div>
+            <div id="lights">
+  <!-- lights go here -->
+ </div>
         </nav>

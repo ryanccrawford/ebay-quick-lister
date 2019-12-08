@@ -1,39 +1,41 @@
 let dbugdumps = (dataToDump) => {
 
     let temp = document.createElement("div");
-    temp.innerHTML=dataToDump;
+    temp.innerHTML = dataToDump;
     document.getElementById('debugdumps').append(temp);
-    
+
 }
 
-if (currentPath === "trading/edit?create=true") {
 
-    var descriptionEditor = CKEDITOR.replace("descriptionEditorArea", {
-        height: "600"
-    });
-    //descriptionHtml
-    var titleLeaveValue = {
-        blob: "",
-        string: ""
-    };
+$(document).ready(function() {
+    if (currentPath === "trading/edit?create=true") {
 
-    var mainImageAsImage = {
-        dom: document.getElementById("mainImageFile"),
-        binary: null,
-        string: null
-    };
-    var descriptionImageAsImage = {
-        dom: document.getElementById("descriptionImageFile"),
-        binary: null,
-        string: null
-    };
+        var descriptionEditor = CKEDITOR.replace("descriptionEditorArea", {
+            height: "600"
+        });
+        //descriptionHtml
+        var titleLeaveValue = {
+            blob: "",
+            string: ""
+        };
 
-    var isShowing = false;
-    var retries = 0;
-    var selectBoxesReady = 0;
-    const numberOfSelectBoxes = 4;
-    var buttonPressed = "none";
-    $(document).ready(function() {
+        var mainImageAsImage = {
+            dom: document.getElementById("mainImageFile"),
+            binary: null,
+            string: null
+        };
+        var descriptionImageAsImage = {
+            dom: document.getElementById("descriptionImageFile"),
+            binary: null,
+            string: null
+        };
+
+        var isShowing = false;
+        var retries = 0;
+        var selectBoxesReady = 0;
+        const numberOfSelectBoxes = 4;
+        var buttonPressed = "none";
+
         $("#item-image").hide();
         disableElement("savetoebay");
 
@@ -343,7 +345,7 @@ if (currentPath === "trading/edit?create=true") {
                 return;
             }
         });
-    });
+    }
 
     function enableElement(id) {
         $("#" + id).prop("disabled", false);
@@ -355,20 +357,23 @@ if (currentPath === "trading/edit?create=true") {
         $("#" + id).addClass("disabled");
     }
 
-    //https://thoughtbot.com/blog/html5-powered-ajax-file-uploads
-    //by Pablo Brasero  July 30, 2010 UPDATED ON March 9, 2019
-    function supportAjaxUploadWithProgress() {
-        return supportFileAPI() && supportAjaxUploadProgressEvents();
+});
 
-        function supportFileAPI() {
-            var fi = document.createElement("INPUT");
-            fi.type = "file";
-            return "files" in fi;
-        }
 
-        function supportAjaxUploadProgressEvents() {
-            var xhr = new XMLHttpRequest();
-            return !!(xhr && "upload" in xhr && "onprogress" in xhr.upload);
-        }
+
+//https://thoughtbot.com/blog/html5-powered-ajax-file-uploads
+//by Pablo Brasero  July 30, 2010 UPDATED ON March 9, 2019
+function supportAjaxUploadWithProgress() {
+    return supportFileAPI() && supportAjaxUploadProgressEvents();
+
+    function supportFileAPI() {
+        var fi = document.createElement("INPUT");
+        fi.type = "file";
+        return "files" in fi;
+    }
+
+    function supportAjaxUploadProgressEvents() {
+        var xhr = new XMLHttpRequest();
+        return !!(xhr && "upload" in xhr && "onprogress" in xhr.upload);
     }
 }

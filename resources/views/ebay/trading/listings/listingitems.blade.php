@@ -91,127 +91,8 @@
                 </nav>
             @endif
             <div class="col-lg-12">
-            <div class="card-group">
-                    <!-- { 'listingArray', 'next_link', 'prev_link', 'totalPages', 'limit', 'currentPage', 'afterCurrentPageLinks', 'beforeCurrentPageLinks' } -->
-            @if($isActiveList)
-                <input type="hidden" value="{{ url('/api/quickupdate/price') }}" id="priceupdateurl">
-                <input type="hidden" value="{{ url('/api/quickupdate/qoh') }}" id="qohupdateurl">
-                @foreach ($itemsArray as $listingItem)
-                        <div class="col-sm-6">
-                        <div class="card shadow rounded mb-3">
-                        <div class="row no-gutters">
-                            <div class="col-sm-4">
-                             <img src="{{ $listingItem->PictureDetails->GalleryURL }} " class="card-img pl-3 pt-3 pr-3" alt="photo">
-                            </div>
-                            <div class="col-sm-8">
-                                <div class="card-body">
-                                    <h6 class="card-title">{{ $listingItem->Title }}</h6>
-                                    <div class="badge badge-secondary">SKU: {{ $listingItem->SKU }}</div>
-                                    <p class="badge badge-secondary ml-2">ID {{$listingItem->ItemID}}</p>
-                                    <span class="badge badge-primary round ml-2" data-toggle="tooltip" data-placement="top" title="Watchers"><i class="fa fa-eye" aria-hidden="true"></i> {{$listingItem->WatchCount}}</span>
-                                </div>
-                                <div class="card-body">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text bg-primary text-white"><strong>Price: </strong></span>
-                                            <span class="input-group-text" id="current_price_{{$listingItem->ItemID}}">
-                                                @php
-                                                    $number = floatval($listingItem->BuyItNowPrice->value );
-                                                @endphp
-                                                ${{  number_format($number, 2) }}
-                                            </span>
-                                        </div>
-                                    <input type="number" name="price_{{$listingItem->ItemID}}" id="price_{{$listingItem->ItemID}}" min="0.00" max="999999.99" class="form-control text-right" aria-label="Dollar amount (with dot and two decimal places)" value="{{number_format($number, 2) }}">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-info text-white change-price" type="button" id="change_price_{{$listingItem->ItemID}}" data-item="{{$listingItem->ItemID}}" name="change_price_{{$listingItem->ItemID}}">Update</button>
-                                        </div>
-                                    </div>
-                                    <div class="input-group mt-1">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text bg-primary text-white"><strong>QOH: </strong></span>
-                                                <span class="input-group-text" id="current_qoh_{{$listingItem->ItemID}}">
-                                                    @php
-                                                        $qty = intval($listingItem->QuantityAvailable);
-                                                    @endphp
-                                                    {{  number_format($qty, 0) }}
-                                                </span>
-                                        </div>
-                                    <input type="number" min="0" max="9999" id="qoh_{{$listingItem->ItemID}}" name="qoh_{{$listingItem->ItemID}}" placeholder="0" class="form-control text-right" aria-label="Quantity on Hand" value="{{number_format($qty, 0)}}">
-                                                    <div class="input-group-append">
-                                                        <button class="btn btn-info text-white change-qoh" type="button" id="change_qoh_{{$listingItem->ItemID}}" data-item="{{$listingItem->ItemID}}" name="change_qoh_{{$listingItem->ItemID}}">Update</button>
-                                                    </div>
-                                                </div>
-
-                                            <div id="error_{{$listingItem->ItemID}}" class="alert alert-danger alert-dismissible fade show" style="display:none;">
-                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                            </div>
-                                        </div>
-                                        <div class="card-body">
-                                                    <div class="btn-group">
-                                                        <a class="btn btn-secondary btn-sm" href="{{$listingItem->ListingDetails->ViewItemURL}}" data-toggle="tooltip" data-placement="top" title="View on Ebay"><i class="fa fa-eye" aria-hidden="true"></i></a>
-                                                        <a href="{{ route('trading/edit') . '?item_id=' . $listingItem->ItemID }}" class="btn btn-primary btn-sm text-right" data-toggle="tooltip" data-placement="top" title="Edit Listing"><i class="fa fa-pencil" aria-hidden="true"></i></a>
-                                                    </div>
-                                        </div>
-                            </div>
-                             </div>
-                            </div>
-                        </div>
-                    @endforeach
-            @endif
-
-            @if($isSoldList)
-
-                    @foreach ($itemsArray as $OrderTransaction)
-                        <?php
-                            $transaction = $OrderTransaction->Transaction;
-                        ?>
-                         <div class="col-sm-6">
-                            <div class="card shadow rounded mb-3">
-                                  <div class="row no-gutters">
-                                    <div class="col-sm-12">
-                                            <div class="card-body">
-                                                 <h6 class="card-title">Order Date: <span class="badge badge-primary">{{ date_format($transaction->CreatedDate, "F jS ,Y") }}</span></h6>
-                                                <h6 class="card-title">ID: <span class="badge badge-secondary ml-2">{{  $transaction->Item->ItemID}}</span></span></h6>
-                                                <p>Buyer Email: <span class="badge badge-secondary ml-2">{{ $transaction->Buyer->Email }}</span></p>
-                                                <p>Buyer Zip: {{ $transaction->Buyer->BuyerInfo->ShippingAddress->PostalCode }}</p>
-                                            </div>
-
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="card-body">
-                                         <table class="table table-sm">
-                                                     <thead class="thead-dark">
-                                                        <tr>
-                                                            <th scope="col">Image</th>
-                                                            <th scope="col">SKU</th>
-                                                            <th scope="col">QTY</th>
-                                                            <th scope="col">Price</th>
-                                                        </tr>
-                                                     </thead>
-                                                     <tbody>
-                                                        <tr>
-                                                            <td><img src="{{ $transaction->Item->PictureDetails->GalleryURL }}" style="width:64px;" alt="photo"></th>
-                                                            <td>{{  $transaction->Item->SKU }}</td>
-                                                            <td>{{ $transaction->QuantityPurchased }}</td>
-                                                            <td>$ {{ $transaction->Item->BuyItNowPrice->value }}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                        </div>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="btn-group">
-                                            <a class="btn btn-secondary btn-sm" href="{{ $transaction->Item->ListingDetails->ViewItemURL}}" data-toggle="tooltip" data-placement="top" title="View on Ebay"><i class="fa fa-eye" aria-hidden="true"></i></a>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                </div>
-                                </div>
-                    @endforeach
-            @endif
-                </div>
-                </div>
+                @include('ebay.trading.listings.itemgroup')
+            </div>
         @endisset
 
 
@@ -223,10 +104,12 @@
 @endsection
 
 @push('end')
-
-    <script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script>
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
         })
     </script>
+    <script src="{{ asset('js/quickupdate.js') }}"></script>
+
 @endpush
