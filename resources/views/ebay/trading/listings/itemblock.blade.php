@@ -66,60 +66,59 @@
                     @endif
 
             @if($isSoldList)
-<div class="table-responsive">
-                <table class="table table-striped table-hover">
-    <thead class="thead-dark">
-    <tr>
-      <th scope="col">Order ID</th>
-      <th scope="col">Date</th>
-      <th scope="col">Buyer</th>
-      <th scope="col">Zip</th>
-      <th scope="col">View on Ebay</th>
-      <th scope="col">Action</th>
-    </tr>
-  </thead>
-  <tbody>
-                    @foreach ($itemsArray as $OrderTransaction)
+            @foreach ($itemsArray as $OrderTransaction)
+              <div class="table-responsive" >
+                    <table class="table table-striped table-hover table-sm">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Order ID</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Buyer</th>
+                            <th scope="col">Zip</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         <?php
                             $transaction = $OrderTransaction->Transaction;
                         ?>
-                        <tr>
-                            <td><span class="badge badge-secondary ml-2">{{  $transaction->Item->ItemID}}</span></td>
+
+                    <tr>
+                            <th scope="row"><span class="badge badge-secondary ml-2">{{  $transaction->Item->ItemID}}</span></td>
                             <td><span class="badge badge-primary">{{ date_format($transaction->CreatedDate, "F jS ,Y") }}</span></td>
                             <td><span class="badge badge-secondary ml-2">{{ $transaction->Buyer->Email }}</span></td>
                             <td>{{ $transaction->Buyer->BuyerInfo->ShippingAddress->PostalCode }}</td>
-                            <td><a class="btn btn-secondary btn-sm" href="{{ $transaction->Item->ListingDetails->ViewItemURL}}" data-toggle="tooltip" data-placement="top" title="View on Ebay"><i class="fa fa-eye" aria-hidden="true"></i></a></td>
-                            <td><button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">+</button></td>
-                        </tr>
+                            <td><a class="btn btn-secondary btn-sm" href="{{ $transaction->Item->ListingDetails->ViewItemURL}}" data-toggle="tooltip" data-placement="top" title="View on Ebay"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                            <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#collapseExample_{{  $transaction->Item->ItemID }}" aria-expanded="false" aria-controls="collapseExample_{{  $transaction->Item->ItemID }}">+</button></td>
+                    </tr>
                         <tr>
-                            <div class="collapse" id="collapseExample">
-                            <div class="card card-body">
-                               <table class="table table-sm">
-                                                     <thead class="thead-dark">
-                                                        <tr>
-                                                            <th scope="col">Image</th>
-                                                            <th scope="col">SKU</th>
-                                                            <th scope="col">QTY</th>
-                                                            <th scope="col">Price</th>
-                                                        </tr>
-                                                     </thead>
-                                                     <tbody>
-                                                        <tr>
-                                                            <td><img src="{{ $transaction->Item->PictureDetails->GalleryURL }}" style="width:64px;" alt="photo"></th>
-                                                            <td>{{  $transaction->Item->SKU }}</td>
-                                                            <td>{{ $transaction->QuantityPurchased }}</td>
-                                                            <td>$ {{ $transaction->Item->BuyItNowPrice->value }}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                            </div>
-                            </div>
+                            <td colspan="5">
+                            <table class="table table-sm">
+                                   <thead class="thead-light">
+                                   <tr>
+                                      <th scope="col">Image</th>
+                                      <th scope="col">SKU</th>
+                                      <th scope="col">QTY</th>
+                                      <th scope="col">Price</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                       <td><img src="{{ $transaction->Item->PictureDetails->GalleryURL }}" style="width:64px;" alt="photo"></th>
+                                       <td>{{  $transaction->Item->SKU }}</td>
+                                       <td>{{ $transaction->QuantityPurchased }}</td>
+                                       <td>$ {{ $transaction->Item->BuyItNowPrice->value }}</td>
+                                    </tr>
+                                        </tbody>
+                                </table>
+                            </td>
                         </tr>
-
-
-                    @endforeach
-  </tbody>
+                    </tbody>
                 </table>
+            </div>
+                    @endforeach
+
+
             @endif
 
 
