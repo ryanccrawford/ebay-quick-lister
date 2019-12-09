@@ -39,12 +39,12 @@ class ItemsController extends EbayBaseController
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Verify a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreItem $request)
+    public function verify(StoreItem $request)
     {
         $this->middleware('auth');
         $this->middleware('ebayauth');
@@ -115,22 +115,59 @@ class ItemsController extends EbayBaseController
         $serviceRequest->Item->DispatchTimeMax = 1;
 
         $serviceResponse = $this->getService('verifyAddFixedPriceItem', ($serviceRequest));
-        dump($serviceRequest);
-        die;
+      
         if ($serviceResponse->Ack === 200) {
             $serviceRealRequest = new \DTS\eBaySDK\Trading\Types\AddFixedPriceItemRequestType();
             $serviceRealRequest->Item = $serviceRequest->Item;
-
-            $serviceRealResponse = $this->service->addFixedPriceItem($serviceRealRequest);
+            //$serviceRealResponse = new \DTS\eBaySDK\Trading\Types\AddFixedPriceItemResponseType();
+           $serviceRealResponse = $this->TradingService->addFixedPriceItem($serviceRealRequest);
             if ($serviceRealResponse->Ack === 200) {
+                $ebay_item_id = $serviceRealResponse->ItemID;
+                $item_sku_id = $serviceRealRequest->
                 $rto = route('trading/edit', ['create' => 'true']);
                 return redirect($rto)
                     ->with($request->input);
             }
-            //   return redirect()->route('trading/edit', ['create' => 'true'])->withInput($request->input);
+            
+            return redirect()->route('trading/edit', ['create' => 'true'])->withInput($request->input);
         }
     }
 
+
+  
+
+     /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(StoreItem $request)
+    {
+        $this->middleware('auth');
+        $this->middleware('ebayauth');
+        $item = null;
+        try {
+            $imageName1 = $request->mainImageFile->store('images');
+            $imageName2 = $request->descriptionImageFile->store('images');
+            $inputData = $request->all();
+            $temp = $inputData['descriptionEditorArea'];
+
+            $temp = str_replace("@title", $imageName2, $temp);
+            $temp = str_replace("@descriptionImage", $this->url->to('/') . $imageName2, $temp);
+            $inputData['descriptionEditorArea'] =  $temp;
+
+            $inputData['mainImageFile'] = $imageName1;
+            $inputData['descriptionImageFile'] = $imageName2;
+            $sku = array('sku' => $request->sku);
+            $item = SellerItem::updateOrCreate($sku, $inputData);
+        } catch (Exception $ex) {
+            return response()->json(['error' => $ex->getMessage()]);
+        }
+        if ($item !== null) {
+            return redirect()->route('trading/edit', ['create' => 'true'])->withInput($request->input);
+        }
+    }
 
     /**
      * Display one specified resource.

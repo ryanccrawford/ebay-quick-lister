@@ -149,7 +149,7 @@
                     </div>
                     <div class="col-md-12">
                         <div class="card mb-3">
-                            <img id="item-image" src="../../images/shippingbox.png" class="ml-3 mt-3 right" alt="..." style="width:48px;">
+                            <img id="item-image" src="{{ asset('/images/shippingbox.png') }}" class="ml-3 mt-3 right" alt="..." style="width:48px;">
                             <div class="card-body">
                                 <h4 class="card-title">Shipping Details</h4>
                                 <div class="form-row">
@@ -259,8 +259,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <button type="submit" id="savetoebay" class="btn bg-primary text-white right">Save For Later <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="verifySpinner" style="display:none;"></span></button>
-                                    <button type="submit" id="saveforlater"  class="btn bg-primary text-white right">Verify and List <div class="progress" id="progress" style="display:none">
+                                    <button type="submit" id="saveforlater" class="btn bg-primary text-white right">Save For Later <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="verifySpinner" style="display:none;"></span></button>
+                                    <button type="submit" id="savetoebay"  class="btn bg-primary text-white right">Verify and List <div class="progress" id="progress" style="display:none">
   <div class="progress-bar" id="uploadProgress" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
 </div></button>
                                 </div>

@@ -8,7 +8,7 @@ let dbugdumps = (dataToDump) => {
 
 
 $(document).ready(function() {
-    if (currentPath === "trading/edit?create=true") {
+  
 
         var descriptionEditor = CKEDITOR.replace("descriptionEditorArea", {
             height: "600"
@@ -345,7 +345,7 @@ $(document).ready(function() {
                 return;
             }
         });
-    }
+    
 
     function enableElement(id) {
         $("#" + id).prop("disabled", false);

@@ -56,7 +56,7 @@
                                                       </td>
                                                      <td> <a href="{{ route('trading/edit') . '?item_id=' . $listingItem->ItemID }}" class="btn btn-primary btn-sm text-right" data-toggle="tooltip" data-placement="top" title="Edit Listing"><i class="fa fa-pencil" aria-hidden="true"></i></a>
 </td>
-                                                    <td><span id="error_{{ $listingItem->ItemID}}" class="alert alert-danger alert-dismissible fade show" style="display:none;"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></span></td>
+                                                    <td><div id="error_{{ $listingItem->ItemID}}" class="alert alert-danger alert-dismissible fade show" style="display:none;"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div></td>
 
     </tr>
                     @endforeach
