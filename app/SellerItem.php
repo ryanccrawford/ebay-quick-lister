@@ -40,6 +40,7 @@ class SellerItem extends Model
         'qty',
         'primaryCategory',
         'descriptionImageFile',
-        'mainImageFile'
+        'mainImageFile',
+        'ebayItemId'
     ];
 }
